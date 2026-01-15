@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_management_system/features/auth/views/forget_pass_page.dart';
 
 import '../../features/auth/views/splash_page.dart';
 import 'route_paths.dart';
@@ -25,6 +26,10 @@ class NavigationService {
         GoRoute(
           path: Routes.login,
           builder: (context, state) => const LoginPage(),
+        ),
+        GoRoute(
+          path: Routes.forgotPassword,
+          builder: (context, state) => const ForgetPassPage(),
         ),
       ],
     );
