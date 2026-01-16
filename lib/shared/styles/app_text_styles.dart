@@ -29,6 +29,13 @@ class AppTextStyles {
     fontFamily: _fontFamily,
   );
 
+  static const TextStyle heading4 = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    fontFamily: _fontFamily,
+  );
+
   // Body Text
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 16,
@@ -124,6 +131,14 @@ class AppTextStyles {
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
+    fontFamily: _fontFamily,
+  );
+
+  // Small Body Text 10
+  static const TextStyle small = TextStyle(
+    fontSize: 10,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textPrimary,
     fontFamily: _fontFamily,
   );
 }

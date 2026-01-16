@@ -9,16 +9,16 @@ class AppColors {
   static const Color secondary = Color(0xFFFF8A34);
 
   // Text Colors
-  static const Color textPrimary = Color(0xFF1A1A1A);
-  static const Color textSecondary = Color(0xFF666666);
+  static const Color textPrimary = Color(0xFF111827);
+  static const Color textSecondary = Color(0xFF9AA4B2);
   static const Color textHint = Color(0xFF999999);
 
   // Background Colors
-  static const Color background = Color(0xFFF5F5F5);
+  static const Color background = Color(0xFFFBFBFC);
   static const Color cardBackground = Colors.white;
 
   // Border Colors
-  static const Color border = Color(0xFFE0E0E0);
+  static const Color border = Color(0xFFE8E8E8);
   static const Color borderFocused = primary;
   static const Color borderError = Colors.red;
 
@@ -34,4 +34,6 @@ class AppColors {
 
   // Shadow Colors
   static Color shadowLight = Colors.black.withOpacity(0.08);
+
+  static const Color white = Colors.white;
 }
