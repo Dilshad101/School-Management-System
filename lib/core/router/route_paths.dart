@@ -14,4 +14,7 @@ class Routes {
   static const String studentDetail = '/students/:id';
 
   static const String attendance = '/attendance';
+  static const String features = '/features';
+  static const String chat = '/chat';
+  static const String profile = '/profile';
 }

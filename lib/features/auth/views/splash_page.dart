@@ -17,9 +17,9 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
 
     // Wait 2 seconds then navigate to login
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 1), () {
       if (mounted) {
-        context.go(Routes.login);
+        context.go(Routes.home);
       }
     });
   }

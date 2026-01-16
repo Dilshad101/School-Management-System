@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:school_management_system/core/theme/light_theme.dart';
 
 import 'core/router/app_router.dart';
 import 'core/utils/di.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
           child: built,
         );
       },
+      theme: lightTheme,
       routerConfig: locator<NavigationService>().router,
     );
   }

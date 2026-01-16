@@ -27,18 +27,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLoginPressed() {
-    if (_formKey.currentState!.validate()) {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text.trim();
+    // if (_formKey.currentState!.validate()) {
+    // final email = _emailController.text.trim();
+    // final password = _passwordController.text.trim();
 
-      // For now just print (replace with AuthBloc later)
-      debugPrint('Email: $email');
-      debugPrint('Password: $password');
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Login pressed')));
-    }
+    context.go(Routes.features);
+    // }
   }
 
   void _onForgotPassword() {
@@ -69,11 +63,55 @@ class _LoginPageState extends State<LoginPage> {
                   bottomRight: Radius.circular(0),
                 ),
               ),
-              child: SvgPicture.asset(
-                'assets/images/gradiant_background.svg',
-                width: double.infinity,
-                height: double.infinity,
-                fit: BoxFit.cover,
+              child: Stack(
+                children: [
+                  SvgPicture.asset(
+                    'assets/images/gradiant_background.svg',
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/images/logo_v2.svg',
+                              width: 80,
+                              height: 80,
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'EduFlow',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Simplify Your School',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
 
