@@ -12,8 +12,13 @@ class Routes {
 
   static const String students = '/students';
   static const String studentDetail = '/students/:id';
+  static const String employees = '/employees';
+  static const String classes = '/classes';
+  static const String classDetail = '/classes/:id';
+  static const String guardians = '/guardians';
 
   static const String attendance = '/attendance';
+  static const String fees = '/fees';
   static const String features = '/features';
   static const String chat = '/chat';
   static const String profile = '/profile';
