@@ -24,6 +24,7 @@ class AppColors {
 
   // Icon Colors
   static const Color iconDefault = Color(0xFF999999);
+  static const Color green = Color(0xFF10B981);
 
   // Gradient
   static const LinearGradient primaryGradient = LinearGradient(
