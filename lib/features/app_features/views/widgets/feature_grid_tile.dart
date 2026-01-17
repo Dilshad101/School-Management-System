@@ -10,26 +10,30 @@ class FeatureGridTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Container(
-            padding: EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: AppColors.primaryGradient.withOpacity(0.3),
+    return InkWell(
+      onTap: feature.onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Container(
+              padding: EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppColors.primaryGradient.withOpacity(0.3),
+              ),
+              child: SvgPicture.asset(feature.iconPath),
             ),
-            child: SvgPicture.asset(feature.iconPath),
-          ),
-          Text(feature.name, style: AppTextStyles.labelSmall),
-        ],
+            Text(feature.name, style: AppTextStyles.labelSmall),
+          ],
+        ),
       ),
     );
   }
@@ -38,6 +42,7 @@ class FeatureGridTile extends StatelessWidget {
 class FeatureData {
   final String name;
   final String iconPath;
+  final VoidCallback? onTap;
 
-  FeatureData({required this.name, required this.iconPath});
+  FeatureData({required this.name, required this.iconPath, this.onTap});
 }

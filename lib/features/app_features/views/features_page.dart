@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/router/app_router.dart';
+import 'package:school_management_system/core/router/route_paths.dart';
+import 'package:school_management_system/core/utils/di.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 
 import 'widgets/feature_grid_tile.dart';
@@ -7,12 +11,66 @@ class FeaturesPage extends StatelessWidget {
   FeaturesPage({super.key});
 
   final _features = [
-    FeatureData(name: 'Employee', iconPath: 'assets/icons/employee.svg'),
-    FeatureData(name: 'Class', iconPath: 'assets/icons/class.svg'),
-    FeatureData(name: 'Students', iconPath: 'assets/icons/students.svg'),
-    FeatureData(name: 'Guardian', iconPath: 'assets/icons/guardian.svg'),
-    FeatureData(name: 'Attendance', iconPath: 'assets/icons/attendance.svg'),
-    FeatureData(name: 'Manage Fees', iconPath: 'assets/icons/fees.svg'),
+    FeatureData(
+      name: 'Employee',
+      iconPath: 'assets/icons/employee.svg',
+      onTap: () {
+        final ctx = locator<NavigationService>().navigatorKey.currentContext;
+        if (ctx != null) {
+          ctx.push(Routes.employees);
+        }
+      },
+    ),
+    FeatureData(
+      name: 'Class',
+      iconPath: 'assets/icons/class.svg',
+      onTap: () {
+        final ctx = locator<NavigationService>().navigatorKey.currentContext;
+        if (ctx != null) {
+          ctx.push(Routes.classes);
+        }
+      },
+    ),
+    FeatureData(
+      name: 'Students',
+      iconPath: 'assets/icons/students.svg',
+      onTap: () {
+        final ctx = locator<NavigationService>().navigatorKey.currentContext;
+        if (ctx != null) {
+          ctx.push(Routes.students);
+        }
+      },
+    ),
+    FeatureData(
+      name: 'Guardian',
+      iconPath: 'assets/icons/guardian.svg',
+      onTap: () {
+        final ctx = locator<NavigationService>().navigatorKey.currentContext;
+        if (ctx != null) {
+          ctx.push(Routes.guardians);
+        }
+      },
+    ),
+    FeatureData(
+      name: 'Attendance',
+      iconPath: 'assets/icons/attendance.svg',
+      onTap: () {
+        final ctx = locator<NavigationService>().navigatorKey.currentContext;
+        if (ctx != null) {
+          ctx.push(Routes.attendance);
+        }
+      },
+    ),
+    FeatureData(
+      name: 'Manage Fees',
+      iconPath: 'assets/icons/fees.svg',
+      onTap: () {
+        final ctx = locator<NavigationService>().navigatorKey.currentContext;
+        if (ctx != null && ctx.mounted) {
+          ctx.push(Routes.fees);
+        }
+      },
+    ),
     FeatureData(
       name: 'Notification',
       iconPath: 'assets/icons/notification.svg',
