@@ -13,6 +13,7 @@ final lightTheme = ThemeData(
     iconTheme: IconThemeData(color: AppColors.textPrimary),
     titleTextStyle: AppTextStyles.heading3,
   ),
+  fontFamily: 'Inter',
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     elevation: 0,
     enableFeedback: false,
