@@ -77,9 +77,6 @@ class NavigationService {
         /// Bottom Navigation Bar with nested routes
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
-            debugPrint(
-              'NavigationShell current index: ${navigationShell.currentIndex}',
-            );
             return NavBarScreen(navigationShell: navigationShell);
           },
           branches: [
