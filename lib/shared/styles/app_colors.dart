@@ -34,7 +34,8 @@ class AppColors {
   );
 
   // Shadow Colors
-  static Color shadowLight = Colors.black.withOpacity(0.08);
+  static Color shadowLight = Colors.black.withAlpha(10);
 
   static const Color white = Colors.white;
+  static const Color orange = Color(0xffFF8D28);
 }
