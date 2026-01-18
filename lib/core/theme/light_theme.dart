@@ -11,6 +11,7 @@ final lightTheme = ThemeData(
     backgroundColor: AppColors.background,
     centerTitle: true,
     iconTheme: IconThemeData(color: AppColors.textPrimary),
+    surfaceTintColor: Colors.transparent,
     titleTextStyle: AppTextStyles.heading3,
   ),
   fontFamily: 'Inter',
