@@ -14,10 +14,26 @@ class EmployeesView extends StatefulWidget {
 }
 
 class _EmployeesViewState extends State<EmployeesView> {
-  final _roles = const ['All', 'Admin', 'Employee', 'Manager'];
-  final _subjects = const ['All', 'Math', 'Science', 'History', 'Art'];
-  String _selectedRole = 'Employee';
-  String _selectedSubject = 'Math';
+  final _roles = const ['Admin', 'Employee', 'Manager'];
+  final _subjects = const ['Math', 'Science', 'History', 'Art'];
+  late String _selectedRole;
+  late String _selectedSubject;
+
+  late ValueNotifier<bool> _allSelectedNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedRole = _roles.first;
+    _selectedSubject = _subjects.first;
+    _allSelectedNotifier = ValueNotifier<bool>(true);
+  }
+
+  @override
+  void dispose() {
+    _allSelectedNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,29 +67,38 @@ class _EmployeesViewState extends State<EmployeesView> {
             const SizedBox(height: 10),
 
             // filter and sort options
-            Row(
-              spacing: 8,
-              children: [
-                _buildAllChip(),
-                FilterDropdown<String>(
-                  items: _roles,
-                  value: _selectedRole,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    _selectedRole = value;
-                  },
-                  hintText: 'Role',
-                ),
-                FilterDropdown<String>(
-                  items: _subjects,
-                  value: _selectedSubject,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    _selectedSubject = value;
-                  },
-                  hintText: 'Subject',
-                ),
-              ],
+            ValueListenableBuilder(
+              valueListenable: _allSelectedNotifier,
+              builder: (context, value, child) {
+                return Row(
+                  spacing: 8,
+                  children: [
+                    _buildAllChip(value),
+                    FilterDropdown<String>(
+                      items: _roles,
+                      value: _selectedRole,
+                      onChanged: (value) {
+                        print('role - $value');
+                        if (value == null) return;
+                        _selectedRole = value;
+                        _allSelectedNotifier.value = false;
+                      },
+                      hintText: 'Role',
+                    ),
+                    FilterDropdown<String>(
+                      items: _subjects,
+                      value: _selectedSubject,
+                      onChanged: (value) {
+                        print('subject - $value');
+                        if (value == null) return;
+                        _selectedSubject = value;
+                        _allSelectedNotifier.value = false;
+                      },
+                      hintText: 'Subject',
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 16),
             // Employee list placeholder
@@ -92,15 +117,27 @@ class _EmployeesViewState extends State<EmployeesView> {
     );
   }
 
-  Widget _buildAllChip() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.border.withAlpha(180)),
+  Widget _buildAllChip(bool isSelected) {
+    return InkWell(
+      onTap: () {
+        _allSelectedNotifier.value = true;
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: isSelected
+              ? null
+              : Border.all(color: AppColors.border.withAlpha(180)),
+        ),
+        child: Text(
+          'All',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: isSelected ? Colors.white : AppColors.textPrimary,
+          ),
+        ),
       ),
-      child: Text('All', style: AppTextStyles.bodySmall),
     );
   }
 }
