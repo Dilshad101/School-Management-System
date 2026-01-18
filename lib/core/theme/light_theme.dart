@@ -25,4 +25,12 @@ final lightTheme = ThemeData(
     unselectedLabelStyle: AppTextStyles.small,
     unselectedItemColor: AppColors.textSecondary,
   ),
+  dropdownMenuTheme: DropdownMenuThemeData(
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    ),
+    textStyle: AppTextStyles.bodySmall,
+  ),
 );
