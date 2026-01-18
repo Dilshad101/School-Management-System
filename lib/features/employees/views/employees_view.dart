@@ -2,11 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
 
+import '../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../shared/widgets/input_fields/search_field.dart';
 import 'widgets/employe_tile.dart';
 
-class EmployeesView extends StatelessWidget {
+class EmployeesView extends StatefulWidget {
   const EmployeesView({super.key});
+
+  @override
+  State<EmployeesView> createState() => _EmployeesViewState();
+}
+
+class _EmployeesViewState extends State<EmployeesView> {
+  final _roles = const ['All', 'Admin', 'Employee', 'Manager'];
+  final _subjects = const ['All', 'Math', 'Science', 'History', 'Art'];
+  String _selectedRole = 'Employee';
+  String _selectedSubject = 'Math';
 
   @override
   Widget build(BuildContext context) {
@@ -43,42 +54,24 @@ class EmployeesView extends StatelessWidget {
             Row(
               spacing: 8,
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.border.withAlpha(180)),
-                  ),
-                  child: Text('All', style: AppTextStyles.bodySmall),
+                _buildAllChip(),
+                FilterDropdown<String>(
+                  items: _roles,
+                  value: _selectedRole,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    _selectedRole = value;
+                  },
+                  hintText: 'Role',
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    spacing: 5,
-                    children: [
-                      Text('Employee', style: AppTextStyles.bodySmall),
-                      Icon(
-                        Icons.keyboard_arrow_down_outlined,
-                        size: 20,
-                        color: AppColors.textPrimary,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    spacing: 5,
-                    children: [
-                      Text('Subject', style: AppTextStyles.bodySmall),
-                      Icon(
-                        Icons.keyboard_arrow_down_outlined,
-                        size: 20,
-                        color: AppColors.textPrimary,
-                      ),
-                    ],
-                  ),
+                FilterDropdown<String>(
+                  items: _subjects,
+                  value: _selectedSubject,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    _selectedSubject = value;
+                  },
+                  hintText: 'Subject',
                 ),
               ],
             ),
@@ -96,6 +89,18 @@ class EmployeesView extends StatelessWidget {
         ),
       ),
       floatingActionButton: MyFloatingActionButton(onPressed: () {}),
+    );
+  }
+
+  Widget _buildAllChip() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border.withAlpha(180)),
+      ),
+      child: Text('All', style: AppTextStyles.bodySmall),
     );
   }
 }
