@@ -16,16 +16,16 @@ class EmployeesView extends StatefulWidget {
 class _EmployeesViewState extends State<EmployeesView> {
   final _roles = const ['Admin', 'Employee', 'Manager'];
   final _subjects = const ['Math', 'Science', 'History', 'Art'];
-  late String _selectedRole;
-  late String _selectedSubject;
+  String? _selectedRole;
+  String? _selectedSubject;
 
   late ValueNotifier<bool> _allSelectedNotifier;
 
   @override
   void initState() {
     super.initState();
-    _selectedRole = _roles.first;
-    _selectedSubject = _subjects.first;
+    _selectedRole = _roles.isNotEmpty ? _roles.first : null;
+    _selectedSubject = _subjects.isNotEmpty ? _subjects.first : null;
     _allSelectedNotifier = ValueNotifier<bool>(true);
   }
 

@@ -17,16 +17,16 @@ class _StudentsViewState extends State<StudentsView> {
   final _classes = const ['Class 1', 'Class 2', 'Class 3'];
   final _divisions = const ['Division A', 'Division B', 'Division C'];
 
-  late String _selectedClass;
-  late String _selectedDivision;
+  String? _selectedClass;
+  String? _selectedDivision;
 
   late ValueNotifier<bool> _allSelectedNotifier;
 
   @override
   void initState() {
     super.initState();
-    _selectedClass = _classes.first;
-    _selectedDivision = _divisions.first;
+    _selectedClass = _classes.isEmpty ? null : _classes.first;
+    _selectedDivision = _divisions.isEmpty ? null : _divisions.first;
     _allSelectedNotifier = ValueNotifier<bool>(true);
   }
 

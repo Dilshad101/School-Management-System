@@ -2,11 +2,39 @@ import 'package:flutter/material.dart';
 
 import '../../../../shared/styles/app_styles.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
+import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../../shared/widgets/input_fields/search_field.dart';
 import 'widgets/class_tile.dart';
 
-class ClassView extends StatelessWidget {
+class ClassView extends StatefulWidget {
   const ClassView({super.key});
+
+  @override
+  State<ClassView> createState() => _ClassViewState();
+}
+
+class _ClassViewState extends State<ClassView> {
+  final _classes = const ['Class 1', 'Class 2', 'Class 3'];
+  final _divisions = const ['Division A', 'Division B', 'Division C'];
+
+  String? _selectedClass;
+  String? _selectedDivision;
+
+  late ValueNotifier<bool> _allSelectedNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedClass = _classes.isNotEmpty ? _classes.first : null;
+    _selectedDivision = _divisions.isNotEmpty ? _divisions.first : null;
+    _allSelectedNotifier = ValueNotifier<bool>(true);
+  }
+
+  @override
+  void dispose() {
+    _allSelectedNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,47 +49,38 @@ class ClassView extends StatelessWidget {
             const SizedBox(height: 10),
 
             // filter and sort options
-            Row(
-              spacing: 8,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.border.withAlpha(180)),
-                  ),
-                  child: Text('All', style: AppTextStyles.bodySmall),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    spacing: 5,
-                    children: [
-                      Text('Class', style: AppTextStyles.bodySmall),
-                      Icon(
-                        Icons.keyboard_arrow_down_outlined,
-                        size: 20,
-                        color: AppColors.textPrimary,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    spacing: 5,
-                    children: [
-                      Text('Division', style: AppTextStyles.bodySmall),
-                      Icon(
-                        Icons.keyboard_arrow_down_outlined,
-                        size: 20,
-                        color: AppColors.textPrimary,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            ValueListenableBuilder(
+              valueListenable: _allSelectedNotifier,
+              builder: (context, value, child) {
+                return Row(
+                  spacing: 8,
+                  children: [
+                    _buildAllChip(value),
+                    FilterDropdown<String>(
+                      items: _classes,
+                      value: _selectedClass,
+                      onChanged: (value) {
+                        print('class - $value');
+                        if (value == null) return;
+                        _selectedClass = value;
+                        _allSelectedNotifier.value = false;
+                      },
+                      hintText: 'Class',
+                    ),
+                    FilterDropdown<String>(
+                      items: _divisions,
+                      value: _selectedDivision,
+                      onChanged: (value) {
+                        print('division - $value');
+                        if (value == null) return;
+                        _selectedDivision = value;
+                        _allSelectedNotifier.value = false;
+                      },
+                      hintText: 'Division',
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 16),
 
@@ -100,6 +119,30 @@ class ClassView extends StatelessWidget {
         ),
       ),
       floatingActionButton: MyFloatingActionButton(onPressed: () {}),
+    );
+  }
+
+  Widget _buildAllChip(bool isSelected) {
+    return InkWell(
+      onTap: () {
+        _allSelectedNotifier.value = true;
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: isSelected
+              ? null
+              : Border.all(color: AppColors.border.withAlpha(180)),
+        ),
+        child: Text(
+          'All',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: isSelected ? Colors.white : AppColors.textPrimary,
+          ),
+        ),
+      ),
     );
   }
 }

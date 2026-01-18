@@ -1,54 +1,80 @@
 import 'package:flutter/material.dart';
 
 import '../../../shared/styles/app_styles.dart';
+import '../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../shared/widgets/input_fields/search_field.dart';
 import 'widgets/attendance_tile.dart';
 
-class AttendanceView extends StatelessWidget {
+class AttendanceView extends StatefulWidget {
   const AttendanceView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Sample data for demonstration
-    final List<Map<String, dynamic>> attendanceData = [
-      {
-        'name': 'Priya',
-        'class': '8 A',
-        'id': 'ID 64452',
-        'date': '10/01/2025',
-        'timeIn': '09:05 AM',
-        'timeOut': '04:00 PM',
-        'status': AttendanceStatus.present,
-      },
-      {
-        'name': 'Priya',
-        'class': '8 A',
-        'id': 'ID 64452',
-        'date': '10/01/2025',
-        'timeIn': null,
-        'timeOut': null,
-        'status': AttendanceStatus.absent,
-      },
-      {
-        'name': 'Priya',
-        'class': '8 A',
-        'id': 'ID 64452',
-        'date': '10/01/2025',
-        'timeIn': '09:05 AM',
-        'timeOut': '04:00 AM',
-        'status': AttendanceStatus.present,
-      },
-      {
-        'name': 'Priya',
-        'class': '8 A',
-        'id': 'ID 64452',
-        'date': '10/01/2025',
-        'timeIn': '09:05 AM',
-        'timeOut': '04:00 PM',
-        'status': AttendanceStatus.present,
-      },
-    ];
+  State<AttendanceView> createState() => _AttendanceViewState();
+}
 
+class _AttendanceViewState extends State<AttendanceView> {
+  final List<Map<String, dynamic>> attendanceData = [
+    {
+      'name': 'Priya',
+      'class': '8 A',
+      'id': 'ID 64452',
+      'date': '10/01/2025',
+      'timeIn': '09:05 AM',
+      'timeOut': '04:00 PM',
+      'status': AttendanceStatus.present,
+    },
+    {
+      'name': 'Priya',
+      'class': '8 A',
+      'id': 'ID 64452',
+      'date': '10/01/2025',
+      'timeIn': null,
+      'timeOut': null,
+      'status': AttendanceStatus.absent,
+    },
+    {
+      'name': 'Priya',
+      'class': '8 A',
+      'id': 'ID 64452',
+      'date': '10/01/2025',
+      'timeIn': '09:05 AM',
+      'timeOut': '04:00 AM',
+      'status': AttendanceStatus.present,
+    },
+    {
+      'name': 'Priya',
+      'class': '8 A',
+      'id': 'ID 64452',
+      'date': '10/01/2025',
+      'timeIn': '09:05 AM',
+      'timeOut': '04:00 PM',
+      'status': AttendanceStatus.present,
+    },
+  ];
+
+  final _classes = const ['Class 1', 'Class 2', 'Class 3'];
+  final _divisions = const ['Division A', 'Division B', 'Division C'];
+  final _students = ['Priya', 'Aarav', 'Saanvi'];
+  String? _selectedClass;
+  String? _selectedDivision;
+  String? _selectedStudent;
+
+  late ValueNotifier<bool> _allSelectedNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _allSelectedNotifier = ValueNotifier<bool>(true);
+  }
+
+  @override
+  void dispose() {
+    _allSelectedNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Attendance')),
       body: Padding(
@@ -80,16 +106,49 @@ class AttendanceView extends StatelessWidget {
             // Filter and sort options
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildFilterChip(label: 'All', isSelected: true),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(label: "Student's", hasDropdown: true),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(label: 'Class', hasDropdown: true),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(label: 'Division', hasDropdown: true),
-                ],
+              child: ValueListenableBuilder(
+                valueListenable: _allSelectedNotifier,
+                builder: (context, value, child) {
+                  return Row(
+                    spacing: 8,
+                    children: [
+                      _buildAllChip(value),
+                      FilterDropdown<String>(
+                        items: _students,
+                        value: _selectedStudent,
+                        onChanged: (value) {
+                          print('student - $value');
+                          if (value == null) return;
+                          _selectedStudent = value;
+                          _allSelectedNotifier.value = false;
+                        },
+                        hintText: 'Student',
+                      ),
+                      FilterDropdown<String>(
+                        items: _classes,
+                        value: _selectedClass,
+                        onChanged: (value) {
+                          print('class - $value');
+                          if (value == null) return;
+                          _selectedClass = value;
+                          _allSelectedNotifier.value = false;
+                        },
+                        hintText: 'Class',
+                      ),
+                      FilterDropdown<String>(
+                        items: _divisions,
+                        value: _selectedDivision,
+                        onChanged: (value) {
+                          print('division - $value');
+                          if (value == null) return;
+                          _selectedDivision = value;
+                          _allSelectedNotifier.value = false;
+                        },
+                        hintText: 'Division',
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 16),
@@ -119,33 +178,26 @@ class AttendanceView extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterChip({
-    required String label,
-    bool isSelected = false,
-    bool hasDropdown = false,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? AppColors.white : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: isSelected
-            ? Border.all(color: AppColors.border.withAlpha(180))
-            : null,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label, style: AppTextStyles.bodySmall),
-          if (hasDropdown) ...[
-            const SizedBox(width: 4),
-            Icon(
-              Icons.keyboard_arrow_down_outlined,
-              size: 20,
-              color: AppColors.textPrimary,
-            ),
-          ],
-        ],
+  Widget _buildAllChip(bool isSelected) {
+    return InkWell(
+      onTap: () {
+        _allSelectedNotifier.value = true;
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: isSelected
+              ? null
+              : Border.all(color: AppColors.border.withAlpha(180)),
+        ),
+        child: Text(
+          'All',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: isSelected ? Colors.white : AppColors.textPrimary,
+          ),
+        ),
       ),
     );
   }
