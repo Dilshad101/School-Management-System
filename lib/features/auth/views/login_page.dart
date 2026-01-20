@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
     // final email = _emailController.text.trim();
     // final password = _passwordController.text.trim();
 
-    context.go(Routes.features);
+    context.go(Routes.home);
     // }
   }
 
