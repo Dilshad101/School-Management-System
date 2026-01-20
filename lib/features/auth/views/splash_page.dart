@@ -19,7 +19,7 @@ class _SplashPageState extends State<SplashPage> {
     // Wait 2 seconds then navigate to login
     Timer(const Duration(seconds: 1), () {
       if (mounted) {
-        context.go(Routes.home);
+        context.go(Routes.login);
       }
     });
   }
