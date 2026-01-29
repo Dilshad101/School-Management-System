@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/styles/app_styles.dart';
-import '../../../../shared/widgets/buttons/micro_delete_button.dart';
-import '../../../../shared/widgets/buttons/micro_edit_button.dart';
+import '../../../../../shared/styles/app_styles.dart';
+import '../../../../../shared/widgets/buttons/micro_delete_button.dart';
+import '../../../../../shared/widgets/buttons/micro_edit_button.dart';
 
 class StudentTile extends StatelessWidget {
   const StudentTile({super.key});

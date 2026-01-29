@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:school_management_system/features/students/views/widgets/student_tile.dart';
+import 'package:school_management_system/features/students/views/students_view/widgets/student_tile.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
 
-import '../../../shared/widgets/dropdowns/filter_dropdown.dart';
-import '../../../shared/widgets/input_fields/search_field.dart';
+import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
+import '../../../../shared/widgets/input_fields/search_field.dart';
 
 class StudentsView extends StatefulWidget {
   const StudentsView({super.key});
