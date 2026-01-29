@@ -6,6 +6,7 @@ import 'package:school_management_system/features/auth/views/forget_pass_page.da
 import 'package:school_management_system/features/chat/views/chat_page.dart';
 import 'package:school_management_system/features/class/views/class_details_view/class_details_view.dart';
 import 'package:school_management_system/features/class/views/class_view/class_view.dart';
+import 'package:school_management_system/features/class/views/create_class_view/create_class_view.dart';
 import 'package:school_management_system/features/dashboard/views/dashboard_page.dart';
 import 'package:school_management_system/features/employees/views/employees_view.dart';
 import 'package:school_management_system/features/fees/views/fees_view/fees_view.dart';
@@ -61,6 +62,10 @@ class NavigationService {
             final classId = state.extra as String?;
             return ClassDetailsView(classId: classId);
           },
+        ),
+        GoRoute(
+          path: Routes.createClass,
+          builder: (context, state) => const CreateClassView(),
         ),
         GoRoute(
           path: Routes.guardians,

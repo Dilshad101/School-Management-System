@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/router/route_paths.dart';
 
 import '../../../../shared/styles/app_styles.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
@@ -118,7 +120,11 @@ class _ClassViewState extends State<ClassView> {
           ],
         ),
       ),
-      floatingActionButton: MyFloatingActionButton(onPressed: () {}),
+      floatingActionButton: MyFloatingActionButton(
+        onPressed: () {
+          context.push(Routes.createClass);
+        },
+      ),
     );
   }
 
