@@ -12,6 +12,7 @@ import 'package:school_management_system/features/fees/views/fees_view/fees_view
 import 'package:school_management_system/features/guardians/view/guardian_view.dart';
 import 'package:school_management_system/features/profile/views/profile_page.dart';
 import 'package:school_management_system/features/students/views/students_view.dart';
+import 'package:school_management_system/features/user_request/views/user_request_view.dart';
 
 import '../../features/auth/views/splash_page.dart';
 import 'nave_bar_page.dart';
@@ -72,6 +73,10 @@ class NavigationService {
         GoRoute(
           path: Routes.fees,
           builder: (context, state) => const FeesView(),
+        ),
+        GoRoute(
+          path: Routes.userRequests,
+          builder: (context, state) => const UserRequestView(),
         ),
 
         /// Bottom Navigation Bar with nested routes

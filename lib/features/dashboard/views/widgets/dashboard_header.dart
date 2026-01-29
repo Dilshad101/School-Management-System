@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/router/route_paths.dart';
 
 import '../../../../shared/styles/app_styles.dart';
 
@@ -7,12 +9,10 @@ class DashboardHeader extends StatelessWidget {
   const DashboardHeader({
     super.key,
     this.requestCount = 84,
-    this.onRequestTap,
     this.onNotificationTap,
   });
 
   final int requestCount;
-  final VoidCallback? onRequestTap;
   final VoidCallback? onNotificationTap;
 
   @override
@@ -69,7 +69,9 @@ class DashboardHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               GestureDetector(
-                onTap: onRequestTap,
+                onTap: () {
+                  context.push(Routes.userRequests);
+                },
                 child: Row(
                   children: [
                     SvgPicture.asset('assets/icons/person_alt_white.svg'),
