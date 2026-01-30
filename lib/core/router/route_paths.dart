@@ -12,6 +12,7 @@ class Routes {
 
   static const String students = '/students';
   static const String studentDetail = '/students/:id';
+  static const String createStudent = '/students-create';
   static const String employees = '/employees';
   static const String classes = '/classes';
   static const String classDetail = '/classes/:id';

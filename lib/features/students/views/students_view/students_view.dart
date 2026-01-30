@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/router/route_paths.dart';
 import 'package:school_management_system/features/students/views/students_view/widgets/student_tile.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
@@ -114,7 +116,11 @@ class _StudentsViewState extends State<StudentsView> {
           ],
         ),
       ),
-      floatingActionButton: MyFloatingActionButton(onPressed: () {}),
+      floatingActionButton: MyFloatingActionButton(
+        onPressed: () {
+          context.push(Routes.createStudent);
+        },
+      ),
     );
   }
 
