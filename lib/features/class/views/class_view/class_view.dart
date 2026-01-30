@@ -111,7 +111,7 @@ class _ClassViewState extends State<ClassView> {
                     studentCount: 36,
                     subjectCount: 8,
                     onManageTimetable: () {
-                      // Handle manage timetable
+                      context.push(Routes.timeTable);
                     },
                   );
                 },

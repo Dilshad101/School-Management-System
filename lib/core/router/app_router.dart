@@ -5,6 +5,7 @@ import 'package:school_management_system/features/attendance/views/attendance_vi
 import 'package:school_management_system/features/auth/views/forget_pass_page.dart';
 import 'package:school_management_system/features/chat/views/chat_page.dart';
 import 'package:school_management_system/features/class/views/class_details_view/class_details_view.dart';
+import 'package:school_management_system/features/class/views/class_time_table_view/class_time_table_view.dart';
 import 'package:school_management_system/features/class/views/class_view/class_view.dart';
 import 'package:school_management_system/features/class/views/create_class_view/create_class_view.dart';
 import 'package:school_management_system/features/dashboard/views/dashboard_page.dart';
@@ -69,6 +70,10 @@ class NavigationService {
         GoRoute(
           path: Routes.classes,
           builder: (context, state) => const ClassView(),
+        ),
+        GoRoute(
+          path: Routes.timeTable,
+          builder: (context, state) => const ClassTimeTableView(),
         ),
         GoRoute(
           path: Routes.classDetail,
