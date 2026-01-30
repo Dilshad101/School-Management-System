@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
 
-import '../../../shared/widgets/dropdowns/filter_dropdown.dart';
-import '../../../shared/widgets/input_fields/search_field.dart';
+import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
+import '../../../../shared/widgets/input_fields/search_field.dart';
 import 'widgets/employe_tile.dart';
 
 class EmployeesView extends StatefulWidget {

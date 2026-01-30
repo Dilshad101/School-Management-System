@@ -8,7 +8,7 @@ import 'package:school_management_system/features/class/views/class_details_view
 import 'package:school_management_system/features/class/views/class_view/class_view.dart';
 import 'package:school_management_system/features/class/views/create_class_view/create_class_view.dart';
 import 'package:school_management_system/features/dashboard/views/dashboard_page.dart';
-import 'package:school_management_system/features/employees/views/employees_view.dart';
+import 'package:school_management_system/features/employees/views/employees_view/employees_view.dart';
 import 'package:school_management_system/features/fees/views/fees_view/fees_view.dart';
 import 'package:school_management_system/features/guardians/view/guardian_view.dart';
 import 'package:school_management_system/features/profile/views/profile_page.dart';
