@@ -74,6 +74,12 @@ class FeaturesPage extends StatelessWidget {
     FeatureData(
       name: 'Notification',
       iconPath: 'assets/icons/notification.svg',
+      onTap: () {
+        final ctx = locator<NavigationService>().navigatorKey.currentContext;
+        if (ctx != null) {
+          ctx.push(Routes.notifications);
+        }
+      },
     ),
     FeatureData(name: 'Chat', iconPath: 'assets/icons/chat_feature.svg'),
     FeatureData(

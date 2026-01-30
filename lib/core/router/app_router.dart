@@ -13,6 +13,7 @@ import 'package:school_management_system/features/employees/views/create_employe
 import 'package:school_management_system/features/employees/views/employees_view/employees_view.dart';
 import 'package:school_management_system/features/fees/views/fees_view/fees_view.dart';
 import 'package:school_management_system/features/guardians/view/guardian_view.dart';
+import 'package:school_management_system/features/notifications/views/notification_view/notification_view.dart';
 import 'package:school_management_system/features/profile/views/profile_page.dart';
 import 'package:school_management_system/features/students/views/create_student_view/create_student_view.dart';
 import 'package:school_management_system/features/students/views/students_view/students_view.dart';
@@ -91,6 +92,10 @@ class NavigationService {
         GoRoute(
           path: Routes.fees,
           builder: (context, state) => const FeesView(),
+        ),
+        GoRoute(
+          path: Routes.notifications,
+          builder: (context, state) => const NotificationView(),
         ),
         GoRoute(
           path: Routes.userRequests,
