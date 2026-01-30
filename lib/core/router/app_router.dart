@@ -8,6 +8,8 @@ import 'package:school_management_system/features/class/views/class_details_view
 import 'package:school_management_system/features/class/views/class_view/class_view.dart';
 import 'package:school_management_system/features/class/views/create_class_view/create_class_view.dart';
 import 'package:school_management_system/features/dashboard/views/dashboard_page.dart';
+import 'package:school_management_system/features/employees/blocs/create_employee/create_employee_state.dart';
+import 'package:school_management_system/features/employees/views/create_employee_view/create_employee_view.dart';
 import 'package:school_management_system/features/employees/views/employees_view/employees_view.dart';
 import 'package:school_management_system/features/fees/views/fees_view/fees_view.dart';
 import 'package:school_management_system/features/guardians/view/guardian_view.dart';
@@ -48,6 +50,12 @@ class NavigationService {
         GoRoute(
           path: Routes.employees,
           builder: (context, state) => const EmployeesView(),
+        ),
+        GoRoute(
+          path: Routes.createEmployee,
+          builder: (context, state) => CreateEmployeeView(
+            initialCategory: state.extra as StaffCategoryModel?,
+          ),
         ),
         GoRoute(
           path: Routes.students,

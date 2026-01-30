@@ -44,7 +44,7 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
           bloodGroups: bloodGroups,
           studentId: studentId,
           // Add default document
-          documents: [const DocumentModel(name: 'birth certificate')],
+          documents: [const DocumentModel(name: 'Birth Certificate')],
         ),
       );
     } catch (e) {
@@ -341,7 +341,7 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
         genders: state.genders,
         bloodGroups: state.bloodGroups,
         studentId: studentId,
-        documents: [const DocumentModel(name: 'birth certificate')],
+        documents: [const DocumentModel(name: 'Birth Certificate')],
       ),
     );
   }

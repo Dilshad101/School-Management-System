@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/router/route_paths.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
 
 import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../../shared/widgets/input_fields/search_field.dart';
+import '../../blocs/create_employee/create_employee_state.dart';
 import 'widgets/employe_tile.dart';
+import 'widgets/staff_category_selector_dialog.dart';
 
 class EmployeesView extends StatefulWidget {
   const EmployeesView({super.key});
@@ -21,6 +25,14 @@ class _EmployeesViewState extends State<EmployeesView> {
 
   late ValueNotifier<bool> _allSelectedNotifier;
 
+  // Sample staff categories for the bottom sheet
+  final List<StaffCategoryModel> _staffCategories = [
+    const StaffCategoryModel(id: '1', name: 'Teachers'),
+    const StaffCategoryModel(id: '2', name: 'Office Staff'),
+    const StaffCategoryModel(id: '3', name: 'Hostel Warden'),
+    const StaffCategoryModel(id: '4', name: 'Security Staff'),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +47,27 @@ class _EmployeesViewState extends State<EmployeesView> {
     super.dispose();
   }
 
+  void _showStaffCategorySelector() {
+    StaffCategorySelectorDialog.show(
+      context: context,
+      categories: _staffCategories,
+      onCategorySelected: (category) {
+        // Navigate to create employee view with pre-selected category
+        context.push(Routes.createEmployee, extra: category);
+      },
+      onAddCategory: (name) {
+        // Add the new category to the list
+        _staffCategories.add(
+          StaffCategoryModel(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            name: name,
+            isCustom: true,
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,26 +77,7 @@ class _EmployeesViewState extends State<EmployeesView> {
         child: Column(
           children: [
             // Search bar with filter button
-            Row(
-              spacing: 8,
-              children: [
-                Expanded(child: AppSearchBar(onChanged: (value) {})),
-                Container(
-                  height: 44,
-                  width: 44,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: AppColors.primaryGradient,
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.tune, color: Colors.white),
-                    onPressed: () {
-                      // Handle filter action
-                    },
-                  ),
-                ),
-              ],
-            ),
+            AppSearchBar(onChanged: (value) {}),
             const SizedBox(height: 10),
 
             // filter and sort options
@@ -83,7 +97,7 @@ class _EmployeesViewState extends State<EmployeesView> {
                         _selectedRole = value;
                         _allSelectedNotifier.value = false;
                       },
-                      hintText: 'Role',
+                      hintText: 'Employees',
                     ),
                     FilterDropdown<String>(
                       items: _subjects,
@@ -94,7 +108,13 @@ class _EmployeesViewState extends State<EmployeesView> {
                         _selectedSubject = value;
                         _allSelectedNotifier.value = false;
                       },
-                      hintText: 'Subject',
+                      hintText: 'Class',
+                    ),
+                    FilterDropdown<String>(
+                      items: const ['Division A', 'Division B', 'Division C'],
+                      value: null,
+                      onChanged: (value) {},
+                      hintText: 'Division',
                     ),
                   ],
                 );
@@ -113,7 +133,9 @@ class _EmployeesViewState extends State<EmployeesView> {
           ],
         ),
       ),
-      floatingActionButton: MyFloatingActionButton(onPressed: () {}),
+      floatingActionButton: MyFloatingActionButton(
+        onPressed: _showStaffCategorySelector,
+      ),
     );
   }
 
