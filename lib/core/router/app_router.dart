@@ -18,6 +18,7 @@ import 'package:school_management_system/features/notifications/views/notificati
 import 'package:school_management_system/features/profile/views/profile_page.dart';
 import 'package:school_management_system/features/students/views/create_student_view/create_student_view.dart';
 import 'package:school_management_system/features/students/views/students_view/students_view.dart';
+import 'package:school_management_system/features/subscriptions/views/subscription_view/subscription_view.dart';
 import 'package:school_management_system/features/user_request/views/user_request_view.dart';
 
 import '../../features/auth/views/splash_page.dart';
@@ -101,6 +102,10 @@ class NavigationService {
         GoRoute(
           path: Routes.notifications,
           builder: (context, state) => const NotificationView(),
+        ),
+        GoRoute(
+          path: Routes.subscriptions,
+          builder: (context, state) => const SubscriptionView(),
         ),
         GoRoute(
           path: Routes.userRequests,

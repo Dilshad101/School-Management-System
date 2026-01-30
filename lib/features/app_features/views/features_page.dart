@@ -81,10 +81,15 @@ class FeaturesPage extends StatelessWidget {
         }
       },
     ),
-    FeatureData(name: 'Chat', iconPath: 'assets/icons/chat_feature.svg'),
     FeatureData(
       name: 'Subscription',
       iconPath: 'assets/icons/subscription.svg',
+      onTap: () {
+        final ctx = locator<NavigationService>().navigatorKey.currentContext;
+        if (ctx != null) {
+          ctx.push(Routes.subscriptions);
+        }
+      },
     ),
   ];
 

@@ -51,7 +51,10 @@ class GradientButton extends StatelessWidget {
                     strokeWidth: 2,
                   ),
                 )
-              : Text(label, style: AppTextStyles.button),
+              : FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(label, style: AppTextStyles.button),
+                ),
         ),
       ),
     );

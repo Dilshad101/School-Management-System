@@ -47,26 +47,7 @@ class _StudentsViewState extends State<StudentsView> {
         child: Column(
           children: [
             // Search bar with filter button
-            Row(
-              spacing: 8,
-              children: [
-                Expanded(child: AppSearchBar(onChanged: (value) {})),
-                Container(
-                  height: 44,
-                  width: 44,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: AppColors.primaryGradient,
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.tune, color: Colors.white),
-                    onPressed: () {
-                      // Handle filter action
-                    },
-                  ),
-                ),
-              ],
-            ),
+            AppSearchBar(onChanged: (value) {}),
             const SizedBox(height: 10),
 
             // filter and sort options
