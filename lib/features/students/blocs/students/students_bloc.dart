@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../repositories/students_repository.dart';
 import 'students_event.dart';
 import 'students_state.dart';
@@ -19,6 +20,14 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
   final StudentsRepository _studentsRepository;
 
   static const int _pageSize = 10;
+
+  /// Extracts a user-friendly error message from an exception.
+  String _getErrorMessage(Object e) {
+    if (e is ApiException) {
+      return e.message;
+    }
+    return 'An unexpected error occurred. Please try again.';
+  }
 
   Future<void> _onFetchRequested(
     StudentsFetchRequested event,
@@ -49,7 +58,12 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
         ),
       );
     } catch (e) {
-      emit(state.copyWith(status: StudentsStatus.failure, error: e.toString()));
+      emit(
+        state.copyWith(
+          status: StudentsStatus.failure,
+          error: _getErrorMessage(e),
+        ),
+      );
     }
   }
 
@@ -83,7 +97,13 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
         ),
       );
     } catch (e) {
-      emit(state.copyWith(status: StudentsStatus.failure, error: e.toString()));
+      // On load more failure, keep existing data but show error
+      emit(
+        state.copyWith(
+          status: StudentsStatus.success,
+          error: _getErrorMessage(e),
+        ),
+      );
     }
   }
 
@@ -117,7 +137,12 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
         ),
       );
     } catch (e) {
-      emit(state.copyWith(status: StudentsStatus.failure, error: e.toString()));
+      emit(
+        state.copyWith(
+          status: StudentsStatus.failure,
+          error: _getErrorMessage(e),
+        ),
+      );
     }
   }
 
@@ -150,7 +175,12 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
         ),
       );
     } catch (e) {
-      emit(state.copyWith(status: StudentsStatus.failure, error: e.toString()));
+      emit(
+        state.copyWith(
+          status: StudentsStatus.failure,
+          error: _getErrorMessage(e),
+        ),
+      );
     }
   }
 
