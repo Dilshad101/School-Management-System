@@ -23,4 +23,7 @@ class Endpoints {
   // Auth endpoints
   static const String login = '/v1/login-web/';
   static const String me = '/v1/me/';
+
+  // Students endpoints
+  static const String students = '/v1/student-users/';
 }

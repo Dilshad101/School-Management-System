@@ -3,9 +3,19 @@ import 'package:flutter/material.dart';
 import '../../../../../shared/styles/app_styles.dart';
 import '../../../../../shared/widgets/buttons/micro_delete_button.dart';
 import '../../../../../shared/widgets/buttons/micro_edit_button.dart';
+import '../../../models/student_model.dart';
 
 class StudentTile extends StatelessWidget {
-  const StudentTile({super.key});
+  const StudentTile({
+    super.key,
+    required this.student,
+    this.onEdit,
+    this.onDelete,
+  });
+
+  final StudentModel student;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -22,19 +32,7 @@ class StudentTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             spacing: 10,
             children: [
-              Container(
-                height: 64,
-                width: 64,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.border.withAlpha(50),
-                ),
-                child: Icon(
-                  Icons.person,
-                  size: 32,
-                  color: AppColors.textPrimary.withAlpha(160),
-                ),
-              ),
+              _buildAvatar(),
               Flexible(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,35 +43,19 @@ class StudentTile extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Priya',
+                            student.fullName,
                             style: AppTextStyles.bodyLarge.copyWith(
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.green.withAlpha(20),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 2,
-                          ),
-                          child: Text(
-                            '98%',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.green,
-                            ),
-                          ),
-                        ),
+                        _buildStatusBadge(),
                       ],
                     ),
                     Row(
                       children: [
                         Text(
-                          '8A',
+                          _getRoleName(),
                           style: AppTextStyles.labelMedium.copyWith(
                             fontWeight: FontWeight.w500,
                           ),
@@ -83,7 +65,7 @@ class StudentTile extends StatelessWidget {
                           child: VerticalDivider(color: AppColors.border),
                         ),
                         Text(
-                          'ID 64452',
+                          'ID ${student.id}',
                           style: AppTextStyles.labelMedium.copyWith(
                             fontWeight: FontWeight.w500,
                             color: AppColors.textPrimary.withAlpha(160),
@@ -100,10 +82,71 @@ class StudentTile extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             spacing: 8,
-            children: [MicroDeleteButton(), MicroEditButton()],
+            children: [
+              MicroDeleteButton(onTap: onDelete),
+              MicroEditButton(onTap: onEdit),
+            ],
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildAvatar() {
+    final profilePic = student.profilePicUrl;
+    if (profilePic != null && profilePic.isNotEmpty) {
+      return Container(
+        height: 64,
+        width: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.border.withAlpha(50),
+          image: DecorationImage(
+            image: NetworkImage(profilePic),
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    }
+    return Container(
+      height: 64,
+      width: 64,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.border.withAlpha(50),
+      ),
+      child: Icon(
+        Icons.person,
+        size: 32,
+        color: AppColors.textPrimary.withAlpha(160),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge() {
+    final isActive = student.isActive;
+    return Container(
+      decoration: BoxDecoration(
+        color: isActive
+            ? AppColors.green.withAlpha(20)
+            : AppColors.borderError.withAlpha(20),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      child: Text(
+        isActive ? 'Active' : 'Inactive',
+        style: AppTextStyles.bodySmall.copyWith(
+          fontWeight: FontWeight.w500,
+          color: isActive ? AppColors.green : AppColors.borderError,
+        ),
+      ),
+    );
+  }
+
+  String _getRoleName() {
+    if (student.rolesDetails.isNotEmpty) {
+      return student.rolesDetails.first.roleName;
+    }
+    return 'Student';
   }
 }

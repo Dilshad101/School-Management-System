@@ -8,6 +8,7 @@ import '../tenant/tenant_context.dart';
 import '../router/app_router.dart';
 import '../../features/auth/repositories/auth_repository.dart';
 import '../../features/auth/repositories/user_repository.dart';
+import '../../features/students/repositories/students_repository.dart';
 
 final locator = GetIt.instance;
 
@@ -58,6 +59,10 @@ Future<void> setupDependency() async {
 
   locator.registerLazySingleton<UserRepository>(
     () => UserRepository(locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<StudentsRepository>(
+    () => StudentsRepository(apiClient: locator<ApiClient>()),
   );
 }
 
