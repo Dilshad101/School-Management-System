@@ -6,6 +6,8 @@ import '../auth/session.dart';
 import '../storage/local_storage.dart';
 import '../tenant/tenant_context.dart';
 import '../router/app_router.dart';
+import '../../features/auth/repositories/auth_repository.dart';
+import '../../features/auth/repositories/user_repository.dart';
 
 final locator = GetIt.instance;
 
@@ -48,22 +50,15 @@ Future<void> setupDependency() async {
   locator.registerSingleton<NavigationService>(NavigationService());
 
   /// -------------------------------
-  /// Repositories (register as needed)
+  /// Repositories
   /// -------------------------------
-  // locator.registerLazySingleton<AuthRepository>(
-  //   () => AuthRepository(locator<ApiClient>()),
-  // );
+  locator.registerLazySingleton<AuthRepository>(
+    () => AuthRepository(locator<ApiClient>()),
+  );
 
-  // locator.registerLazySingleton<StudentsRepository>(
-  //   () => StudentsRepository(locator<ApiClient>()),
-  // );
-
-  /// -------------------------------
-  /// Blocs (register when you create them)
-  /// -------------------------------
-  // locator.registerFactory<AuthBloc>(
-  //   () => AuthBloc(locator<AuthRepository>()),
-  // );
+  locator.registerLazySingleton<UserRepository>(
+    () => UserRepository(locator<ApiClient>()),
+  );
 }
 
 /// Simple holder for Session (keeps DI clean)
