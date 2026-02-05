@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_management_system/core/utils/validations.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/dropdowns/bottom_sheet_dropdown.dart';
 import 'package:school_management_system/shared/widgets/input_fields/simple_form_field.dart';
@@ -13,20 +14,23 @@ class PersonalInfoStep extends StatefulWidget {
     required this.formKey,
     required this.fullName,
     required this.selectedClass,
-    required this.academicYear,
+    required this.selectedAcademicYear,
     required this.dateOfBirth,
     required this.selectedGender,
     required this.selectedBloodGroup,
     required this.address,
     required this.email,
     required this.studentId,
+    required this.roleNumber,
     required this.classes,
     required this.genders,
+    required this.academicYears,
     required this.bloodGroups,
     required this.onFullNameChanged,
     required this.onClassChanged,
     required this.onDivisionChanged,
     required this.onAcademicYearChanged,
+    required this.onRoleNumberChanged,
     required this.onDateOfBirthChanged,
     required this.onGenderChanged,
     required this.onBloodGroupChanged,
@@ -37,20 +41,23 @@ class PersonalInfoStep extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final String fullName;
   final String? selectedClass;
-  final String academicYear;
+  final String? selectedAcademicYear;
   final DateTime? dateOfBirth;
   final String? selectedGender;
   final String? selectedBloodGroup;
   final String address;
   final String email;
   final String studentId;
+  final String roleNumber;
   final List<String> classes;
   final List<String> genders;
   final List<String> bloodGroups;
+  final List<String> academicYears;
   final ValueChanged<String> onFullNameChanged;
   final ValueChanged<String?> onClassChanged;
   final ValueChanged<String?> onDivisionChanged;
-  final ValueChanged<String> onAcademicYearChanged;
+  final ValueChanged<String?> onAcademicYearChanged;
+  final ValueChanged<String> onRoleNumberChanged;
   final ValueChanged<DateTime?> onDateOfBirthChanged;
   final ValueChanged<String?> onGenderChanged;
   final ValueChanged<String?> onBloodGroupChanged;
@@ -63,7 +70,7 @@ class PersonalInfoStep extends StatefulWidget {
 
 class _PersonalInfoStepState extends State<PersonalInfoStep> {
   late TextEditingController _fullNameController;
-  late TextEditingController _academicYearController;
+  late TextEditingController _roleNumberController;
   late TextEditingController _addressController;
   late TextEditingController _emailController;
   late TextEditingController _studentIdController;
@@ -72,7 +79,7 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.fullName);
-    _academicYearController = TextEditingController(text: widget.academicYear);
+    _roleNumberController = TextEditingController(text: widget.roleNumber);
     _addressController = TextEditingController(text: widget.address);
     _emailController = TextEditingController(text: widget.email);
     _studentIdController = TextEditingController(text: widget.studentId);
@@ -83,9 +90,9 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
     super.didUpdateWidget(oldWidget);
     _syncController(_fullNameController, widget.fullName, oldWidget.fullName);
     _syncController(
-      _academicYearController,
-      widget.academicYear,
-      oldWidget.academicYear,
+      _roleNumberController,
+      widget.roleNumber,
+      oldWidget.roleNumber,
     );
     _syncController(_addressController, widget.address, oldWidget.address);
     _syncController(_emailController, widget.email, oldWidget.email);
@@ -109,10 +116,10 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
   @override
   void dispose() {
     _fullNameController.dispose();
-    _academicYearController.dispose();
     _addressController.dispose();
     _emailController.dispose();
     _studentIdController.dispose();
+    _roleNumberController.dispose();
     super.dispose();
   }
 
@@ -142,12 +149,9 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
               hint: 'Enter full name',
               icon: Icons.person_outline,
               onChanged: widget.onFullNameChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Full name is required';
-                }
-                return null;
-              },
+              isRequired: true,
+              validator: (value) =>
+                  Validations.validateRequiredField(value, 'Full name'),
             ),
             const SizedBox(height: 16),
 
@@ -158,27 +162,34 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
               items: widget.classes,
               value: widget.selectedClass,
               onChanged: widget.onClassChanged,
-              validator: (value) {
-                if (value == null) {
-                  return 'Please select a class';
-                }
-                return null;
-              },
+              // validator: (value) {
+              //   if (value == null) {
+              //     return 'Please select a class';
+              //   }
+              //   return null;
+              // },
             ),
             const SizedBox(height: 16),
 
             // Academic Year
             SimpleFormField(
-              controller: _academicYearController,
+              controller: _roleNumberController,
+              label: 'Role Number',
+              isRequired: true,
+              hint: 'Enter role number',
+              onChanged: widget.onRoleNumberChanged,
+              validator: (value) =>
+                  Validations.validateRequiredField(value, 'Role number'),
+            ),
+            const SizedBox(height: 16),
+
+            // Academic Year
+            BottomSheetDropdown<String>(
               label: 'Academic Year',
-              hint: '0000 - 0000',
+              hint: 'Select academic year',
+              items: widget.academicYears,
+              value: widget.selectedAcademicYear,
               onChanged: widget.onAcademicYearChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Academic year is required';
-                }
-                return null;
-              },
             ),
             const SizedBox(height: 16),
 
@@ -187,6 +198,7 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
               label: 'Date Of Birth',
               hint: 'Select date of birth',
               value: widget.dateOfBirth,
+              isRequired: true,
               onChanged: widget.onDateOfBirthChanged,
               validator: (value) {
                 if (value == null) {
@@ -204,12 +216,6 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
               items: widget.genders,
               value: widget.selectedGender,
               onChanged: widget.onGenderChanged,
-              validator: (value) {
-                if (value == null) {
-                  return 'Please select a gender';
-                }
-                return null;
-              },
             ),
             const SizedBox(height: 16),
 
@@ -229,13 +235,11 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
               label: 'Address',
               hint: 'Enter Address',
               icon: Icons.location_on_outlined,
+              isRequired: true,
               onChanged: widget.onAddressChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Address is required';
-                }
-                return null;
-              },
+              validator: (value) =>
+                  Validations.validateRequiredField(value, 'Address'),
+              maxLines: 3,
             ),
             const SizedBox(height: 16),
 
@@ -246,18 +250,9 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
               hint: 'Enter your Email',
               icon: Icons.mail_outline,
               keyboardType: TextInputType.emailAddress,
+              isRequired: true,
               onChanged: widget.onEmailChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Email is required';
-                }
-                if (!RegExp(
-                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                ).hasMatch(value)) {
-                  return 'Please enter a valid email';
-                }
-                return null;
-              },
+              validator: (value) => Validations.validateEmail(value),
             ),
             const SizedBox(height: 16),
 

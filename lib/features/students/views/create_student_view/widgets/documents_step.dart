@@ -50,9 +50,7 @@ class DocumentsStep extends StatelessWidget {
                 child: _DocumentCard(
                   document: doc,
                   onPickFile: () => onPickFile(index),
-                  onRemove: documents.length > 1
-                      ? () => onRemoveDocument(index)
-                      : null,
+                  onRemove: () => onRemoveDocument(index),
                 ),
               );
             }),
@@ -60,11 +58,16 @@ class DocumentsStep extends StatelessWidget {
             const SizedBox(height: 8),
 
             // Add document button
-            Align(
-              alignment: Alignment.centerRight,
-              child: _AddDocumentButton(onTap: onAddDocument),
-            ),
+            if (documents.isNotEmpty)
+              Align(
+                alignment: Alignment.centerRight,
+                child: _AddDocumentButton(onTap: onAddDocument),
+              ),
+            if (documents.isEmpty) ...[
+              const SizedBox(height: 16),
 
+              Center(child: _AddDocumentButton(onTap: onAddDocument)),
+            ],
             const SizedBox(height: 24),
           ],
         ),

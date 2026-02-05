@@ -25,12 +25,14 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
         _fetchDivisions(),
         _fetchGenders(),
         _fetchBloodGroups(),
+        _fetchAcademicYears(),
       ]);
 
       final classes = results[0];
       final divisions = results[1];
       final genders = results[2];
       final bloodGroups = results[3];
+      final academicYears = results[4];
 
       // Generate auto student ID
       final studentId = _generateStudentId();
@@ -42,9 +44,9 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
           divisions: divisions,
           genders: genders,
           bloodGroups: bloodGroups,
+          academicYears: academicYears,
           studentId: studentId,
-          // Add default document
-          documents: [const DocumentModel(name: 'Birth Certificate')],
+          documents: [],
         ),
       );
     } catch (e) {
@@ -61,6 +63,12 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
   Future<List<String>> _fetchClasses() async {
     await Future.delayed(const Duration(milliseconds: 500));
     return ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+  }
+
+  /// Simulates fetching academic years from API.
+  Future<List<String>> _fetchAcademicYears() async {
+    await Future.delayed(const Duration(milliseconds: 600));
+    return ['2020-2021', '2021-2022', '2022-2023', '2023-2024'];
   }
 
   /// Simulates fetching divisions from API.
@@ -124,8 +132,12 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
     emit(state.copyWith(selectedDivision: value));
   }
 
-  void updateAcademicYear(String value) {
-    emit(state.copyWith(academicYear: value));
+  void updateAcademicYear(String? value) {
+    emit(state.copyWith(selectedAcademicYear: value));
+  }
+
+  void updateRoleNumber(String value) {
+    emit(state.copyWith(roleNumber: value));
   }
 
   void updateDateOfBirth(DateTime? value) {

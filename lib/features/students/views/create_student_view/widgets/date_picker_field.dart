@@ -14,6 +14,7 @@ class DatePickerField extends StatelessWidget {
     this.firstDate,
     this.lastDate,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.isRequired = false,
   });
 
   final String label;
@@ -24,6 +25,7 @@ class DatePickerField extends StatelessWidget {
   final DateTime? firstDate;
   final DateTime? lastDate;
   final AutovalidateMode autovalidateMode;
+  final bool isRequired;
 
   String _formatDate(DateTime date) {
     return DateFormat('dd/MM/yyyy').format(date);
@@ -61,7 +63,19 @@ class DatePickerField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.labelMedium),
+        Text.rich(
+          TextSpan(
+            text: label,
+            style: AppTextStyles.labelMedium,
+            children: [
+              if (isRequired)
+                const TextSpan(
+                  text: ' *',
+                  style: TextStyle(color: Colors.red),
+                ),
+            ],
+          ),
+        ),
         const SizedBox(height: 8),
         FormField<DateTime>(
           initialValue: value,

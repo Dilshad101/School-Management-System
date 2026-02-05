@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_management_system/core/utils/validations.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 
 import 'icon_form_field.dart';
@@ -105,12 +106,6 @@ class _ParentInfoStepState extends State<ParentInfoStep> {
               hint: 'Enter full name',
               icon: Icons.person_outline,
               onChanged: widget.onFullNameChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Parent name is required';
-                }
-                return null;
-              },
             ),
             const SizedBox(height: 16),
 
@@ -122,17 +117,7 @@ class _ParentInfoStepState extends State<ParentInfoStep> {
               icon: Icons.mail_outline,
               keyboardType: TextInputType.emailAddress,
               onChanged: widget.onEmailChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Email is required';
-                }
-                if (!RegExp(
-                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                ).hasMatch(value)) {
-                  return 'Please enter a valid email';
-                }
-                return null;
-              },
+              validator: (value) => Validations.validateOptionalEmail(value),
             ),
             const SizedBox(height: 16),
 
@@ -143,13 +128,9 @@ class _ParentInfoStepState extends State<ParentInfoStep> {
               hint: '91 00000 00000',
               icon: Icons.phone_outlined,
               keyboardType: TextInputType.phone,
+              isRequired: true,
               onChanged: widget.onContactNoChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Contact number is required';
-                }
-                return null;
-              },
+              validator: (value) => Validations.validatePhoneNumber(value),
             ),
             const SizedBox(height: 16),
 
@@ -157,15 +138,11 @@ class _ParentInfoStepState extends State<ParentInfoStep> {
             IconFormField(
               controller: _addressController,
               label: 'Address',
-              hint: 'Enter your admission number',
+              hint: 'Enter your address',
+              keyboardType: TextInputType.streetAddress,
               icon: Icons.location_on_outlined,
               onChanged: widget.onAddressChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Address is required';
-                }
-                return null;
-              },
+              maxLines: 3,
             ),
             const SizedBox(height: 24),
           ],

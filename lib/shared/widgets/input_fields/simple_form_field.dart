@@ -14,6 +14,7 @@ class SimpleFormField extends StatelessWidget {
     this.enabled = true,
     this.maxLines = 1,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.isRequired = false,
   });
 
   final TextEditingController controller;
@@ -25,13 +26,26 @@ class SimpleFormField extends StatelessWidget {
   final bool enabled;
   final int maxLines;
   final AutovalidateMode autovalidateMode;
+  final bool isRequired;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.labelMedium),
+        Text.rich(
+          TextSpan(
+            text: label,
+            style: AppTextStyles.labelMedium,
+            children: [
+              if (isRequired)
+                const TextSpan(
+                  text: ' *',
+                  style: TextStyle(color: Colors.red),
+                ),
+            ],
+          ),
+        ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,

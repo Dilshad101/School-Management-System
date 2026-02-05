@@ -15,6 +15,7 @@ class BottomSheetDropdown<T> extends StatefulWidget {
     this.searchable = false,
     this.validator,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.isRequired = false,
   });
 
   final String label;
@@ -26,6 +27,7 @@ class BottomSheetDropdown<T> extends StatefulWidget {
   final bool searchable;
   final String? Function(T?)? validator;
   final AutovalidateMode autovalidateMode;
+  final bool isRequired;
 
   @override
   State<BottomSheetDropdown<T>> createState() => _BottomSheetDropdownState<T>();
@@ -64,7 +66,20 @@ class _BottomSheetDropdownState<T> extends State<BottomSheetDropdown<T>> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.label, style: AppTextStyles.labelMedium),
+        Text.rich(
+          TextSpan(
+            text: widget.label,
+            style: AppTextStyles.labelMedium,
+            children: [
+              if (widget.isRequired)
+                const TextSpan(
+                  text: ' *',
+                  style: TextStyle(color: Colors.red),
+                ),
+            ],
+          ),
+          style: AppTextStyles.labelMedium,
+        ),
         const SizedBox(height: 8),
         FormField<T>(
           key: _formFieldKey,
@@ -207,135 +222,137 @@ class _BottomSheetContentState<T> extends State<_BottomSheetContent<T>> {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle bar
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.border,
-              borderRadius: BorderRadius.circular(2),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          // Title
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Select ${widget.title}',
-                    style: AppTextStyles.heading4,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: AppColors.border.withAlpha(100),
-                      shape: BoxShape.circle,
+            // Title
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Select ${widget.title}',
+                      style: AppTextStyles.heading4,
                     ),
-                    child: Icon(
-                      Icons.close,
-                      size: 20,
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.border.withAlpha(100),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        size: 20,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Search field (if searchable)
+            if (widget.searchable) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _filterItems,
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: AppTextStyles.hint,
+                    prefixIcon: Icon(
+                      Icons.search,
                       color: AppColors.textSecondary,
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Search field (if searchable)
-          if (widget.searchable) ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _filterItems,
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: AppTextStyles.hint,
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: AppColors.textSecondary,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.background,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                    filled: true,
+                    fillColor: AppColors.background,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-          ],
-          const Divider(height: 1),
-          // Items list
-          Flexible(
-            child: ListView.builder(
-              shrinkWrap: true,
-              padding: EdgeInsets.only(bottom: bottomPadding + 16),
-              itemCount: _filteredItems.length,
-              itemBuilder: (context, index) {
-                final item = _filteredItems[index];
-                final isSelected = item == widget.selectedValue;
+              const SizedBox(height: 8),
+            ],
+            const Divider(height: 1),
+            // Items list
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.only(bottom: bottomPadding + 16),
+                itemCount: _filteredItems.length,
+                itemBuilder: (context, index) {
+                  final item = _filteredItems[index];
+                  final isSelected = item == widget.selectedValue;
 
-                return InkWell(
-                  onTap: () => widget.onItemSelected(item),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primary.withAlpha(15)
-                          : Colors.transparent,
-                      border: Border(
-                        bottom: BorderSide(
-                          color: AppColors.border.withAlpha(100),
-                          width: 0.5,
+                  return InkWell(
+                    onTap: () => widget.onItemSelected(item),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.primary.withAlpha(15)
+                            : Colors.transparent,
+                        border: Border(
+                          bottom: BorderSide(
+                            color: AppColors.border.withAlpha(100),
+                            width: 0.5,
+                          ),
                         ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            _getItemLabel(item),
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : AppColors.textPrimary,
-                              fontWeight: isSelected
-                                  ? FontWeight.w500
-                                  : FontWeight.normal,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _getItemLabel(item),
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.textPrimary,
+                                fontWeight: isSelected
+                                    ? FontWeight.w500
+                                    : FontWeight.normal,
+                              ),
                             ),
                           ),
-                        ),
-                        if (isSelected)
-                          Icon(
-                            Icons.check_circle,
-                            color: AppColors.primary,
-                            size: 20,
-                          ),
-                      ],
+                          if (isSelected)
+                            Icon(
+                              Icons.check_circle,
+                              color: AppColors.primary,
+                              size: 20,
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

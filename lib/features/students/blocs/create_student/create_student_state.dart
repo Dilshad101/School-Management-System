@@ -37,7 +37,8 @@ class CreateStudentState extends Equatable {
     // Step 1: Personal Info
     this.fullName = '',
     this.selectedClass,
-    this.academicYear = '',
+    this.selectedAcademicYear,
+    this.roleNumber = '',
     this.dateOfBirth,
     this.selectedGender,
     this.selectedBloodGroup,
@@ -57,6 +58,7 @@ class CreateStudentState extends Equatable {
     this.classes = const [],
     this.genders = const [],
     this.bloodGroups = const [],
+    this.academicYears = const [],
   });
 
   // Flow state
@@ -68,8 +70,9 @@ class CreateStudentState extends Equatable {
   // Step 1: Personal Info
   final String fullName;
   final String? selectedClass;
-  final String academicYear;
+  final String roleNumber;
   final DateTime? dateOfBirth;
+  final String? selectedAcademicYear;
   final String? selectedGender;
   final String? selectedBloodGroup;
   final String address;
@@ -92,6 +95,7 @@ class CreateStudentState extends Equatable {
   final List<String> classes;
   final List<String> genders;
   final List<String> bloodGroups;
+  final List<String> academicYears;
 
   /// Helper getters
   bool get isSubmitting => submissionStatus == SubmissionStatus.loading;
@@ -127,7 +131,8 @@ class CreateStudentState extends Equatable {
     String? fullName,
     String? selectedClass,
     String? selectedDivision,
-    String? academicYear,
+    String? selectedAcademicYear,
+    String? roleNumber,
     DateTime? dateOfBirth,
     String? selectedGender,
     String? selectedBloodGroup,
@@ -149,6 +154,7 @@ class CreateStudentState extends Equatable {
     List<String>? divisions,
     List<String>? genders,
     List<String>? bloodGroups,
+    List<String>? academicYears,
   }) {
     return CreateStudentState(
       currentStep: currentStep ?? this.currentStep,
@@ -158,7 +164,8 @@ class CreateStudentState extends Equatable {
       // Step 1
       fullName: fullName ?? this.fullName,
       selectedClass: selectedClass ?? this.selectedClass,
-      academicYear: academicYear ?? this.academicYear,
+      selectedAcademicYear: selectedAcademicYear ?? this.selectedAcademicYear,
+      roleNumber: roleNumber ?? this.roleNumber,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       selectedGender: selectedGender ?? this.selectedGender,
       selectedBloodGroup: selectedBloodGroup ?? this.selectedBloodGroup,
@@ -178,6 +185,7 @@ class CreateStudentState extends Equatable {
       classes: classes ?? this.classes,
       genders: genders ?? this.genders,
       bloodGroups: bloodGroups ?? this.bloodGroups,
+      academicYears: academicYears ?? this.academicYears,
     );
   }
 
@@ -189,7 +197,8 @@ class CreateStudentState extends Equatable {
     errorMessage,
     fullName,
     selectedClass,
-    academicYear,
+    selectedAcademicYear,
+    roleNumber,
     dateOfBirth,
     selectedGender,
     selectedBloodGroup,
@@ -205,5 +214,6 @@ class CreateStudentState extends Equatable {
     classes,
     genders,
     bloodGroups,
+    academicYears,
   ];
 }

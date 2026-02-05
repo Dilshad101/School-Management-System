@@ -16,6 +16,7 @@ class IconFormField extends StatelessWidget {
     this.maxLines = 1,
     this.showLabel = true,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.isRequired = false,
   });
 
   final TextEditingController controller;
@@ -29,6 +30,7 @@ class IconFormField extends StatelessWidget {
   final int maxLines;
   final bool showLabel;
   final AutovalidateMode autovalidateMode;
+  final bool isRequired;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,19 @@ class IconFormField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showLabel) ...[
-          Text(label, style: AppTextStyles.labelMedium),
+          Text.rich(
+            TextSpan(
+              text: label,
+              style: AppTextStyles.labelMedium,
+              children: [
+                if (isRequired)
+                  const TextSpan(
+                    text: ' *',
+                    style: TextStyle(color: Colors.red),
+                  ),
+              ],
+            ),
+          ),
           const SizedBox(height: 8),
         ],
         TextFormField(
