@@ -37,7 +37,6 @@ class CreateStudentState extends Equatable {
     // Step 1: Personal Info
     this.fullName = '',
     this.selectedClass,
-    this.selectedDivision,
     this.academicYear = '',
     this.dateOfBirth,
     this.selectedGender,
@@ -56,7 +55,6 @@ class CreateStudentState extends Equatable {
     this.photo,
     // Dropdown data (fetched from API)
     this.classes = const [],
-    this.divisions = const [],
     this.genders = const [],
     this.bloodGroups = const [],
   });
@@ -70,7 +68,6 @@ class CreateStudentState extends Equatable {
   // Step 1: Personal Info
   final String fullName;
   final String? selectedClass;
-  final String? selectedDivision;
   final String academicYear;
   final DateTime? dateOfBirth;
   final String? selectedGender;
@@ -93,7 +90,6 @@ class CreateStudentState extends Equatable {
 
   // Dropdown data (fetched from API)
   final List<String> classes;
-  final List<String> divisions;
   final List<String> genders;
   final List<String> bloodGroups;
 
@@ -162,7 +158,6 @@ class CreateStudentState extends Equatable {
       // Step 1
       fullName: fullName ?? this.fullName,
       selectedClass: selectedClass ?? this.selectedClass,
-      selectedDivision: selectedDivision ?? this.selectedDivision,
       academicYear: academicYear ?? this.academicYear,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       selectedGender: selectedGender ?? this.selectedGender,
@@ -181,7 +176,6 @@ class CreateStudentState extends Equatable {
       photo: clearPhoto ? null : (photo ?? this.photo),
       // Dropdown data
       classes: classes ?? this.classes,
-      divisions: divisions ?? this.divisions,
       genders: genders ?? this.genders,
       bloodGroups: bloodGroups ?? this.bloodGroups,
     );
@@ -195,7 +189,6 @@ class CreateStudentState extends Equatable {
     errorMessage,
     fullName,
     selectedClass,
-    selectedDivision,
     academicYear,
     dateOfBirth,
     selectedGender,
@@ -210,7 +203,6 @@ class CreateStudentState extends Equatable {
     parentAddress,
     photo?.path,
     classes,
-    divisions,
     genders,
     bloodGroups,
   ];

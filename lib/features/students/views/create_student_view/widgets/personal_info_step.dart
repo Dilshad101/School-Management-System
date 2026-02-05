@@ -13,7 +13,6 @@ class PersonalInfoStep extends StatefulWidget {
     required this.formKey,
     required this.fullName,
     required this.selectedClass,
-    required this.selectedDivision,
     required this.academicYear,
     required this.dateOfBirth,
     required this.selectedGender,
@@ -22,7 +21,6 @@ class PersonalInfoStep extends StatefulWidget {
     required this.email,
     required this.studentId,
     required this.classes,
-    required this.divisions,
     required this.genders,
     required this.bloodGroups,
     required this.onFullNameChanged,
@@ -39,7 +37,6 @@ class PersonalInfoStep extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final String fullName;
   final String? selectedClass;
-  final String? selectedDivision;
   final String academicYear;
   final DateTime? dateOfBirth;
   final String? selectedGender;
@@ -48,7 +45,6 @@ class PersonalInfoStep extends StatefulWidget {
   final String email;
   final String studentId;
   final List<String> classes;
-  final List<String> divisions;
   final List<String> genders;
   final List<String> bloodGroups;
   final ValueChanged<String> onFullNameChanged;
@@ -156,40 +152,18 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
             const SizedBox(height: 16),
 
             // Class and Division row
-            Row(
-              children: [
-                Expanded(
-                  child: BottomSheetDropdown<String>(
-                    label: 'Class',
-                    hint: 'Select class',
-                    items: widget.classes,
-                    value: widget.selectedClass,
-                    onChanged: widget.onClassChanged,
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select a class';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: BottomSheetDropdown<String>(
-                    label: 'Division',
-                    hint: 'Select Division',
-                    items: widget.divisions,
-                    value: widget.selectedDivision,
-                    onChanged: widget.onDivisionChanged,
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select a division';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ],
+            BottomSheetDropdown<String>(
+              label: 'Class',
+              hint: 'Select class',
+              items: widget.classes,
+              value: widget.selectedClass,
+              onChanged: widget.onClassChanged,
+              validator: (value) {
+                if (value == null) {
+                  return 'Please select a class';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
 
