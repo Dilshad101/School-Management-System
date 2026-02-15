@@ -30,4 +30,7 @@ class Endpoints {
   // Academics endpoints
   static const String classRooms = '/v1/academics/class-room/';
   static const String academicYears = '/v1/academics/academic-year/';
+
+  // Employees/School Users endpoints
+  static const String schoolUsers = '/v1/school-users/';
 }

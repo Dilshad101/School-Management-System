@@ -1,23 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
+import 'package:school_management_system/core/utils/di.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
 
 import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../../shared/widgets/input_fields/search_field.dart';
 import '../../blocs/create_employee/create_employee_state.dart';
+import '../../blocs/employees/employees_bloc.dart';
+import '../../blocs/employees/employees_event.dart';
+import '../../blocs/employees/employees_state.dart';
+import '../../repositories/employees_repository.dart';
 import 'widgets/employe_tile.dart';
 import 'widgets/staff_category_selector_dialog.dart';
 
-class EmployeesView extends StatefulWidget {
+class EmployeesView extends StatelessWidget {
   const EmployeesView({super.key});
 
   @override
-  State<EmployeesView> createState() => _EmployeesViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          EmployeesBloc(employeesRepository: locator<EmployeesRepository>())
+            ..add(const FetchEmployees()),
+      child: const _EmployeesViewContent(),
+    );
+  }
 }
 
-class _EmployeesViewState extends State<EmployeesView> {
+class _EmployeesViewContent extends StatefulWidget {
+  const _EmployeesViewContent();
+
+  @override
+  State<_EmployeesViewContent> createState() => _EmployeesViewContentState();
+}
+
+class _EmployeesViewContentState extends State<_EmployeesViewContent> {
   final _roles = const ['Admin', 'Employee', 'Manager'];
   final _subjects = const ['Math', 'Science', 'History', 'Art'];
   String? _selectedRole;
@@ -77,7 +97,11 @@ class _EmployeesViewState extends State<EmployeesView> {
         child: Column(
           children: [
             // Search bar with filter button
-            AppSearchBar(onChanged: (value) {}),
+            AppSearchBar(
+              onChanged: (value) {
+                context.read<EmployeesBloc>().add(SearchEmployees(value));
+              },
+            ),
             const SizedBox(height: 10),
 
             // filter and sort options
@@ -121,13 +145,88 @@ class _EmployeesViewState extends State<EmployeesView> {
               },
             ),
             const SizedBox(height: 16),
-            // Employee list placeholder
-            // EmployeeTile(),
+            // Employee list
             Expanded(
-              child: ListView.separated(
-                itemCount: 10,
-                separatorBuilder: (context, index) => SizedBox(height: 10),
-                itemBuilder: (context, index) => EmployeeTile(),
+              child: BlocConsumer<EmployeesBloc, EmployeesState>(
+                listener: (context, state) {
+                  if (state.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.errorMessage!),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state.isLoading && state.employees.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state.employees.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No employees found',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<EmployeesBloc>().add(
+                        const RefreshEmployees(),
+                      );
+                    },
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (scrollInfo) {
+                        if (scrollInfo.metrics.pixels >=
+                                scrollInfo.metrics.maxScrollExtent - 200 &&
+                            !state.isLoadingMore &&
+                            state.hasNext) {
+                          context.read<EmployeesBloc>().add(
+                            const LoadMoreEmployees(),
+                          );
+                        }
+                        return false;
+                      },
+                      child: ListView.separated(
+                        itemCount:
+                            state.employees.length +
+                            (state.isLoadingMore ? 1 : 0),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          if (index >= state.employees.length) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+                          final employee = state.employees[index];
+                          return EmployeeTile(
+                            employee: employee,
+                            onEdit: () {
+                              // Navigate to edit employee
+                              context.push(
+                                Routes.createEmployee,
+                                extra: employee.id,
+                              );
+                            },
+                            onDelete: () {
+                              // Show delete confirmation dialog
+                              _showDeleteConfirmation(context, employee.id);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -159,6 +258,31 @@ class _EmployeesViewState extends State<EmployeesView> {
             color: isSelected ? Colors.white : AppColors.textPrimary,
           ),
         ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, int employeeId) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Employee'),
+        content: const Text('Are you sure you want to delete this employee?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              // TODO: Add delete event to bloc when implemented
+              // context.read<EmployeesBloc>().add(DeleteEmployee(employeeId));
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
       ),
     );
   }
