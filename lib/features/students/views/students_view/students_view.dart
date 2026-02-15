@@ -215,7 +215,10 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
                         return StudentTile(
                           student: student,
                           onEdit: () {
-                            // TODO: Navigate to edit student
+                            context.push(
+                              Routes.createStudent,
+                              extra: student.id,
+                            );
                           },
                           onDelete: () {
                             // TODO: Show delete confirmation

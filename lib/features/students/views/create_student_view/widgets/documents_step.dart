@@ -113,9 +113,13 @@ class _DocumentCard extends StatelessWidget {
                   strokeAlign: BorderSide.strokeAlignInside,
                 ),
               ),
-              child: document.hasFile
+              child: document.hasAnyFile
                   ? _FileSelectedContent(
-                      fileName: document.fileName,
+                      fileName: document.hasFile
+                          ? document.fileName
+                          : document.name,
+                      isExistingUrl:
+                          document.hasExistingFile && !document.hasFile,
                       onReplace: onPickFile,
                     )
                   : _UploadContent(onTap: onPickFile),
@@ -197,10 +201,15 @@ class _UploadContent extends StatelessWidget {
 
 /// Content shown when a file is selected.
 class _FileSelectedContent extends StatelessWidget {
-  const _FileSelectedContent({required this.fileName, required this.onReplace});
+  const _FileSelectedContent({
+    required this.fileName,
+    required this.onReplace,
+    this.isExistingUrl = false,
+  });
 
   final String fileName;
   final VoidCallback onReplace;
+  final bool isExistingUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -215,14 +224,16 @@ class _FileSelectedContent extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: Icon(
-            Icons.check_circle_outline,
+            isExistingUrl
+                ? Icons.cloud_done_outlined
+                : Icons.check_circle_outline,
             color: AppColors.green,
             size: 28,
           ),
         ),
         const SizedBox(height: 12),
         Text(
-          fileName,
+          isExistingUrl ? 'Already uploaded' : fileName,
           style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
           textAlign: TextAlign.center,
           maxLines: 1,

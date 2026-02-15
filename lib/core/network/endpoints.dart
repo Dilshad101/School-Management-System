@@ -26,4 +26,8 @@ class Endpoints {
 
   // Students endpoints
   static const String students = '/v1/student-users/';
+
+  // Academics endpoints
+  static const String classRooms = '/v1/academics/class-room/';
+  static const String academicYears = '/v1/academics/academic-year/';
 }

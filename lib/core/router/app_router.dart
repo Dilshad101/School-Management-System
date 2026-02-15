@@ -66,7 +66,8 @@ class NavigationService {
         ),
         GoRoute(
           path: Routes.createStudent,
-          builder: (context, state) => const CreateStudentView(),
+          builder: (context, state) =>
+              CreateStudentView(studentId: state.extra as int?),
         ),
         GoRoute(
           path: Routes.classes,

@@ -14,12 +14,23 @@ import 'widgets/student_created_dialog.dart';
 import 'widgets/student_step_indicator.dart';
 
 class CreateStudentView extends StatelessWidget {
-  const CreateStudentView({super.key});
+  const CreateStudentView({super.key, this.studentId});
+
+  /// If provided, the view will load the student and enter edit mode.
+  final int? studentId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CreateStudentCubit()..initialize(),
+      create: (context) {
+        final cubit = CreateStudentCubit();
+        if (studentId != null) {
+          cubit.initializeForEdit(studentId!);
+        } else {
+          cubit.initialize();
+        }
+        return cubit;
+      },
       child: const _CreateStudentViewContent(),
     );
   }
@@ -58,7 +69,10 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.background,
-          appBar: AppBar(title: const Text('Add Student'), centerTitle: true),
+          appBar: AppBar(
+            title: Text(state.isEditMode ? 'Edit Student' : 'Add Student'),
+            centerTitle: true,
+          ),
           body: state.isInitialLoading
               ? const Center(child: CircularProgressIndicator())
               : Column(
@@ -83,7 +97,7 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
         return PersonalInfoStep(
           formKey: _step1FormKey,
           fullName: state.fullName,
-          selectedClass: state.selectedClass,
+          selectedClassRoom: state.selectedClassRoom,
           selectedAcademicYear: state.selectedAcademicYear,
           roleNumber: state.roleNumber,
           dateOfBirth: state.dateOfBirth,
@@ -91,14 +105,14 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
           selectedBloodGroup: state.selectedBloodGroup,
           address: state.address,
           email: state.email,
+          phone: state.phone,
           studentId: state.studentId,
-          classes: state.classes,
+          classRooms: state.classRooms,
           genders: state.genders,
           academicYears: state.academicYears,
           bloodGroups: state.bloodGroups,
           onFullNameChanged: cubit.updateFullName,
-          onClassChanged: cubit.updateClass,
-          onDivisionChanged: cubit.updateDivision,
+          onClassRoomChanged: cubit.updateClassRoom,
           onAcademicYearChanged: cubit.updateAcademicYear,
           onRoleNumberChanged: cubit.updateRoleNumber,
           onDateOfBirthChanged: cubit.updateDateOfBirth,
@@ -106,6 +120,7 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
           onBloodGroupChanged: cubit.updateBloodGroup,
           onAddressChanged: cubit.updateAddress,
           onEmailChanged: cubit.updateEmail,
+          onPhoneChanged: cubit.updatePhone,
         );
 
       case CreateStudentStep.documents:
@@ -136,6 +151,7 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
           formKey: _step4FormKey,
           studentName: state.displayName,
           photo: state.photo,
+          existingPhotoUrl: state.existingPhotoUrl,
           onPickFromGallery: cubit.pickPhotoFromGallery,
           onPickFromCamera: cubit.pickPhotoFromCamera,
           onRemovePhoto: cubit.removePhoto,
@@ -253,6 +269,20 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
 
   void _showSuccessDialog(BuildContext context, CreateStudentState state) {
     final cubit = context.read<CreateStudentCubit>();
+
+    if (state.isEditMode) {
+      // For edit mode, show a simple success snackbar and go back
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Student updated successfully'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      cubit.resetSubmissionStatus();
+      context.pop();
+      return;
+    }
 
     StudentCreatedDialog.show(
       context: context,

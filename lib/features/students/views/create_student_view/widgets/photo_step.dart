@@ -10,6 +10,7 @@ class PhotoStep extends StatelessWidget {
     required this.formKey,
     required this.studentName,
     required this.photo,
+    this.existingPhotoUrl,
     required this.onPickFromGallery,
     required this.onPickFromCamera,
     required this.onRemovePhoto,
@@ -18,9 +19,24 @@ class PhotoStep extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final String studentName;
   final File? photo;
+  final String? existingPhotoUrl;
   final VoidCallback onPickFromGallery;
   final VoidCallback onPickFromCamera;
   final VoidCallback onRemovePhoto;
+
+  bool get hasPhoto => photo != null || existingPhotoUrl != null;
+
+  DecorationImage? _buildDecorationImage() {
+    if (photo != null) {
+      return DecorationImage(image: FileImage(photo!), fit: BoxFit.cover);
+    } else if (existingPhotoUrl != null) {
+      return DecorationImage(
+        image: NetworkImage(existingPhotoUrl!),
+        fit: BoxFit.cover,
+      );
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +68,7 @@ class PhotoStep extends StatelessWidget {
               child: FormField<File>(
                 initialValue: photo,
                 validator: (value) {
-                  if (value == null) {
+                  if (!hasPhoto) {
                     return 'Please upload a photo';
                   }
                   return null;
@@ -88,14 +104,9 @@ class PhotoStep extends StatelessWidget {
                                 spreadRadius: 5,
                               ),
                             ],
-                            image: photo != null
-                                ? DecorationImage(
-                                    image: FileImage(photo!),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
+                            image: _buildDecorationImage(),
                           ),
-                          child: photo == null
+                          child: !hasPhoto
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -125,7 +136,7 @@ class PhotoStep extends StatelessWidget {
                           ),
                         ),
                       ],
-                      if (photo != null) ...[
+                      if (hasPhoto) ...[
                         const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
