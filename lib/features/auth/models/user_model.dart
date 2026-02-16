@@ -11,8 +11,8 @@ class UserSchoolRole extends Equatable {
     this.joinedAt,
   });
 
-  final int id;
-  final int user;
+  final String id;
+  final String user;
   final String school;
   final List<String> roles;
   final String status;
@@ -20,11 +20,11 @@ class UserSchoolRole extends Equatable {
 
   factory UserSchoolRole.fromJson(Map<String, dynamic> json) {
     return UserSchoolRole(
-      id: json['id'] ?? 0,
-      user: json['user'] ?? 0,
-      school: json['school'] ?? '',
+      id: json['id']?.toString() ?? '',
+      user: json['user']?.toString() ?? '',
+      school: json['school']?.toString() ?? '',
       roles: List<String>.from(json['roles'] ?? []),
-      status: json['status'] ?? '',
+      status: json['status']?.toString() ?? '',
       joinedAt: json['joined_at'] != null
           ? DateTime.tryParse(json['joined_at'])
           : null,
@@ -51,7 +51,7 @@ class UserModel extends Equatable {
     this.schools = const [],
   });
 
-  final int id;
+  final String id;
   final String email;
   final String? phone;
   final String? firstName;
@@ -81,7 +81,7 @@ class UserModel extends Equatable {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>? ?? json;
     return UserModel(
-      id: data['id'] ?? 0,
+      id: data['id'] ?? '',
       email: data['email'] ?? '',
       phone: data['phone'],
       firstName: data['first_name'],

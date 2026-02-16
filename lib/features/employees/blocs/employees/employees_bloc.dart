@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -58,7 +59,8 @@ class EmployeesBloc extends Bloc<EmployeesEvent, EmployeesState> {
           searchQuery: event.search ?? state.searchQuery,
         ),
       );
-    } on ApiException catch (e) {
+    } on ApiException catch (e, s) {
+      log('$e trace: $s');
       emit(
         state.copyWith(
           isLoading: false,
@@ -67,7 +69,8 @@ class EmployeesBloc extends Bloc<EmployeesEvent, EmployeesState> {
           errorMessage: e.message,
         ),
       );
-    } catch (e) {
+    } catch (e, s) {
+      log('$e trace: $s');
       emit(
         state.copyWith(
           isLoading: false,

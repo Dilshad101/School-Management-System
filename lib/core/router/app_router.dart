@@ -13,6 +13,7 @@ import 'package:school_management_system/features/employees/blocs/create_employe
 import 'package:school_management_system/features/employees/views/create_employee_view/create_employee_view.dart';
 import 'package:school_management_system/features/employees/views/employees_view/employees_view.dart';
 import 'package:school_management_system/features/fees/views/fees_view/fees_view.dart';
+import 'package:school_management_system/features/guardians/view/add_guardian_view.dart';
 import 'package:school_management_system/features/guardians/view/guardian_view.dart';
 import 'package:school_management_system/features/notifications/views/notification_view/notification_view.dart';
 import 'package:school_management_system/features/profile/views/profile_page.dart';
@@ -22,6 +23,7 @@ import 'package:school_management_system/features/subscriptions/views/subscripti
 import 'package:school_management_system/features/user_request/views/user_request_view.dart';
 
 import '../../features/auth/views/splash_page.dart';
+import '../utils/di.dart';
 import 'nave_bar_page.dart';
 import 'route_paths.dart';
 
@@ -91,6 +93,21 @@ class NavigationService {
         GoRoute(
           path: Routes.guardians,
           builder: (context, state) => const GuardianView(),
+        ),
+        GoRoute(
+          path: Routes.createGuardian,
+          builder: (context, state) {
+            final schoolId = locator<SessionHolder>().session?.schoolId ?? '';
+            return AddGuardianView(schoolId: schoolId);
+          },
+        ),
+        GoRoute(
+          path: Routes.editGuardian,
+          builder: (context, state) {
+            final guardianId = state.pathParameters['id'];
+            final schoolId = locator<SessionHolder>().session?.schoolId ?? '';
+            return AddGuardianView(schoolId: schoolId, guardianId: guardianId);
+          },
         ),
         GoRoute(
           path: Routes.attendance,

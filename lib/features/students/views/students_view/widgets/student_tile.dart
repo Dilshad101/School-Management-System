@@ -64,11 +64,14 @@ class StudentTile extends StatelessWidget {
                           height: 18,
                           child: VerticalDivider(color: AppColors.border),
                         ),
-                        Text(
-                          'ID ${student.id}',
-                          style: AppTextStyles.labelMedium.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textPrimary.withAlpha(160),
+                        Expanded(
+                          child: Text(
+                            'ID ${student.id}',
+                            style: AppTextStyles.labelMedium.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textPrimary.withAlpha(160),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ],

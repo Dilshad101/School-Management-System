@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import '../auth/session.dart';
 import '../tenant/tenant_context.dart';
@@ -13,7 +15,7 @@ class ApiClient {
 
   factory ApiClient({
     required Session? Function() sessionProvider,
-    required TenantContext tenantContext,
+    required TenantContext Function() tenantContext,
   }) {
     final dio = Dio(
       BaseOptions(
@@ -136,7 +138,7 @@ class ApiClient {
 /// the X-School-Id part.
 class _AuthTenantInterceptor extends Interceptor {
   final Session? Function() sessionProvider;
-  final TenantContext tenantContext;
+  final TenantContext Function() tenantContext;
 
   _AuthTenantInterceptor({
     required this.sessionProvider,
@@ -147,18 +149,26 @@ class _AuthTenantInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final session = sessionProvider();
 
+    // Attach tenant/school context as a header (useful for multi-tenant APIs)
+    // Priority: session.schoolId > tenantContext.selectedSchoolId
+    final effectiveSchoolId =
+        ((session?.schoolId?.isNotEmpty ?? false) ? session?.schoolId : null) ??
+        tenantContext().selectedSchoolId;
+
+    log('Session schoolId: ${session?.schoolId}');
+    log('TenantContext selectedSchoolId: ${tenantContext().selectedSchoolId}');
+    log('Effective schoolId: $effectiveSchoolId');
+
+    if (effectiveSchoolId != null && effectiveSchoolId.isNotEmpty) {
+      options.headers['X-School-Id'] = effectiveSchoolId;
+    }
+
     // Attach bearer token if available
     if (session != null && session.accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer ${session.accessToken}';
     }
 
-    // Optional: Attach tenant/school context as a header (useful for multi-tenant APIs)
-    final effectiveSchoolId =
-        session?.schoolId ?? tenantContext.selectedSchoolId;
-    if (effectiveSchoolId != null && effectiveSchoolId.isNotEmpty) {
-      options.headers['X-School-Id'] = effectiveSchoolId;
-    }
-
+    log('Final request headers: ${options.headers}');
     handler.next(options);
   }
 

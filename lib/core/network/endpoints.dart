@@ -33,4 +33,7 @@ class Endpoints {
 
   // Employees/School Users endpoints
   static const String schoolUsers = '/v1/school-users/';
+
+  // Guardians endpoints
+  static const String guardians = '/v1/guardian-users/';
 }

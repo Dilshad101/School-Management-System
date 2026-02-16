@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 
 import '../../../core/network/api_client.dart';
@@ -54,7 +56,8 @@ class EmployeesRepository {
       );
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);
-    } catch (e) {
+    } catch (e, s) {
+      log('$e trace: $s');
       if (e is ApiException) rethrow;
       throw ApiException(message: 'Failed to fetch employees: ${e.toString()}');
     }

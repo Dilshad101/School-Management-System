@@ -37,8 +37,8 @@ class EmployeeProfileModel extends Equatable {
     this.updatedAt,
   });
 
-  final int id;
-  final int user;
+  final String? id;
+  final String? user;
   final String? profilePic;
   final String? dateOfBirth;
   final String? address;
@@ -50,8 +50,8 @@ class EmployeeProfileModel extends Equatable {
 
   factory EmployeeProfileModel.fromJson(Map<String, dynamic> json) {
     return EmployeeProfileModel(
-      id: json['id'] ?? 0,
-      user: json['user'] ?? 0,
+      id: json['id']?.toString() ?? '',
+      user: json['user']?.toString() ?? '',
       profilePic: json['profile_pic'],
       dateOfBirth: json['date_of_birth'],
       address: json['address'],
@@ -163,7 +163,7 @@ class EmployeeModel extends Equatable {
     this.documents = const [],
   });
 
-  final int id;
+  final String id;
   final String email;
   final String? phone;
   final String? firstName;
@@ -193,7 +193,7 @@ class EmployeeModel extends Equatable {
 
   factory EmployeeModel.fromJson(Map<String, dynamic> json) {
     return EmployeeModel(
-      id: json['id'] ?? 0,
+      id: json['id'] ?? '',
       email: json['email'] ?? '',
       phone: json['phone'],
       firstName: json['first_name'],

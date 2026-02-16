@@ -10,6 +10,7 @@ import '../../features/auth/repositories/auth_repository.dart';
 import '../../features/auth/repositories/user_repository.dart';
 import '../../features/employees/repositories/employees_repository.dart';
 import '../../features/students/repositories/students_repository.dart';
+import '../../features/guardians/repositories/guardians_repository.dart';
 
 final locator = GetIt.instance;
 
@@ -42,7 +43,7 @@ Future<void> setupDependency() async {
   locator.registerSingleton<ApiClient>(
     ApiClient(
       sessionProvider: () => locator<SessionHolder>().session,
-      tenantContext: locator<TenantContext>(),
+      tenantContext: () => locator<TenantContext>(),
     ),
   );
 
@@ -68,6 +69,10 @@ Future<void> setupDependency() async {
 
   locator.registerLazySingleton<EmployeesRepository>(
     () => EmployeesRepository(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<GuardiansRepository>(
+    () => GuardiansRepository(apiClient: locator<ApiClient>()),
   );
 }
 

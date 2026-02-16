@@ -21,6 +21,8 @@ class Routes {
   static const String createClass = '/classes-create';
   static const String timeTable = '/classes-timetable';
   static const String guardians = '/guardians';
+  static const String createGuardian = '/guardians-create';
+  static const String editGuardian = '/guardians-edit/:id';
 
   static const String attendance = '/attendance';
   static const String fees = '/fees';

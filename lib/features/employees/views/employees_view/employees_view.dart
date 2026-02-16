@@ -262,7 +262,7 @@ class _EmployeesViewContentState extends State<_EmployeesViewContent> {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, int employeeId) {
+  void _showDeleteConfirmation(BuildContext context, String employeeId) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(

@@ -83,11 +83,13 @@ class EmployeeTile extends StatelessWidget {
                             child: VerticalDivider(color: AppColors.border),
                           ),
                         ],
-                        Text(
-                          employee.displayId,
-                          style: AppTextStyles.labelMedium.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textPrimary.withAlpha(160),
+                        Expanded(
+                          child: Text(
+                            employee.displayId,
+                            style: AppTextStyles.labelMedium.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textPrimary.withAlpha(160),
+                            ),
                           ),
                         ),
                       ],

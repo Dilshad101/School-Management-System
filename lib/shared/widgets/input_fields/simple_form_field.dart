@@ -21,7 +21,7 @@ class SimpleFormField extends StatelessWidget {
   final String label;
   final String hint;
   final TextInputType? keyboardType;
-  final String? Function(String?)? validator;
+  final String? Function(String? value)? validator;
   final ValueChanged<String>? onChanged;
   final bool enabled;
   final int maxLines;
