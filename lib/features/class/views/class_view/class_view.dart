@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
+import 'package:school_management_system/core/utils/di.dart';
+import 'package:school_management_system/features/class/blocs/classroom/classroom_bloc.dart';
+import 'package:school_management_system/features/class/repositories/classroom_repository.dart';
 
 import '../../../../shared/styles/app_styles.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
@@ -8,14 +12,28 @@ import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../../shared/widgets/input_fields/search_field.dart';
 import 'widgets/class_tile.dart';
 
-class ClassView extends StatefulWidget {
+class ClassView extends StatelessWidget {
   const ClassView({super.key});
 
   @override
-  State<ClassView> createState() => _ClassViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          ClassroomBloc(classroomRepository: locator<ClassroomRepository>())
+            ..add(const FetchClassrooms()),
+      child: const _ClassViewContent(),
+    );
+  }
 }
 
-class _ClassViewState extends State<ClassView> {
+class _ClassViewContent extends StatefulWidget {
+  const _ClassViewContent();
+
+  @override
+  State<_ClassViewContent> createState() => _ClassViewContentState();
+}
+
+class _ClassViewContentState extends State<_ClassViewContent> {
   final _classes = const ['Class 1', 'Class 2', 'Class 3'];
   final _divisions = const ['Division A', 'Division B', 'Division C'];
 
@@ -38,6 +56,13 @@ class _ClassViewState extends State<ClassView> {
     super.dispose();
   }
 
+  Future<void> _navigateToCreateClass() async {
+    final result = await context.push<bool>(Routes.createClass);
+    if (result == true && mounted) {
+      context.read<ClassroomBloc>().add(const RefreshClassrooms());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +72,11 @@ class _ClassViewState extends State<ClassView> {
         child: Column(
           children: [
             // Search bar
-            AppSearchBar(onChanged: (value) {}),
+            AppSearchBar(
+              onChanged: (value) {
+                context.read<ClassroomBloc>().add(SearchClassrooms(value));
+              },
+            ),
             const SizedBox(height: 10),
 
             // filter and sort options
@@ -88,31 +117,104 @@ class _ClassViewState extends State<ClassView> {
 
             // Class list
             Expanded(
-              child: ListView.separated(
-                itemCount: 10,
-                separatorBuilder: (context, index) => SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  // Show different states based on index for demonstration
-                  if (index == 1) {
-                    return ClassTile(
-                      className: 'Class 10 - A',
-                      roomNumber: 'Room A-12',
-                      teacherName: 'Ms. johnson',
-                      studentCount: 36,
-                      subjectCount: 8,
-                      hasTimetable: false,
-                      daysLeft: 2,
+              child: BlocConsumer<ClassroomBloc, ClassroomState>(
+                listener: (context, state) {
+                  if (state.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.errorMessage!),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    context.read<ClassroomBloc>().add(
+                      const ClearClassroomError(),
                     );
                   }
-                  return ClassTile(
-                    className: 'Class 10 - A',
-                    roomNumber: 'Room A-12',
-                    teacherName: 'Ms. johnson',
-                    studentCount: 36,
-                    subjectCount: 8,
-                    onManageTimetable: () {
-                      context.push(Routes.timeTable);
+                },
+                builder: (context, state) {
+                  // Loading state
+                  if (state.isLoading && state.classrooms.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  // Empty state
+                  if (state.classrooms.isEmpty && !state.isLoading) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.class_outlined,
+                            size: 64,
+                            color: AppColors.textSecondary.withAlpha(100),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No classes found',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          TextButton(
+                            onPressed: () {
+                              context.read<ClassroomBloc>().add(
+                                const RefreshClassrooms(),
+                              );
+                            },
+                            child: const Text('Refresh'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  // Success state with data
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<ClassroomBloc>().add(
+                        const RefreshClassrooms(),
+                      );
                     },
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (scrollInfo) {
+                        if (scrollInfo.metrics.pixels >=
+                                scrollInfo.metrics.maxScrollExtent - 200 &&
+                            !state.isLoadingMore &&
+                            state.hasNext) {
+                          context.read<ClassroomBloc>().add(
+                            const LoadMoreClassrooms(),
+                          );
+                        }
+                        return false;
+                      },
+                      child: ListView.separated(
+                        itemCount:
+                            state.classrooms.length +
+                            (state.isLoadingMore ? 1 : 0),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          // Loading more indicator
+                          if (index >= state.classrooms.length) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+
+                          final classroom = state.classrooms[index];
+                          return ClassTile(
+                            classroom: classroom,
+                            onManageTimetable: () {
+                              context.push(Routes.timeTable);
+                            },
+                          );
+                        },
+                      ),
+                    ),
                   );
                 },
               ),
@@ -121,9 +223,7 @@ class _ClassViewState extends State<ClassView> {
         ),
       ),
       floatingActionButton: MyFloatingActionButton(
-        onPressed: () {
-          context.push(Routes.createClass);
-        },
+        onPressed: _navigateToCreateClass,
       ),
     );
   }

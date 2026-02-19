@@ -8,6 +8,7 @@ import '../tenant/tenant_context.dart';
 import '../router/app_router.dart';
 import '../../features/auth/repositories/auth_repository.dart';
 import '../../features/auth/repositories/user_repository.dart';
+import '../../features/class/repositories/classroom_repository.dart';
 import '../../features/employees/repositories/employees_repository.dart';
 import '../../features/employees/repositories/roles_repository.dart';
 import '../../features/employees/repositories/subjects_repository.dart';
@@ -83,6 +84,10 @@ Future<void> setupDependency() async {
 
   locator.registerLazySingleton<GuardiansRepository>(
     () => GuardiansRepository(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<ClassroomRepository>(
+    () => ClassroomRepository(apiClient: locator<ApiClient>()),
   );
 }
 

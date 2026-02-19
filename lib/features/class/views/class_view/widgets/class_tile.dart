@@ -1,37 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
+import 'package:school_management_system/features/class/models/classroom_model.dart';
 
 import '../../../../../shared/styles/app_styles.dart';
 
 class ClassTile extends StatelessWidget {
   const ClassTile({
     super.key,
-    this.className = 'Class 10 - A',
-    this.classId = 'class_10_a',
-    this.roomNumber = 'Room A-12',
-    this.teacherName = 'Ms. johnson',
-    this.studentCount = 36,
-    this.subjectCount = 8,
+    required this.classroom,
     this.hasTimetable = true,
     this.daysLeft,
     this.onManageTimetable,
   });
 
-  final String className, classId;
-  final String roomNumber;
-  final String teacherName;
-  final int studentCount;
-  final int subjectCount;
+  final ClassroomModel classroom;
   final bool hasTimetable;
   final int? daysLeft;
   final VoidCallback? onManageTimetable;
 
   @override
   Widget build(BuildContext context) {
+    final teacherName = classroom.classTeacherDetails?.name ?? 'Not assigned';
+
     return InkWell(
       onTap: () {
-        context.push(Routes.classDetail, extra: classId);
+        context.push(Routes.classDetail, extra: classroom.id);
       },
       child: Container(
         padding: EdgeInsets.all(16),
@@ -43,18 +37,18 @@ class ClassTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Class name and room number row
+            // Class name and code row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  className,
+                  classroom.name,
                   style: AppTextStyles.bodyLarge.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  roomNumber,
+                  classroom.code.toUpperCase(),
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -72,7 +66,7 @@ class ClassTile extends StatelessWidget {
             ),
             const SizedBox(height: 6),
 
-            // Students and subjects count row
+            // Students count row
             Row(
               children: [
                 // Students count
@@ -82,29 +76,13 @@ class ClassTile extends StatelessWidget {
                     Icon(Icons.school, size: 22, color: AppColors.primary),
                     const SizedBox(width: 6),
                     Text(
-                      '$studentCount Students',
+                      '${classroom.studentCount} Students',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textPrimary.withAlpha(150),
                       ),
                     ),
                   ],
                 ),
-                // const SizedBox(width: 16),
-
-                // // Subjects count
-                // Row(
-                //   mainAxisSize: MainAxisSize.min,
-                //   children: [
-                //     Icon(Icons.book, size: 22, color: AppColors.primary),
-                //     const SizedBox(width: 6),
-                //     Text(
-                //       '$subjectCount Subjects',
-                //       style: AppTextStyles.bodySmall.copyWith(
-                //         color: AppColors.textPrimary.withAlpha(150),
-                //       ),
-                //     ),
-                //   ],
-                // ),
               ],
             ),
 
