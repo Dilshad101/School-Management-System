@@ -89,22 +89,22 @@ class ClassTile extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(width: 16),
+                // const SizedBox(width: 16),
 
-                // Subjects count
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.book, size: 22, color: AppColors.primary),
-                    const SizedBox(width: 6),
-                    Text(
-                      '$subjectCount Subjects',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textPrimary.withAlpha(150),
-                      ),
-                    ),
-                  ],
-                ),
+                // // Subjects count
+                // Row(
+                //   mainAxisSize: MainAxisSize.min,
+                //   children: [
+                //     Icon(Icons.book, size: 22, color: AppColors.primary),
+                //     const SizedBox(width: 6),
+                //     Text(
+                //       '$subjectCount Subjects',
+                //       style: AppTextStyles.bodySmall.copyWith(
+                //         color: AppColors.textPrimary.withAlpha(150),
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ],
             ),
 
