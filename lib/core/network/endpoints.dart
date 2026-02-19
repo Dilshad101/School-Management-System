@@ -28,11 +28,17 @@ class Endpoints {
   static const String students = '/v1/student-users/';
 
   // Academics endpoints
-  static const String classRooms = '/v1/academics/class-room/';
-  static const String academicYears = '/v1/academics/academic-year/';
+  static const String classRooms = '/v1/academics/classrooms/';
+  static const String academicYears = '/v1/academics/academic-years/';
 
   // Employees/School Users endpoints
   static const String schoolUsers = '/v1/school-users/';
+
+  // Roles endpoints
+  static const String roles = '/v1/roles/';
+
+  // Subjects endpoints
+  static const String subjects = '/v1/academics/subjects/';
 
   // Guardians endpoints
   static const String guardians = '/v1/guardian-users/';

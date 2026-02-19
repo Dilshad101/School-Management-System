@@ -105,8 +105,8 @@ class EmployeeDocumentApiModel extends Equatable {
     this.uploadedAt,
   });
 
-  final int id;
-  final int user;
+  final String? id;
+  final String? user;
   final String? documentFile;
   final String? documentName;
   final String? documentNumber;
@@ -115,8 +115,8 @@ class EmployeeDocumentApiModel extends Equatable {
 
   factory EmployeeDocumentApiModel.fromJson(Map<String, dynamic> json) {
     return EmployeeDocumentApiModel(
-      id: json['id'] ?? 0,
-      user: json['user'] ?? 0,
+      id: json['id']?.toString() ?? '',
+      user: json['user']?.toString() ?? '',
       documentFile: json['document_file'],
       documentName: json['document_name'],
       documentNumber: json['document_number'],

@@ -2,16 +2,11 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 
-/// Enum for staff categories.
-enum StaffCategory {
-  teachers('Teachers'),
-  officeStaff('Office Staff'),
-  hostelWarden('Hostel Warden'),
-  securityStaff('Security Staff');
+import '../../models/role_model.dart';
+import '../../models/subject_model.dart';
 
-  const StaffCategory(this.label);
-  final String label;
-}
+export '../../models/role_model.dart';
+export '../../models/subject_model.dart';
 
 /// Enum for the current step in the create employee flow.
 enum CreateEmployeeStep { personalInfo, documents, photo }
@@ -25,42 +20,38 @@ class EmployeeDocumentModel extends Equatable {
     required this.id,
     required this.name,
     this.file,
+    this.existingUrl,
+    this.isExisting = false,
   });
 
   final String id;
   final String name;
   final File? file;
+  final String? existingUrl;
+  final bool isExisting;
 
-  EmployeeDocumentModel copyWith({String? id, String? name, File? file}) {
+  EmployeeDocumentModel copyWith({
+    String? id,
+    String? name,
+    File? file,
+    String? existingUrl,
+    bool? isExisting,
+  }) {
     return EmployeeDocumentModel(
       id: id ?? this.id,
       name: name ?? this.name,
       file: file ?? this.file,
+      existingUrl: existingUrl ?? this.existingUrl,
+      isExisting: isExisting ?? this.isExisting,
     );
   }
 
-  bool get hasFile => file != null;
+  bool get hasFile => file != null || existingUrl != null;
 
   String get fileName => file?.path.split('/').last ?? '';
 
   @override
-  List<Object?> get props => [id, name, file?.path];
-}
-
-/// Model for a staff category.
-class StaffCategoryModel extends Equatable {
-  const StaffCategoryModel({
-    required this.id,
-    required this.name,
-    this.isCustom = false,
-  });
-
-  final String id;
-  final String name;
-  final bool isCustom;
-
-  @override
-  List<Object?> get props => [id, name, isCustom];
+  List<Object?> get props => [id, name, file?.path, existingUrl, isExisting];
 }
 
 /// Immutable state class for CreateEmployeeCubit.
@@ -70,9 +61,8 @@ class CreateEmployeeState extends Equatable {
     this.isInitialLoading = true,
     this.submissionStatus = SubmissionStatus.initial,
     this.errorMessage,
-    // Staff category selection
-    this.selectedStaffCategory,
     // Step 1: Personal Info
+    this.selectedRoles = const [],
     this.fullName = '',
     this.mobileNo = '',
     this.joiningDate,
@@ -86,10 +76,16 @@ class CreateEmployeeState extends Equatable {
     this.documents = const [],
     // Step 3: Photo
     this.photo,
+    this.existingProfilePicUrl,
     // Dropdown data (fetched from API)
+    this.roles = const [],
     this.subjects = const [],
     this.genders = const [],
     this.bloodGroups = const [],
+    // Edit mode
+    this.isEditMode = false,
+    this.editingEmployeeId,
+    this.deletedDocumentIds = const [],
   });
 
   // Flow state
@@ -98,14 +94,12 @@ class CreateEmployeeState extends Equatable {
   final SubmissionStatus submissionStatus;
   final String? errorMessage;
 
-  // Staff category selection
-  final StaffCategoryModel? selectedStaffCategory;
-
   // Step 1: Personal Info
+  final List<RoleModel> selectedRoles;
   final String fullName;
   final String mobileNo;
   final DateTime? joiningDate;
-  final List<String> selectedSubjects;
+  final List<SubjectModel> selectedSubjects;
   final String? selectedGender;
   final String? selectedBloodGroup;
   final String address;
@@ -117,11 +111,18 @@ class CreateEmployeeState extends Equatable {
 
   // Step 3: Photo
   final File? photo;
+  final String? existingProfilePicUrl;
 
   // Dropdown data (fetched from API)
-  final List<String> subjects;
+  final List<RoleModel> roles;
+  final List<SubjectModel> subjects;
   final List<String> genders;
   final List<String> bloodGroups;
+
+  // Edit mode
+  final bool isEditMode;
+  final String? editingEmployeeId;
+  final List<String> deletedDocumentIds;
 
   /// Helper getters
   bool get isSubmitting => submissionStatus == SubmissionStatus.loading;
@@ -134,16 +135,20 @@ class CreateEmployeeState extends Equatable {
   bool get isFirstStep => currentStep == CreateEmployeeStep.personalInfo;
   bool get isLastStep => currentStep == CreateEmployeeStep.photo;
 
-  bool get hasCategorySelected => selectedStaffCategory != null;
+  bool get hasRolesSelected => selectedRoles.isNotEmpty;
 
   /// Get employee name for display
   String get displayName => fullName.isNotEmpty ? fullName : 'Employee';
 
-  /// Check if photo is selected
-  bool get hasPhoto => photo != null;
+  /// Check if photo is selected (either new or existing)
+  bool get hasPhoto => photo != null || existingProfilePicUrl != null;
 
-  /// Get category label
-  String get categoryLabel => selectedStaffCategory?.name ?? 'Select Category';
+  /// Check if has new photo selected
+  bool get hasNewPhoto => photo != null;
+
+  /// Get primary role label (first selected role)
+  String get primaryRoleLabel =>
+      selectedRoles.isNotEmpty ? selectedRoles.first.name : 'Select Role';
 
   /// Formatted joining date
   String get formattedJoiningDate {
@@ -158,13 +163,12 @@ class CreateEmployeeState extends Equatable {
     bool? isInitialLoading,
     SubmissionStatus? submissionStatus,
     String? errorMessage,
-    // Staff category
-    StaffCategoryModel? selectedStaffCategory,
     // Step 1
+    List<RoleModel>? selectedRoles,
     String? fullName,
     String? mobileNo,
     DateTime? joiningDate,
-    List<String>? selectedSubjects,
+    List<SubjectModel>? selectedSubjects,
     String? selectedGender,
     String? selectedBloodGroup,
     String? address,
@@ -175,20 +179,25 @@ class CreateEmployeeState extends Equatable {
     // Step 3
     File? photo,
     bool clearPhoto = false,
+    String? existingProfilePicUrl,
+    bool clearExistingPhoto = false,
     // Dropdown data
-    List<String>? subjects,
+    List<RoleModel>? roles,
+    List<SubjectModel>? subjects,
     List<String>? genders,
     List<String>? bloodGroups,
+    // Edit mode
+    bool? isEditMode,
+    String? editingEmployeeId,
+    List<String>? deletedDocumentIds,
   }) {
     return CreateEmployeeState(
       currentStep: currentStep ?? this.currentStep,
       isInitialLoading: isInitialLoading ?? this.isInitialLoading,
       submissionStatus: submissionStatus ?? this.submissionStatus,
       errorMessage: errorMessage,
-      // Staff category
-      selectedStaffCategory:
-          selectedStaffCategory ?? this.selectedStaffCategory,
       // Step 1
+      selectedRoles: selectedRoles ?? this.selectedRoles,
       fullName: fullName ?? this.fullName,
       mobileNo: mobileNo ?? this.mobileNo,
       joiningDate: joiningDate ?? this.joiningDate,
@@ -202,10 +211,18 @@ class CreateEmployeeState extends Equatable {
       documents: documents ?? this.documents,
       // Step 3
       photo: clearPhoto ? null : (photo ?? this.photo),
+      existingProfilePicUrl: clearExistingPhoto
+          ? null
+          : (existingProfilePicUrl ?? this.existingProfilePicUrl),
       // Dropdown data
+      roles: roles ?? this.roles,
       subjects: subjects ?? this.subjects,
       genders: genders ?? this.genders,
       bloodGroups: bloodGroups ?? this.bloodGroups,
+      // Edit mode
+      isEditMode: isEditMode ?? this.isEditMode,
+      editingEmployeeId: editingEmployeeId ?? this.editingEmployeeId,
+      deletedDocumentIds: deletedDocumentIds ?? this.deletedDocumentIds,
     );
   }
 
@@ -215,7 +232,7 @@ class CreateEmployeeState extends Equatable {
     isInitialLoading,
     submissionStatus,
     errorMessage,
-    selectedStaffCategory,
+    selectedRoles,
     fullName,
     mobileNo,
     joiningDate,
@@ -227,8 +244,13 @@ class CreateEmployeeState extends Equatable {
     employeeId,
     documents,
     photo,
+    existingProfilePicUrl,
+    roles,
     subjects,
     genders,
     bloodGroups,
+    isEditMode,
+    editingEmployeeId,
+    deletedDocumentIds,
   ];
 }

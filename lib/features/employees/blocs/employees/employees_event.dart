@@ -44,7 +44,7 @@ class RefreshEmployees extends EmployeesEvent {
 class DeleteEmployee extends EmployeesEvent {
   const DeleteEmployee(this.employeeId);
 
-  final int employeeId;
+  final String employeeId;
 
   @override
   List<Object?> get props => [employeeId];

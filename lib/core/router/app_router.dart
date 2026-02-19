@@ -9,7 +9,6 @@ import 'package:school_management_system/features/class/views/class_time_table_v
 import 'package:school_management_system/features/class/views/class_view/class_view.dart';
 import 'package:school_management_system/features/class/views/create_class_view/create_class_view.dart';
 import 'package:school_management_system/features/dashboard/views/dashboard_page.dart';
-import 'package:school_management_system/features/employees/blocs/create_employee/create_employee_state.dart';
 import 'package:school_management_system/features/employees/views/create_employee_view/create_employee_view.dart';
 import 'package:school_management_system/features/employees/views/employees_view/employees_view.dart';
 import 'package:school_management_system/features/fees/views/fees_view/fees_view.dart';
@@ -58,9 +57,14 @@ class NavigationService {
         ),
         GoRoute(
           path: Routes.createEmployee,
-          builder: (context, state) => CreateEmployeeView(
-            initialCategory: state.extra as StaffCategoryModel?,
-          ),
+          builder: (context, state) => const CreateEmployeeView(),
+        ),
+        GoRoute(
+          path: Routes.editEmployee,
+          builder: (context, state) {
+            final employeeId = state.extra as String?;
+            return CreateEmployeeView(employeeId: employeeId);
+          },
         ),
         GoRoute(
           path: Routes.students,

@@ -3,18 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
 import 'package:school_management_system/core/utils/di.dart';
+import 'package:school_management_system/core/utils/helpers.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
 
 import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../../shared/widgets/input_fields/search_field.dart';
-import '../../blocs/create_employee/create_employee_state.dart';
 import '../../blocs/employees/employees_bloc.dart';
 import '../../blocs/employees/employees_event.dart';
 import '../../blocs/employees/employees_state.dart';
 import '../../repositories/employees_repository.dart';
 import 'widgets/employe_tile.dart';
-import 'widgets/staff_category_selector_dialog.dart';
 
 class EmployeesView extends StatelessWidget {
   const EmployeesView({super.key});
@@ -45,14 +44,6 @@ class _EmployeesViewContentState extends State<_EmployeesViewContent> {
 
   late ValueNotifier<bool> _allSelectedNotifier;
 
-  // Sample staff categories for the bottom sheet
-  final List<StaffCategoryModel> _staffCategories = [
-    const StaffCategoryModel(id: '1', name: 'Teachers'),
-    const StaffCategoryModel(id: '2', name: 'Office Staff'),
-    const StaffCategoryModel(id: '3', name: 'Hostel Warden'),
-    const StaffCategoryModel(id: '4', name: 'Security Staff'),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -67,25 +58,11 @@ class _EmployeesViewContentState extends State<_EmployeesViewContent> {
     super.dispose();
   }
 
-  void _showStaffCategorySelector() {
-    StaffCategorySelectorDialog.show(
-      context: context,
-      categories: _staffCategories,
-      onCategorySelected: (category) {
-        // Navigate to create employee view with pre-selected category
-        context.push(Routes.createEmployee, extra: category);
-      },
-      onAddCategory: (name) {
-        // Add the new category to the list
-        _staffCategories.add(
-          StaffCategoryModel(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            name: name,
-            isCustom: true,
-          ),
-        );
-      },
-    );
+  Future<void> _navigateToCreateEmployee() async {
+    final result = await context.push<bool>(Routes.createEmployee);
+    if (result == true && mounted) {
+      context.read<EmployeesBloc>().add(const RefreshEmployees());
+    }
   }
 
   @override
@@ -210,12 +187,17 @@ class _EmployeesViewContentState extends State<_EmployeesViewContent> {
                           final employee = state.employees[index];
                           return EmployeeTile(
                             employee: employee,
-                            onEdit: () {
+                            onEdit: () async {
                               // Navigate to edit employee
-                              context.push(
-                                Routes.createEmployee,
+                              final result = await context.push<bool>(
+                                Routes.editEmployee,
                                 extra: employee.id,
                               );
+                              if (result == true && context.mounted) {
+                                context.read<EmployeesBloc>().add(
+                                  const RefreshEmployees(),
+                                );
+                              }
                             },
                             onDelete: () {
                               // Show delete confirmation dialog
@@ -233,7 +215,7 @@ class _EmployeesViewContentState extends State<_EmployeesViewContent> {
         ),
       ),
       floatingActionButton: MyFloatingActionButton(
-        onPressed: _showStaffCategorySelector,
+        onPressed: _navigateToCreateEmployee,
       ),
     );
   }
@@ -263,27 +245,14 @@ class _EmployeesViewContentState extends State<_EmployeesViewContent> {
   }
 
   void _showDeleteConfirmation(BuildContext context, String employeeId) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Employee'),
-        content: const Text('Are you sure you want to delete this employee?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              // TODO: Add delete event to bloc when implemented
-              // context.read<EmployeesBloc>().add(DeleteEmployee(employeeId));
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+    Helpers.showWarningBottomSheet(
+      context,
+      title: 'Delete Employee',
+      message: 'Are you sure you want to delete this employee?',
+      confirmText: 'Delete',
+      onConfirm: () {
+        context.read<EmployeesBloc>().add(DeleteEmployee(employeeId));
+      },
     );
   }
 }

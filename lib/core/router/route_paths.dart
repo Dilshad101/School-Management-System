@@ -16,6 +16,7 @@ class Routes {
   static const String employees = '/employees';
   // static const String employeeDetail = '/employees/:id';
   static const String createEmployee = '/employees-create';
+  static const String editEmployee = '/employees-edit/:id';
   static const String classes = '/classes';
   static const String classDetail = '/classes/:id';
   static const String createClass = '/classes-create';

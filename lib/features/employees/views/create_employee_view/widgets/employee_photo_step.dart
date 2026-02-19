@@ -10,17 +10,21 @@ class EmployeePhotoStep extends StatelessWidget {
     required this.formKey,
     required this.employeeName,
     required this.photo,
+    this.existingPhotoUrl,
     required this.onPickFromGallery,
     required this.onPickFromCamera,
     required this.onRemovePhoto,
+    this.isEditMode = false,
   });
 
   final GlobalKey<FormState> formKey;
   final String employeeName;
   final File? photo;
+  final String? existingPhotoUrl;
   final VoidCallback onPickFromGallery;
   final VoidCallback onPickFromCamera;
   final VoidCallback onRemovePhoto;
+  final bool isEditMode;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +56,11 @@ class EmployeePhotoStep extends StatelessWidget {
               child: FormField<File>(
                 initialValue: photo,
                 validator: (value) {
-                  if (value == null) {
+                  // In edit mode, existing photo is acceptable
+                  if (isEditMode && existingPhotoUrl != null) {
+                    return null;
+                  }
+                  if (value == null && existingPhotoUrl == null) {
                     return 'Please upload a photo';
                   }
                   return null;
@@ -64,6 +72,8 @@ class EmployeePhotoStep extends StatelessWidget {
                       state.didChange(photo);
                     });
                   }
+
+                  final hasAnyPhoto = photo != null || existingPhotoUrl != null;
 
                   return Column(
                     children: [
@@ -93,9 +103,14 @@ class EmployeePhotoStep extends StatelessWidget {
                                     image: FileImage(photo!),
                                     fit: BoxFit.cover,
                                   )
+                                : existingPhotoUrl != null
+                                ? DecorationImage(
+                                    image: NetworkImage(existingPhotoUrl!),
+                                    fit: BoxFit.cover,
+                                  )
                                 : null,
                           ),
-                          child: photo == null
+                          child: !hasAnyPhoto
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -127,7 +142,7 @@ class EmployeePhotoStep extends StatelessWidget {
                       ],
 
                       // Remove photo button (shown when photo exists)
-                      if (photo != null) ...[
+                      if (hasAnyPhoto) ...[
                         const SizedBox(height: 24),
                         _RemovePhotoButton(onTap: onRemovePhoto),
                       ],

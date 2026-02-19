@@ -9,6 +9,8 @@ import '../router/app_router.dart';
 import '../../features/auth/repositories/auth_repository.dart';
 import '../../features/auth/repositories/user_repository.dart';
 import '../../features/employees/repositories/employees_repository.dart';
+import '../../features/employees/repositories/roles_repository.dart';
+import '../../features/employees/repositories/subjects_repository.dart';
 import '../../features/students/repositories/students_repository.dart';
 import '../../features/guardians/repositories/guardians_repository.dart';
 
@@ -69,6 +71,14 @@ Future<void> setupDependency() async {
 
   locator.registerLazySingleton<EmployeesRepository>(
     () => EmployeesRepository(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<RolesRepository>(
+    () => RolesRepository(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<SubjectsRepository>(
+    () => SubjectsRepository(apiClient: locator<ApiClient>()),
   );
 
   locator.registerLazySingleton<GuardiansRepository>(

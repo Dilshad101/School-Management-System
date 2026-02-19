@@ -13,14 +13,23 @@ import 'widgets/employee_photo_step.dart';
 import 'widgets/employee_step_indicator.dart';
 
 class CreateEmployeeView extends StatelessWidget {
-  const CreateEmployeeView({super.key, required this.initialCategory});
+  const CreateEmployeeView({super.key, this.employeeId});
 
-  final StaffCategoryModel? initialCategory;
+  /// The ID of the employee to edit. If null, creates a new employee.
+  final String? employeeId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CreateEmployeeCubit()..initialize(initialCategory),
+      create: (context) {
+        final cubit = CreateEmployeeCubit();
+        if (employeeId != null) {
+          cubit.initializeForEdit(employeeId: employeeId!);
+        } else {
+          cubit.initialize();
+        }
+        return cubit;
+      },
       child: const _CreateEmployeeViewContent(),
     );
   }
@@ -77,12 +86,13 @@ class _CreateEmployeeViewContentState
   }
 
   String _getAppBarTitle(CreateEmployeeState state) {
-    if (!state.hasCategorySelected) {
+    if (state.isEditMode) {
+      return 'Edit Employee';
+    }
+    if (!state.hasRolesSelected) {
       return 'Add Employee';
     }
-    return state.categoryLabel == 'Teachers'
-        ? 'Add Teacher'
-        : 'Add ${state.categoryLabel}';
+    return 'Add Employee';
   }
 
   Widget _buildStepContent(BuildContext context, CreateEmployeeState state) {
@@ -104,7 +114,10 @@ class _CreateEmployeeViewContentState
           subjects: state.subjects,
           genders: state.genders,
           bloodGroups: state.bloodGroups,
-          categoryLabel: state.categoryLabel,
+          roles: state.roles,
+          selectedRoles: state.selectedRoles,
+          onRoleAdded: cubit.addRole,
+          onRoleRemoved: cubit.removeRole,
           onFullNameChanged: cubit.updateFullName,
           onMobileNoChanged: cubit.updateMobileNo,
           onJoiningDateChanged: cubit.updateJoiningDate,
@@ -132,9 +145,11 @@ class _CreateEmployeeViewContentState
           formKey: _step3FormKey,
           employeeName: state.displayName,
           photo: state.photo,
+          existingPhotoUrl: state.existingProfilePicUrl,
           onPickFromGallery: cubit.pickPhotoFromGallery,
           onPickFromCamera: cubit.pickPhotoFromCamera,
           onRemovePhoto: cubit.removePhoto,
+          isEditMode: state.isEditMode,
         );
     }
   }
@@ -183,7 +198,9 @@ class _CreateEmployeeViewContentState
                 Expanded(
                   flex: state.isFirstStep ? 1 : 1,
                   child: GradientButton(
-                    label: state.isLastStep ? 'Add' : 'Next',
+                    label: state.isLastStep
+                        ? (state.isEditMode ? 'Update' : 'Add')
+                        : 'Next',
                     isLoading: state.isSubmitting,
                     onPressed: state.isSubmitting
                         ? null
@@ -250,15 +267,29 @@ class _CreateEmployeeViewContentState
   void _showSuccessDialog(BuildContext context, CreateEmployeeState state) {
     final cubit = context.read<CreateEmployeeCubit>();
 
+    if (state.isEditMode) {
+      // For edit mode, just show a snackbar and go back
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Employee updated successfully'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      cubit.resetSubmissionStatus();
+      context.pop(true); // Return true to indicate success
+      return;
+    }
+
     EmployeeCreatedDialog.show(
       context: context,
       employeeName: state.fullName.isNotEmpty ? state.fullName : 'Employee',
       employeeId: state.employeeId,
-      categoryLabel: state.categoryLabel,
+      categoryLabel: state.primaryRoleLabel,
       onViewProfile: () {
         Navigator.pop(context); // Close dialog
         cubit.resetSubmissionStatus();
-        context.pop(); // Navigate back to employees list
+        context.pop(true); // Return true to indicate success
       },
       onAddAnother: () {
         Navigator.pop(context); // Close dialog
@@ -267,7 +298,7 @@ class _CreateEmployeeViewContentState
       onClose: () {
         Navigator.pop(context); // Close dialog
         cubit.resetSubmissionStatus();
-        context.pop(); // Go back
+        context.pop(true); // Return true to indicate success
       },
     );
   }

@@ -4,6 +4,7 @@ import 'package:school_management_system/shared/widgets/dropdowns/bottom_sheet_d
 
 import '../../../../../features/students/views/create_student_view/widgets/date_picker_field.dart';
 import '../../../../../features/students/views/create_student_view/widgets/icon_form_field.dart';
+import '../../../blocs/create_employee/create_employee_state.dart';
 
 /// Step 1 of Create Employee flow - Personal Information.
 class EmployeePersonalInfoStep extends StatefulWidget {
@@ -22,7 +23,10 @@ class EmployeePersonalInfoStep extends StatefulWidget {
     required this.subjects,
     required this.genders,
     required this.bloodGroups,
-    required this.categoryLabel,
+    required this.roles,
+    required this.selectedRoles,
+    required this.onRoleAdded,
+    required this.onRoleRemoved,
     required this.onFullNameChanged,
     required this.onMobileNoChanged,
     required this.onJoiningDateChanged,
@@ -38,21 +42,24 @@ class EmployeePersonalInfoStep extends StatefulWidget {
   final String fullName;
   final String mobileNo;
   final DateTime? joiningDate;
-  final List<String> selectedSubjects;
+  final List<SubjectModel> selectedSubjects;
   final String? selectedGender;
   final String? selectedBloodGroup;
   final String address;
   final String email;
   final String employeeId;
-  final List<String> subjects;
+  final List<SubjectModel> subjects;
   final List<String> genders;
   final List<String> bloodGroups;
-  final String categoryLabel;
+  final List<RoleModel> roles;
+  final List<RoleModel> selectedRoles;
+  final ValueChanged<RoleModel> onRoleAdded;
+  final ValueChanged<RoleModel> onRoleRemoved;
   final ValueChanged<String> onFullNameChanged;
   final ValueChanged<String> onMobileNoChanged;
   final ValueChanged<DateTime?> onJoiningDateChanged;
-  final ValueChanged<String> onSubjectAdded;
-  final ValueChanged<String> onSubjectRemoved;
+  final ValueChanged<SubjectModel> onSubjectAdded;
+  final ValueChanged<SubjectModel> onSubjectRemoved;
   final ValueChanged<String?> onGenderChanged;
   final ValueChanged<String?> onBloodGroupChanged;
   final ValueChanged<String> onAddressChanged;
@@ -116,7 +123,7 @@ class _EmployeePersonalInfoStepState extends State<EmployeePersonalInfoStep> {
 
   void _showSubjectSelector(BuildContext context) {
     final availableSubjects = widget.subjects
-        .where((s) => !widget.selectedSubjects.contains(s))
+        .where((s) => !widget.selectedSubjects.any((ss) => ss.id == s.id))
         .toList();
 
     if (availableSubjects.isEmpty) {
@@ -130,10 +137,42 @@ class _EmployeePersonalInfoStepState extends State<EmployeePersonalInfoStep> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _SubjectSelectorBottomSheet(
-        subjects: availableSubjects,
-        onSubjectSelected: (subject) {
+      builder: (context) => _ItemSelectorBottomSheet<SubjectModel>(
+        title: 'Select Subject',
+        subtitle: 'Choose a subject to add',
+        items: availableSubjects,
+        itemLabelBuilder: (item) => item.name,
+        onItemSelected: (subject) {
           widget.onSubjectAdded(subject);
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  void _showRoleSelector(BuildContext context) {
+    final availableRoles = widget.roles
+        .where((r) => !widget.selectedRoles.any((sr) => sr.id == r.id))
+        .toList();
+
+    if (availableRoles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All roles have been selected')),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _ItemSelectorBottomSheet<RoleModel>(
+        title: 'Select Role',
+        subtitle: 'Choose a role to add',
+        items: availableRoles,
+        itemLabelBuilder: (item) => item.name,
+        onItemSelected: (role) {
+          widget.onRoleAdded(role);
           Navigator.pop(context);
         },
       ),
@@ -158,6 +197,24 @@ class _EmployeePersonalInfoStepState extends State<EmployeePersonalInfoStep> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // Roles (Multiple selection)
+            _MultiSelectField<RoleModel>(
+              label: 'Role(s)',
+              hint: 'Select roles',
+              icon: Icons.work_outline,
+              selectedItems: widget.selectedRoles,
+              itemLabelBuilder: (item) => item.name,
+              onAddItem: () => _showRoleSelector(context),
+              onRemoveItem: widget.onRoleRemoved,
+              validator: (items) {
+                if (items.isEmpty) {
+                  return 'Please select at least one role';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
 
             // Full Name
             IconFormField(
@@ -212,17 +269,17 @@ class _EmployeePersonalInfoStepState extends State<EmployeePersonalInfoStep> {
             ),
             const SizedBox(height: 16),
 
-            // Subjects (if teacher)
-            if (widget.categoryLabel == 'Teachers') ...[
-              _SubjectSelector(
-                label: "Subject's",
-                hint: 'Select subjects',
-                selectedSubjects: widget.selectedSubjects,
-                onAddSubject: () => _showSubjectSelector(context),
-                onRemoveSubject: widget.onSubjectRemoved,
-              ),
-              const SizedBox(height: 16),
-            ],
+            // Subjects (always visible)
+            _MultiSelectField<SubjectModel>(
+              label: "Subject's",
+              hint: 'Select subjects',
+              icon: Icons.menu_book_outlined,
+              selectedItems: widget.selectedSubjects,
+              itemLabelBuilder: (item) => item.name,
+              onAddItem: () => _showSubjectSelector(context),
+              onRemoveItem: widget.onSubjectRemoved,
+            ),
+            const SizedBox(height: 16),
 
             // Gender
             BottomSheetDropdown<String>(
@@ -285,10 +342,8 @@ class _EmployeePersonalInfoStepState extends State<EmployeePersonalInfoStep> {
             // Employee ID (auto-generated)
             IconFormField(
               controller: _employeeIdController,
-              label:
-                  '${widget.categoryLabel == 'Teachers' ? 'Teacher' : 'Employee'} ID (Auto Generated)',
-              hint:
-                  'Enter ${widget.categoryLabel == 'Teachers' ? 'Teacher' : 'Employee'} ID',
+              label: 'Employee ID (Auto Generated)',
+              hint: 'Enter Employee ID',
               icon: Icons.badge_outlined,
               enabled: false,
             ),
@@ -300,75 +355,98 @@ class _EmployeePersonalInfoStepState extends State<EmployeePersonalInfoStep> {
   }
 }
 
-/// Subject selector widget with chips.
-class _SubjectSelector extends StatelessWidget {
-  const _SubjectSelector({
-    required this.label,
-    required this.hint,
-    required this.selectedSubjects,
-    required this.onAddSubject,
-    required this.onRemoveSubject,
-  });
+/// Generic multi-select field widget with chips.
+class _MultiSelectField<T> extends FormField<List<T>> {
+  _MultiSelectField({
+    super.key,
+    required String label,
+    required String hint,
+    required IconData icon,
+    required List<T> selectedItems,
+    required String Function(T) itemLabelBuilder,
+    required VoidCallback onAddItem,
+    required ValueChanged<T> onRemoveItem,
+    String? Function(List<T>)? validator,
+  }) : super(
+         initialValue: selectedItems,
+         validator: validator != null
+             ? (value) => validator(value ?? [])
+             : null,
+         autovalidateMode: AutovalidateMode.onUserInteraction,
+         builder: (FormFieldState<List<T>> state) {
+           // Sync with external state
+           if (state.value != selectedItems) {
+             WidgetsBinding.instance.addPostFrameCallback((_) {
+               state.didChange(selectedItems);
+             });
+           }
 
-  final String label;
-  final String hint;
-  final List<String> selectedSubjects;
-  final VoidCallback onAddSubject;
-  final ValueChanged<String> onRemoveSubject;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: AppTextStyles.labelMedium),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: onAddSubject,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.cardBackground,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border, width: 1),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.menu_book_outlined,
-                  color: AppColors.iconDefault,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: selectedSubjects.isEmpty
-                      ? Text(hint, style: AppTextStyles.hint)
-                      : Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: selectedSubjects
-                              .map(
-                                (subject) => _SubjectChip(
-                                  label: subject,
-                                  onRemove: () => onRemoveSubject(subject),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+           return Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+               Text(label, style: AppTextStyles.labelMedium),
+               const SizedBox(height: 8),
+               GestureDetector(
+                 onTap: onAddItem,
+                 child: Container(
+                   width: double.infinity,
+                   padding: const EdgeInsets.symmetric(
+                     horizontal: 16,
+                     vertical: 12,
+                   ),
+                   decoration: BoxDecoration(
+                     color: AppColors.cardBackground,
+                     borderRadius: BorderRadius.circular(12),
+                     border: Border.all(
+                       color: state.hasError
+                           ? AppColors.borderError
+                           : AppColors.border,
+                       width: 1,
+                     ),
+                   ),
+                   child: Row(
+                     children: [
+                       Icon(icon, color: AppColors.iconDefault, size: 20),
+                       const SizedBox(width: 12),
+                       Expanded(
+                         child: selectedItems.isEmpty
+                             ? Text(hint, style: AppTextStyles.hint)
+                             : Wrap(
+                                 spacing: 8,
+                                 runSpacing: 8,
+                                 children: selectedItems
+                                     .map(
+                                       (item) => _ItemChip(
+                                         label: itemLabelBuilder(item),
+                                         onRemove: () => onRemoveItem(item),
+                                       ),
+                                     )
+                                     .toList(),
+                               ),
+                       ),
+                     ],
+                   ),
+                 ),
+               ),
+               if (state.hasError)
+                 Padding(
+                   padding: const EdgeInsets.only(top: 8, left: 12),
+                   child: Text(
+                     state.errorText ?? '',
+                     style: AppTextStyles.caption.copyWith(
+                       color: AppColors.borderError,
+                     ),
+                   ),
+                 ),
+             ],
+           );
+         },
+       );
 }
 
-/// Individual subject chip widget.
-class _SubjectChip extends StatelessWidget {
-  const _SubjectChip({required this.label, required this.onRemove});
+/// Individual item chip widget.
+class _ItemChip extends StatelessWidget {
+  const _ItemChip({required this.label, required this.onRemove});
 
   final String label;
   final VoidCallback onRemove;
@@ -402,30 +480,37 @@ class _SubjectChip extends StatelessWidget {
   }
 }
 
-/// Bottom sheet for selecting subjects with improved design.
-class _SubjectSelectorBottomSheet extends StatefulWidget {
-  const _SubjectSelectorBottomSheet({
-    required this.subjects,
-    required this.onSubjectSelected,
+/// Generic bottom sheet for selecting items with search.
+class _ItemSelectorBottomSheet<T> extends StatefulWidget {
+  const _ItemSelectorBottomSheet({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.items,
+    required this.itemLabelBuilder,
+    required this.onItemSelected,
   });
 
-  final List<String> subjects;
-  final ValueChanged<String> onSubjectSelected;
+  final String title;
+  final String subtitle;
+  final List<T> items;
+  final String Function(T) itemLabelBuilder;
+  final ValueChanged<T> onItemSelected;
 
   @override
-  State<_SubjectSelectorBottomSheet> createState() =>
-      _SubjectSelectorBottomSheetState();
+  State<_ItemSelectorBottomSheet<T>> createState() =>
+      _ItemSelectorBottomSheetState<T>();
 }
 
-class _SubjectSelectorBottomSheetState
-    extends State<_SubjectSelectorBottomSheet> {
+class _ItemSelectorBottomSheetState<T>
+    extends State<_ItemSelectorBottomSheet<T>> {
   final TextEditingController _searchController = TextEditingController();
-  List<String> _filteredSubjects = [];
+  List<T> _filteredItems = [];
 
   @override
   void initState() {
     super.initState();
-    _filteredSubjects = widget.subjects;
+    _filteredItems = widget.items;
   }
 
   @override
@@ -434,13 +519,18 @@ class _SubjectSelectorBottomSheetState
     super.dispose();
   }
 
-  void _filterSubjects(String query) {
+  void _filterItems(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredSubjects = widget.subjects;
+        _filteredItems = widget.items;
       } else {
-        _filteredSubjects = widget.subjects
-            .where((s) => s.toLowerCase().contains(query.toLowerCase()))
+        _filteredItems = widget.items
+            .where(
+              (item) => widget
+                  .itemLabelBuilder(item)
+                  .toLowerCase()
+                  .contains(query.toLowerCase()),
+            )
             .toList();
       }
     });
@@ -449,7 +539,6 @@ class _SubjectSelectorBottomSheetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      // margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -473,14 +562,14 @@ class _SubjectSelectorBottomSheetState
                   ),
                 ),
                 Text(
-                  'Select Subject',
+                  widget.title,
                   style: AppTextStyles.heading4.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Choose a subject to add',
+                  widget.subtitle,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -495,9 +584,9 @@ class _SubjectSelectorBottomSheetState
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
               controller: _searchController,
-              onChanged: _filterSubjects,
+              onChanged: _filterItems,
               decoration: InputDecoration(
-                hintText: 'Search subjects...',
+                hintText: 'Search...',
                 hintStyle: AppTextStyles.hint,
                 prefixIcon: Icon(
                   Icons.search,
@@ -530,12 +619,12 @@ class _SubjectSelectorBottomSheetState
           ),
           const SizedBox(height: 16),
 
-          // Subject list
+          // Item list
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.35,
             ),
-            child: _filteredSubjects.isEmpty
+            child: _filteredItems.isEmpty
                 ? Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(
@@ -548,7 +637,7 @@ class _SubjectSelectorBottomSheetState
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'No subjects found',
+                          'No items found',
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -559,11 +648,11 @@ class _SubjectSelectorBottomSheetState
                 : ListView.builder(
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
-                    itemCount: _filteredSubjects.length,
+                    itemCount: _filteredItems.length,
                     itemBuilder: (context, index) {
-                      final subject = _filteredSubjects[index];
+                      final item = _filteredItems[index];
                       return InkWell(
-                        onTap: () => widget.onSubjectSelected(subject),
+                        onTap: () => widget.onItemSelected(item),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
@@ -592,7 +681,7 @@ class _SubjectSelectorBottomSheetState
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
-                                  Icons.menu_book_outlined,
+                                  Icons.check_circle_outline,
                                   color: AppColors.primary,
                                   size: 18,
                                 ),
@@ -600,7 +689,7 @@ class _SubjectSelectorBottomSheetState
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  subject,
+                                  widget.itemLabelBuilder(item),
                                   style: AppTextStyles.bodyMedium.copyWith(
                                     fontWeight: FontWeight.w500,
                                   ),
