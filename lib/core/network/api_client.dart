@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import '../auth/session.dart';
 import '../tenant/tenant_context.dart';
@@ -155,10 +153,6 @@ class _AuthTenantInterceptor extends Interceptor {
         ((session?.schoolId?.isNotEmpty ?? false) ? session?.schoolId : null) ??
         tenantContext().selectedSchoolId;
 
-    log('Session schoolId: ${session?.schoolId}');
-    log('TenantContext selectedSchoolId: ${tenantContext().selectedSchoolId}');
-    log('Effective schoolId: $effectiveSchoolId');
-
     if (effectiveSchoolId != null && effectiveSchoolId.isNotEmpty) {
       options.headers['X-School-Id'] = effectiveSchoolId;
     }
@@ -168,7 +162,6 @@ class _AuthTenantInterceptor extends Interceptor {
       options.headers['Authorization'] = 'Bearer ${session.accessToken}';
     }
 
-    log('Final request headers: ${options.headers}');
     handler.next(options);
   }
 
