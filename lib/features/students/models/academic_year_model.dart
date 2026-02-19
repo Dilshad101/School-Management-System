@@ -11,7 +11,7 @@ class AcademicYearModel extends Equatable {
     this.school,
   });
 
-  final int id;
+  final String? id;
   final String name;
   final String? startDate;
   final String? endDate;
@@ -20,7 +20,7 @@ class AcademicYearModel extends Equatable {
 
   factory AcademicYearModel.fromJson(Map<String, dynamic> json) {
     return AcademicYearModel(
-      id: json['id'] ?? 0,
+      id: json['id']?.toString() ?? '',
       name: json['name'] ?? '',
       startDate: json['start_date'],
       endDate: json['end_date'],

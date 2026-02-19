@@ -33,8 +33,8 @@ class StudentProfileModel extends Equatable {
     this.updatedAt,
   });
 
-  final int id;
-  final int user;
+  final String? id;
+  final String? user;
   final String? profilePic;
   final String? dateOfBirth;
   final String? address;
@@ -46,8 +46,8 @@ class StudentProfileModel extends Equatable {
 
   factory StudentProfileModel.fromJson(Map<String, dynamic> json) {
     return StudentProfileModel(
-      id: json['id'] ?? 0,
-      user: json['user'] ?? 0,
+      id: json['id']?.toString() ?? '',
+      user: json['user']?.toString() ?? '',
       profilePic: json['profile_pic'],
       dateOfBirth: json['date_of_birth'],
       address: json['address'],
@@ -88,8 +88,8 @@ class StudentModel extends Equatable {
     this.documents = const [],
   });
 
-  final int id;
-  final String email;
+  final String? id;
+  final String? email;
   final String? phone;
   final String? firstName;
   final String? lastName;
@@ -103,7 +103,7 @@ class StudentModel extends Equatable {
     final first = firstName ?? '';
     final last = lastName ?? '';
     final name = '$first $last'.trim();
-    return name.isEmpty ? email : name;
+    return name.isEmpty ? email ?? '' : name;
   }
 
   /// Get profile picture URL.
@@ -111,7 +111,7 @@ class StudentModel extends Equatable {
 
   factory StudentModel.fromJson(Map<String, dynamic> json) {
     return StudentModel(
-      id: json['id'] ?? 0,
+      id: json['id']?.toString() ?? '',
       email: json['email'] ?? '',
       phone: json['phone'],
       firstName: json['first_name'],

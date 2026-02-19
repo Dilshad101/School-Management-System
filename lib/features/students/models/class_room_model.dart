@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 
 import 'academic_year_model.dart';
 
-/// Model for classroom.
 class ClassRoomModel extends Equatable {
   const ClassRoomModel({
     required this.id,
@@ -15,13 +14,13 @@ class ClassRoomModel extends Equatable {
     this.academicYearDetails,
   });
 
-  final int id;
+  final String id;
   final String name;
   final String? code;
   final Map<String, dynamic>? meta;
   final String? school;
-  final int? academicYear;
-  final int? classTeacher;
+  final String? academicYear;
+  final String? classTeacher;
   final AcademicYearModel? academicYearDetails;
 
   factory ClassRoomModel.fromJson(Map<String, dynamic> json) {

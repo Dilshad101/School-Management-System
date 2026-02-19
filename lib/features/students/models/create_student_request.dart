@@ -34,8 +34,8 @@ class CreateStudentRequest {
   final List<DocumentRequest> documents;
   final String school;
   final String? rollNo;
-  final int? classroomId;
-  final int? academicYearId;
+  final String? classroomId;
+  final String? academicYearId;
 
   /// Converts the request to JSON format for API submission.
   Future<Map<String, dynamic>> toJson() async {
@@ -156,8 +156,8 @@ class UpdateStudentRequest {
   final String? bloodGroup;
   final List<DocumentRequest> documents;
   final String? rollNo;
-  final int? classroomId;
-  final int? academicYearId;
+  final String? classroomId;
+  final String? academicYearId;
 
   /// Converts the request to JSON format for API submission.
   Future<Map<String, dynamic>> toJson() async {
