@@ -42,4 +42,12 @@ class Endpoints {
 
   // Guardians endpoints
   static const String guardians = '/v1/guardian-users/';
+
+  // Chat/Communication endpoints
+  static const String chat = '/v1/communication/chat/';
+  static const String chatStartChat = '/v1/communication/chat/start_chat/';
+  static String chatConversation(String conversationId) =>
+      '/v1/communication/chat/conversation/$conversationId/';
+  static String chatMarkRead(String conversationId) =>
+      '/v1/communication/chat/conversation/$conversationId/mark-read/';
 }

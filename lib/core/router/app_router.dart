@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:school_management_system/features/app_features/views/features_page.dart';
 import 'package:school_management_system/features/attendance/views/attendance_view.dart';
 import 'package:school_management_system/features/auth/views/forget_pass_page.dart';
+import 'package:school_management_system/features/chat/views/chat_detail_page.dart';
 import 'package:school_management_system/features/chat/views/chat_page.dart';
 import 'package:school_management_system/features/class/views/class_details_view/class_details_view.dart';
 import 'package:school_management_system/features/class/views/class_time_table_view/class_time_table_view.dart';
@@ -132,6 +133,13 @@ class NavigationService {
         GoRoute(
           path: Routes.userRequests,
           builder: (context, state) => const UserRequestView(),
+        ),
+        GoRoute(
+          path: Routes.chatDetail,
+          builder: (context, state) {
+            final args = state.extra as Map<String, dynamic>;
+            return ChatDetailPage(args: ChatDetailArgs.fromMap(args));
+          },
         ),
 
         /// Bottom Navigation Bar with nested routes

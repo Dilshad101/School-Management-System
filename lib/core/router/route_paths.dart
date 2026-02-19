@@ -29,6 +29,7 @@ class Routes {
   static const String fees = '/fees';
   static const String features = '/features';
   static const String chat = '/chat';
+  static const String chatDetail = '/chat/conversation';
   static const String profile = '/profile';
   static const String notifications = '/notifications';
   static const String subscriptions = '/subscriptions';
