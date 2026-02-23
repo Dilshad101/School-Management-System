@@ -13,8 +13,9 @@ import '../../features/chat/repositories/chat_repository.dart';
 import '../../features/employees/repositories/employees_repository.dart';
 import '../../features/employees/repositories/roles_repository.dart';
 import '../../features/employees/repositories/subjects_repository.dart';
-import '../../features/students/repositories/students_repository.dart';
 import '../../features/guardians/repositories/guardians_repository.dart';
+import '../../features/notifications/repositories/notification_repository.dart';
+import '../../features/students/repositories/students_repository.dart';
 
 final locator = GetIt.instance;
 
@@ -93,6 +94,10 @@ Future<void> setupDependency() async {
 
   locator.registerLazySingleton<ChatRepository>(
     () => ChatRepository(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepository(apiClient: locator<ApiClient>()),
   );
 }
 
