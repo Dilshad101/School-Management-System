@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import '../auth/session.dart';
 import '../tenant/tenant_context.dart';
@@ -160,6 +162,7 @@ class _AuthTenantInterceptor extends Interceptor {
     // Attach bearer token if available
     if (session != null && session.accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer ${session.accessToken}';
+      log('Attached Authorization header: ${options.headers['Authorization']}');
     }
 
     handler.next(options);
