@@ -43,6 +43,9 @@ class Endpoints {
   // Guardians endpoints
   static const String guardians = '/v1/guardian-users/';
 
+  // Notifications endpoints
+  static const String notifications = '/v1/notification/notification/';
+
   // Chat/Communication endpoints
   static const String chat = '/v1/communication/chat/';
   static const String chatStartChat = '/v1/communication/chat/start_chat/';
