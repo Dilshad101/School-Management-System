@@ -40,14 +40,7 @@ class _ChatPageContentState extends State<_ChatPageContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 20),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text('Chat'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Chat'), centerTitle: true),
       body: BlocConsumer<ChatListBloc, ChatListState>(
         listener: (context, state) {
           // Handle errors
