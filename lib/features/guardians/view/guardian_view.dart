@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/utils/helpers.dart';
 import 'package:school_management_system/features/guardians/blocs/blocs.dart';
 import 'package:school_management_system/features/guardians/view/widgets/guardian_tile.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
@@ -330,30 +331,16 @@ class _GuardianViewContentState extends State<_GuardianViewContent> {
   }
 
   void _onDeleteGuardian(GuardianModel guardian) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Guardian'),
-        content: Text(
-          'Are you sure you want to delete ${guardian.displayName}?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              this.context.read<GuardiansBloc>().add(
-                GuardianDeleteRequested(guardianId: guardian.id),
-              );
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+    Helpers.showWarningBottomSheet(
+      context,
+      title: 'Delete Guardian',
+      message: 'Are you sure you want to delete ${guardian.displayName}?',
+      onConfirm: () {
+        context.read<GuardiansBloc>().add(
+          GuardianDeleteRequested(guardianId: guardian.id),
+        );
+      },
+      confirmText: 'Delete',
     );
   }
 
