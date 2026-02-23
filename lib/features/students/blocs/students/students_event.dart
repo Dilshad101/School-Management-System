@@ -48,3 +48,13 @@ class StudentsSearchCleared extends StudentsEvent {
 class StudentsErrorCleared extends StudentsEvent {
   const StudentsErrorCleared();
 }
+
+/// Event to delete a student.
+class StudentDeleteRequested extends StudentsEvent {
+  const StudentDeleteRequested({required this.studentId});
+
+  final String studentId;
+
+  @override
+  List<Object?> get props => [studentId];
+}

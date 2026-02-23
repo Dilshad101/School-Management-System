@@ -66,7 +66,7 @@ class StudentsRepository {
   /// Fetches a single student by ID.
   ///
   /// Throws [ApiException] if the request fails.
-  Future<StudentModel> getStudentById(int id) async {
+  Future<StudentModel> getStudentById(String id) async {
     try {
       final response = await _apiClient.get('${Endpoints.students}$id/');
 
@@ -84,7 +84,11 @@ class StudentsRepository {
         throw const ApiException(message: 'Empty response from server');
       }
 
-      return StudentModel.fromJson(response.data as Map<String, dynamic>);
+      final responseData = response.data as Map<String, dynamic>;
+      // Extract student data from nested 'data' field if present
+      final studentData =
+          responseData['data'] as Map<String, dynamic>? ?? responseData;
+      return StudentModel.fromJson(studentData);
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);
     } catch (e) {
@@ -211,7 +215,7 @@ class StudentsRepository {
   ///
   /// Throws [ApiException] if the request fails.
   Future<StudentModel> updateStudent(
-    int id,
+    String id,
     UpdateStudentRequest request,
   ) async {
     try {
@@ -243,6 +247,28 @@ class StudentsRepository {
     } catch (e) {
       if (e is ApiException) rethrow;
       throw ApiException(message: 'Failed to update student: ${e.toString()}');
+    }
+  }
+
+  /// Deletes a student by ID.
+  ///
+  /// Throws [ApiException] if the request fails.
+  Future<void> deleteStudent(String id) async {
+    try {
+      final response = await _apiClient.delete('${Endpoints.students}$id/');
+
+      if (response.statusCode != null &&
+          (response.statusCode! < 200 || response.statusCode! >= 300)) {
+        throw ApiException(
+          message: 'Failed to delete student',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException(message: 'Failed to delete student: ${e.toString()}');
     }
   }
 }

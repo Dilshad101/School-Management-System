@@ -106,7 +106,7 @@ class CreateStudentState extends Equatable {
 
   // Form mode
   final StudentFormMode formMode;
-  final int? editingStudentId;
+  final String? editingStudentId;
 
   // Flow state
   final CreateStudentStep currentStep;
@@ -178,7 +178,7 @@ class CreateStudentState extends Equatable {
 
   CreateStudentState copyWith({
     StudentFormMode? formMode,
-    int? editingStudentId,
+    String? editingStudentId,
     bool clearEditingStudentId = false,
     CreateStudentStep? currentStep,
     bool? isInitialLoading,

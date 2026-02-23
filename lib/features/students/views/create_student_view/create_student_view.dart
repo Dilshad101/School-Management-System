@@ -17,7 +17,7 @@ class CreateStudentView extends StatelessWidget {
   const CreateStudentView({super.key, this.studentId});
 
   /// If provided, the view will load the student and enter edit mode.
-  final int? studentId;
+  final String? studentId;
 
   @override
   Widget build(BuildContext context) {

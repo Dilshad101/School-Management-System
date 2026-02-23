@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
+import 'package:school_management_system/core/utils/helpers.dart';
 import 'package:school_management_system/features/students/views/students_view/widgets/student_tile.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
@@ -127,9 +128,28 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
             const SizedBox(height: 16),
             // Students list
             Expanded(
-              child: BlocBuilder<StudentsBloc, StudentsState>(
+              child: BlocConsumer<StudentsBloc, StudentsState>(
+                listenWhen: (previous, current) =>
+                    previous.error != current.error && current.error != null,
+                listener: (context, state) {
+                  if (state.error != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.error!),
+                        backgroundColor: AppColors.borderError,
+                      ),
+                    );
+                    context.read<StudentsBloc>().add(
+                      const StudentsErrorCleared(),
+                    );
+                  }
+                },
                 builder: (context, state) {
                   if (state.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state.isDeleting) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
@@ -221,7 +241,20 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
                             );
                           },
                           onDelete: () {
-                            // TODO: Show delete confirmation
+                            Helpers.showWarningBottomSheet(
+                              context,
+                              title: 'Delete Student',
+                              message:
+                                  'Are you sure you want to delete this student?',
+                              onConfirm: () {
+                                context.read<StudentsBloc>().add(
+                                  StudentDeleteRequested(
+                                    studentId: student.id!,
+                                  ),
+                                );
+                              },
+                              confirmText: 'Delete',
+                            );
                           },
                         );
                       },

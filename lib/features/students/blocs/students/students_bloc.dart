@@ -15,6 +15,7 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
     on<StudentsSearchRequested>(_onSearchRequested);
     on<StudentsSearchCleared>(_onSearchCleared);
     on<StudentsErrorCleared>(_onErrorCleared);
+    on<StudentDeleteRequested>(_onDeleteRequested);
   }
 
   final StudentsRepository _studentsRepository;
@@ -189,5 +190,36 @@ class StudentsBloc extends Bloc<StudentsEvent, StudentsState> {
     Emitter<StudentsState> emit,
   ) {
     emit(state.copyWith(status: StudentsStatus.success, error: null));
+  }
+
+  Future<void> _onDeleteRequested(
+    StudentDeleteRequested event,
+    Emitter<StudentsState> emit,
+  ) async {
+    emit(state.copyWith(status: StudentsStatus.deleting));
+
+    try {
+      await _studentsRepository.deleteStudent(event.studentId);
+
+      // Remove the deleted student from the list
+      final updatedStudents = state.students
+          .where((student) => student.id != event.studentId)
+          .toList();
+
+      emit(
+        state.copyWith(
+          status: StudentsStatus.success,
+          students: updatedStudents,
+          totalCount: state.totalCount - 1,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: StudentsStatus.success,
+          error: _getErrorMessage(e),
+        ),
+      );
+    }
   }
 }

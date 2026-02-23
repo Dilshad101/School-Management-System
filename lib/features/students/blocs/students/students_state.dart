@@ -3,7 +3,14 @@ import 'package:equatable/equatable.dart';
 import '../../models/student_model.dart';
 
 /// Enum representing the status of students operations.
-enum StudentsStatus { initial, loading, loadingMore, success, failure }
+enum StudentsStatus {
+  initial,
+  loading,
+  loadingMore,
+  success,
+  failure,
+  deleting,
+}
 
 /// State class for students feature.
 class StudentsState extends Equatable {
@@ -32,6 +39,9 @@ class StudentsState extends Equatable {
 
   /// Check if loading more is in progress.
   bool get isLoadingMore => status == StudentsStatus.loadingMore;
+
+  /// Check if deleting is in progress.
+  bool get isDeleting => status == StudentsStatus.deleting;
 
   /// Check if there's an error.
   bool get hasError => status == StudentsStatus.failure;

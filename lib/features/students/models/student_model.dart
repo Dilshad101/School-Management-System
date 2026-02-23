@@ -74,6 +74,46 @@ class StudentProfileModel extends Equatable {
   ];
 }
 
+/// Model for student enrollment details.
+class StudentEnrollmentModel extends Equatable {
+  const StudentEnrollmentModel({
+    this.id,
+    this.rollNo,
+    this.classroomId,
+    this.classroomName,
+    this.academicYearId,
+    this.academicYearName,
+  });
+
+  final String? id;
+  final String? rollNo;
+  final String? classroomId;
+  final String? classroomName;
+  final String? academicYearId;
+  final String? academicYearName;
+
+  factory StudentEnrollmentModel.fromJson(Map<String, dynamic> json) {
+    return StudentEnrollmentModel(
+      id: json['id']?.toString(),
+      rollNo: json['roll_no']?.toString(),
+      classroomId: json['classroom']?.toString(),
+      classroomName: json['classroom_name']?.toString(),
+      academicYearId: json['academic_year']?.toString(),
+      academicYearName: json['academic_year_name']?.toString(),
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    id,
+    rollNo,
+    classroomId,
+    classroomName,
+    academicYearId,
+    academicYearName,
+  ];
+}
+
 /// Model for a student.
 class StudentModel extends Equatable {
   const StudentModel({
@@ -86,6 +126,7 @@ class StudentModel extends Equatable {
     this.rolesDetails = const [],
     this.profile,
     this.documents = const [],
+    this.enrollment,
   });
 
   final String? id;
@@ -97,6 +138,7 @@ class StudentModel extends Equatable {
   final List<RoleDetailModel> rolesDetails;
   final StudentProfileModel? profile;
   final List<dynamic> documents;
+  final StudentEnrollmentModel? enrollment;
 
   /// Get the student's full name.
   String get fullName {
@@ -110,6 +152,16 @@ class StudentModel extends Equatable {
   String? get profilePicUrl => profile?.profilePic;
 
   factory StudentModel.fromJson(Map<String, dynamic> json) {
+    // Parse enrollment from student_enrolment_details array (take first item)
+    StudentEnrollmentModel? enrollment;
+    final enrolmentDetails =
+        json['student_enrolment_details'] as List<dynamic>?;
+    if (enrolmentDetails != null && enrolmentDetails.isNotEmpty) {
+      enrollment = StudentEnrollmentModel.fromJson(
+        enrolmentDetails.first as Map<String, dynamic>,
+      );
+    }
+
     return StudentModel(
       id: json['id']?.toString() ?? '',
       email: json['email'] ?? '',
@@ -128,6 +180,7 @@ class StudentModel extends Equatable {
             )
           : null,
       documents: json['documents'] as List<dynamic>? ?? [],
+      enrollment: enrollment,
     );
   }
 
@@ -142,6 +195,7 @@ class StudentModel extends Equatable {
     rolesDetails,
     profile,
     documents,
+    enrollment,
   ];
 }
 

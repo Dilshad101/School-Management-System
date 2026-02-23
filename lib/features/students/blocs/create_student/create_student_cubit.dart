@@ -72,7 +72,7 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
   }
 
   /// Initialize for editing an existing student.
-  Future<void> initializeForEdit(int studentId) async {
+  Future<void> initializeForEdit(String studentId) async {
     emit(
       state.copyWith(
         isInitialLoading: true,
@@ -105,6 +105,34 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
       // Convert documents from API to DocumentModel
       final documents = _convertApiDocuments(student.documents);
 
+      // Find matching classroom from dropdown list
+      ClassRoomModel? selectedClassRoom;
+      if (student.enrollment?.classroomId != null &&
+          classRoomsResponse.results.isNotEmpty) {
+        try {
+          selectedClassRoom = classRoomsResponse.results.firstWhere(
+            (c) => c.id == student.enrollment!.classroomId,
+          );
+        } catch (_) {
+          // No matching classroom found
+          selectedClassRoom = null;
+        }
+      }
+
+      // Find matching academic year from dropdown list
+      AcademicYearModel? selectedAcademicYear;
+      if (student.enrollment?.academicYearId != null &&
+          academicYearsResponse.results.isNotEmpty) {
+        try {
+          selectedAcademicYear = academicYearsResponse.results.firstWhere(
+            (a) => a.id == student.enrollment!.academicYearId,
+          );
+        } catch (_) {
+          // No matching academic year found
+          selectedAcademicYear = null;
+        }
+      }
+
       emit(
         state.copyWith(
           isInitialLoading: false,
@@ -125,6 +153,10 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
           documents: documents,
           // Student ID for display purposes
           studentId: 'STU${student.id}',
+          // Enrollment data
+          selectedClassRoom: selectedClassRoom,
+          selectedAcademicYear: selectedAcademicYear,
+          roleNumber: student.enrollment?.rollNo ?? '',
         ),
       );
     } on ApiException catch (e) {
