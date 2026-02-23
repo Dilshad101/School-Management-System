@@ -2,95 +2,33 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 
-/// Enum for notification audience type.
-enum NotificationAudience {
-  all('All'),
-  students('Student'),
-  employees('Employee'),
-  guardians('Guardian');
+import '../../models/notification_models.dart';
 
-  const NotificationAudience(this.label);
-  final String label;
-}
+export '../../models/notification_models.dart';
+
+/// Enum for data loading status.
+enum NotificationLoadStatus { initial, loading, success, failure }
 
 /// Enum for the submission status.
 enum NotificationSubmissionStatus { initial, loading, success, failure }
 
-/// Model for a notification item.
-class NotificationModel extends Equatable {
-  const NotificationModel({
-    required this.id,
-    required this.title,
-    required this.message,
-    required this.audience,
-    required this.createdAt,
-    this.className,
-    this.division,
-    this.attachment,
-  });
-
-  final String id;
-  final String title;
-  final String message;
-  final NotificationAudience audience;
-  final DateTime createdAt;
-  final String? className;
-  final String? division;
-  final File? attachment;
-
-  /// Get the color associated with each audience type.
-  static int getAudienceColorValue(NotificationAudience audience) {
-    switch (audience) {
-      case NotificationAudience.all:
-        return 0xFF10B981; // Green
-      case NotificationAudience.students:
-        return 0xFF3B82F6; // Blue
-      case NotificationAudience.employees:
-        return 0xFF6D5DD3; // Purple
-      case NotificationAudience.guardians:
-        return 0xFFEC4899; // Pink
-    }
-  }
-
-  /// Get relative time string.
-  String get timeAgo {
-    final now = DateTime.now();
-    final difference = now.difference(createdAt);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
-    } else {
-      return 'Just now';
-    }
-  }
-
-  @override
-  List<Object?> get props => [
-    id,
-    title,
-    message,
-    audience,
-    createdAt,
-    className,
-    division,
-    attachment?.path,
-  ];
-}
-
 /// Immutable state class for NotificationCubit.
 class NotificationState extends Equatable {
   const NotificationState({
-    this.isInitialLoading = true,
+    // Loading states
+    this.loadStatus = NotificationLoadStatus.initial,
+    this.isLoadingMore = false,
     this.submissionStatus = NotificationSubmissionStatus.initial,
     this.errorMessage,
     // Filter
     this.selectedFilter = NotificationAudience.all,
     // Notifications list
     this.notifications = const [],
+    // Pagination
+    this.currentPage = 1,
+    this.totalPages = 1,
+    this.totalCount = 0,
+    this.hasMore = false,
     // Add notification form
     this.sentTo = NotificationAudience.all,
     this.selectedClass,
@@ -105,7 +43,8 @@ class NotificationState extends Equatable {
   });
 
   // Loading states
-  final bool isInitialLoading;
+  final NotificationLoadStatus loadStatus;
+  final bool isLoadingMore;
   final NotificationSubmissionStatus submissionStatus;
   final String? errorMessage;
 
@@ -114,6 +53,12 @@ class NotificationState extends Equatable {
 
   // Notifications list
   final List<NotificationModel> notifications;
+
+  // Pagination
+  final int currentPage;
+  final int totalPages;
+  final int totalCount;
+  final bool hasMore;
 
   // Add notification form fields
   final NotificationAudience sentTo;
@@ -128,12 +73,27 @@ class NotificationState extends Equatable {
   final List<String> divisions;
   final List<NotificationAudience> audiences;
 
+  /// Check if initial loading.
+  bool get isInitialLoading => loadStatus == NotificationLoadStatus.loading;
+
+  /// Check if loading (initial or more).
+  bool get isLoading =>
+      loadStatus == NotificationLoadStatus.loading || isLoadingMore;
+
+  /// Check if load was successful.
+  bool get isSuccess => loadStatus == NotificationLoadStatus.success;
+
+  /// Check if load failed.
+  bool get isFailure => loadStatus == NotificationLoadStatus.failure;
+
   /// Get filtered notifications based on selected filter.
   List<NotificationModel> get filteredNotifications {
     if (selectedFilter == NotificationAudience.all) {
       return notifications;
     }
-    return notifications.where((n) => n.audience == selectedFilter).toList();
+    return notifications
+        .where((n) => n.notificationType == selectedFilter)
+        .toList();
   }
 
   /// Check if form is valid for submission.
@@ -143,12 +103,20 @@ class NotificationState extends Equatable {
   bool get isSubmitting =>
       submissionStatus == NotificationSubmissionStatus.loading;
 
+  /// Check if can load more notifications.
+  bool get canLoadMore => hasMore && !isLoadingMore;
+
   NotificationState copyWith({
-    bool? isInitialLoading,
+    NotificationLoadStatus? loadStatus,
+    bool? isLoadingMore,
     NotificationSubmissionStatus? submissionStatus,
     String? errorMessage,
     NotificationAudience? selectedFilter,
     List<NotificationModel>? notifications,
+    int? currentPage,
+    int? totalPages,
+    int? totalCount,
+    bool? hasMore,
     NotificationAudience? sentTo,
     String? selectedClass,
     String? selectedDivision,
@@ -164,13 +132,18 @@ class NotificationState extends Equatable {
     bool clearSelectedDivision = false,
   }) {
     return NotificationState(
-      isInitialLoading: isInitialLoading ?? this.isInitialLoading,
+      loadStatus: loadStatus ?? this.loadStatus,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       submissionStatus: submissionStatus ?? this.submissionStatus,
       errorMessage: clearErrorMessage
           ? null
           : (errorMessage ?? this.errorMessage),
       selectedFilter: selectedFilter ?? this.selectedFilter,
       notifications: notifications ?? this.notifications,
+      currentPage: currentPage ?? this.currentPage,
+      totalPages: totalPages ?? this.totalPages,
+      totalCount: totalCount ?? this.totalCount,
+      hasMore: hasMore ?? this.hasMore,
       sentTo: sentTo ?? this.sentTo,
       selectedClass: clearSelectedClass
           ? null
@@ -189,11 +162,16 @@ class NotificationState extends Equatable {
 
   @override
   List<Object?> get props => [
-    isInitialLoading,
+    loadStatus,
+    isLoadingMore,
     submissionStatus,
     errorMessage,
     selectedFilter,
     notifications,
+    currentPage,
+    totalPages,
+    totalCount,
+    hasMore,
     sentTo,
     selectedClass,
     selectedDivision,

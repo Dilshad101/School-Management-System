@@ -3,117 +3,148 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/network/api_exception.dart';
+import '../../repositories/notification_repository.dart';
 import 'notification_state.dart';
 
 export 'notification_state.dart';
 
 /// Cubit for managing notifications state.
 class NotificationCubit extends Cubit<NotificationState> {
-  NotificationCubit() : super(const NotificationState());
+  NotificationCubit({required NotificationRepository repository})
+    : _repository = repository,
+      super(const NotificationState());
 
-  /// Initialize and fetch all data.
+  final NotificationRepository _repository;
+
+  /// Default page size for pagination.
+  static const int _pageSize = 10;
+
+  /// Initialize and fetch initial data.
   Future<void> initialize() async {
-    emit(state.copyWith(isInitialLoading: true));
+    emit(
+      state.copyWith(
+        loadStatus: NotificationLoadStatus.loading,
+        clearErrorMessage: true,
+      ),
+    );
 
     try {
-      // Simulate parallel API calls
-      final results = await Future.wait([
-        _fetchNotifications(),
-        _fetchClasses(),
-        _fetchDivisions(),
-      ]);
-
-      final notifications = results[0] as List<NotificationModel>;
-      final classes = results[1] as List<String>;
-      final divisions = results[2] as List<String>;
+      final response = await _repository.getNotifications(
+        page: 1,
+        pageSize: _pageSize,
+      );
 
       emit(
         state.copyWith(
-          isInitialLoading: false,
-          notifications: notifications,
-          classes: classes,
-          divisions: divisions,
+          loadStatus: NotificationLoadStatus.success,
+          notifications: response.results,
+          currentPage: response.page,
+          totalPages: response.totalPages,
+          totalCount: response.count,
+          hasMore: response.hasMore,
           audiences: NotificationAudience.values,
+        ),
+      );
+    } on ApiException catch (e) {
+      emit(
+        state.copyWith(
+          loadStatus: NotificationLoadStatus.failure,
+          errorMessage: e.message,
         ),
       );
     } catch (e) {
       emit(
         state.copyWith(
-          isInitialLoading: false,
+          loadStatus: NotificationLoadStatus.failure,
           errorMessage: 'Failed to load notifications. Please try again.',
         ),
       );
     }
   }
 
-  /// Simulates fetching notifications from API.
-  Future<List<NotificationModel>> _fetchNotifications() async {
-    await Future.delayed(const Duration(milliseconds: 800));
+  /// Refresh notifications (pull to refresh).
+  Future<void> refresh() async {
+    emit(
+      state.copyWith(
+        loadStatus: NotificationLoadStatus.loading,
+        clearErrorMessage: true,
+      ),
+    );
 
-    final now = DateTime.now();
-    return [
-      NotificationModel(
-        id: '1',
-        title: 'Update',
-        message: 'Please update student and staff details for this month.',
-        audience: NotificationAudience.students,
-        createdAt: now.subtract(const Duration(hours: 4)),
-      ),
-      NotificationModel(
-        id: '2',
-        title: 'Update',
-        message: 'Please update student and staff details for this month.',
-        audience: NotificationAudience.students,
-        createdAt: now.subtract(const Duration(hours: 4)),
-      ),
-      NotificationModel(
-        id: '3',
-        title: 'Update',
-        message: 'Please update student and staff details for this month.',
-        audience: NotificationAudience.guardians,
-        createdAt: now.subtract(const Duration(hours: 4)),
-      ),
-      NotificationModel(
-        id: '4',
-        title: 'Update',
-        message: 'Please update student and staff details for this month.',
-        audience: NotificationAudience.all,
-        createdAt: now.subtract(const Duration(hours: 4)),
-      ),
-      NotificationModel(
-        id: '5',
-        title: 'Update',
-        message: 'Please update student and staff details for this month.',
-        audience: NotificationAudience.employees,
-        createdAt: now.subtract(const Duration(hours: 4)),
-      ),
-      NotificationModel(
-        id: '6',
-        title: 'Update',
-        message: 'Please update student and staff details for this month.',
-        audience: NotificationAudience.all,
-        createdAt: now.subtract(const Duration(hours: 4)),
-      ),
-      NotificationModel(
-        id: '7',
-        title: 'Update',
-        message: 'Please update student and staff details for this month.',
-        audience: NotificationAudience.employees,
-        createdAt: now.subtract(const Duration(hours: 4)),
-      ),
-    ];
+    try {
+      final response = await _repository.getNotifications(
+        page: 1,
+        pageSize: _pageSize,
+      );
+
+      emit(
+        state.copyWith(
+          loadStatus: NotificationLoadStatus.success,
+          notifications: response.results,
+          currentPage: response.page,
+          totalPages: response.totalPages,
+          totalCount: response.count,
+          hasMore: response.hasMore,
+        ),
+      );
+    } on ApiException catch (e) {
+      emit(
+        state.copyWith(
+          loadStatus: NotificationLoadStatus.failure,
+          errorMessage: e.message,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          loadStatus: NotificationLoadStatus.failure,
+          errorMessage: 'Failed to refresh notifications. Please try again.',
+        ),
+      );
+    }
   }
 
-  /// Simulates fetching classes from API.
-  Future<List<String>> _fetchClasses() async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    return ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'];
-  }
+  /// Load more notifications (pagination).
+  Future<void> loadMore() async {
+    // Prevent multiple simultaneous load more requests.
+    if (state.isLoadingMore || !state.hasMore) return;
 
-  /// Simulates fetching divisions from API.
-  Future<List<String>> _fetchDivisions() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return ['Division A', 'Division B', 'Division C'];
+    emit(state.copyWith(isLoadingMore: true));
+
+    try {
+      final nextPage = state.currentPage + 1;
+      final response = await _repository.getNotifications(
+        page: nextPage,
+        pageSize: _pageSize,
+      );
+
+      // Append new notifications to existing list.
+      final updatedNotifications = [
+        ...state.notifications,
+        ...response.results,
+      ];
+
+      emit(
+        state.copyWith(
+          isLoadingMore: false,
+          notifications: updatedNotifications,
+          currentPage: response.page,
+          totalPages: response.totalPages,
+          totalCount: response.count,
+          hasMore: response.hasMore,
+        ),
+      );
+    } on ApiException catch (e) {
+      emit(state.copyWith(isLoadingMore: false, errorMessage: e.message));
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isLoadingMore: false,
+          errorMessage: 'Failed to load more notifications.',
+        ),
+      );
+    }
   }
 
   // ==================== Filter ====================
@@ -202,32 +233,26 @@ class NotificationCubit extends Cubit<NotificationState> {
     );
 
     try {
-      // Simulate API call
+      // TODO: Implement actual API call when endpoint is available
+      // For now, simulate API call
       await Future.delayed(const Duration(seconds: 2));
 
-      // Create new notification
-      final newNotification = NotificationModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: state.title,
-        message: state.message,
-        audience: state.sentTo,
-        createdAt: DateTime.now(),
-        className: state.selectedClass,
-        division: state.selectedDivision,
-        attachment: state.attachment,
-      );
-
-      // Add to the beginning of the list
-      final updatedNotifications = [newNotification, ...state.notifications];
-
       emit(
-        state.copyWith(
-          submissionStatus: NotificationSubmissionStatus.success,
-          notifications: updatedNotifications,
-        ),
+        state.copyWith(submissionStatus: NotificationSubmissionStatus.success),
       );
+
+      // Refresh notifications to get the newly created one
+      await refresh();
 
       return true;
+    } on ApiException catch (e) {
+      emit(
+        state.copyWith(
+          submissionStatus: NotificationSubmissionStatus.failure,
+          errorMessage: e.message,
+        ),
+      );
+      return false;
     } catch (e) {
       emit(
         state.copyWith(

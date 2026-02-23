@@ -13,7 +13,7 @@ class NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final audienceColor = Color(
-      NotificationModel.getAudienceColorValue(notification.audience),
+      NotificationModel.getAudienceColorValue(notification.notificationType),
     );
 
     return InkWell(
@@ -104,7 +104,7 @@ class NotificationTile extends StatelessWidget {
 
   Widget _buildAudienceBadge(Color color) {
     String label;
-    switch (notification.audience) {
+    switch (notification.notificationType) {
       case NotificationAudience.all:
         label = 'All';
       case NotificationAudience.students:
