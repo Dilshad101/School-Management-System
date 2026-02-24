@@ -89,6 +89,7 @@ class EmployeeTile extends StatelessWidget {
                             style: AppTextStyles.labelMedium.copyWith(
                               fontWeight: FontWeight.w500,
                               color: AppColors.textPrimary.withAlpha(160),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
