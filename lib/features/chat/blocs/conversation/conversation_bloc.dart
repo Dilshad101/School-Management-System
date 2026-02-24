@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/utils/di.dart';
 import '../../repositories/chat_repository.dart';
 import 'conversation_event.dart';
 import 'conversation_state.dart';
@@ -180,12 +181,26 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     if (state.conversationId == null) return;
     if (event.message.trim().isEmpty) return;
 
+    // Get the current user ID from session
+    final userId = locator<SessionHolder>().session?.userId;
+    if (userId == null) {
+      emit(
+        state.copyWith(
+          isSending: false,
+          isSuccess: false,
+          errorMessage: 'User session not found. Please log in again.',
+        ),
+      );
+      return;
+    }
+
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
       final sentMessage = await _chatRepository.sendMessage(
         conversationId: state.conversationId!,
-        message: event.message,
+        userId: userId,
+        content: event.message,
       );
 
       // Add sent message to the list

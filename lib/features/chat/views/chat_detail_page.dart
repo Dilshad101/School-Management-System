@@ -127,11 +127,6 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
     ConversationState state,
   ) {
     return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, size: 20),
-        onPressed: () => context.pop(),
-      ),
-      titleSpacing: 0,
       title: Row(
         children: [
           // Profile picture

@@ -49,6 +49,7 @@ class Endpoints {
   // Chat/Communication endpoints
   static const String chat = '/v1/communication/chat/';
   static const String chatStartChat = '/v1/communication/chat/start_chat/';
+  static const String chatSendMessage = '/v1/communication/chat/send_message/';
   static String chatConversation(String conversationId) =>
       '/v1/communication/chat/conversation/$conversationId/';
   static String chatMarkRead(String conversationId) =>

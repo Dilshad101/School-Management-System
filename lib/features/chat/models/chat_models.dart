@@ -183,18 +183,40 @@ class ChatMessageModel extends Equatable {
   final bool isRead;
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
+    // Handle sender as either a string ID or an object
+    String senderId = '';
+    String? senderName;
+    String? senderProfilePic;
+
+    if (json['sender'] is Map<String, dynamic>) {
+      final senderMap = json['sender'] as Map<String, dynamic>;
+      senderId = senderMap['id']?.toString() ?? '';
+      final firstName = senderMap['first_name']?.toString() ?? '';
+      final lastName = senderMap['last_name']?.toString() ?? '';
+      senderName = '$firstName $lastName'.trim();
+      senderProfilePic = senderMap['profile_pic'];
+    } else {
+      senderId =
+          json['sender_id']?.toString() ?? json['sender']?.toString() ?? '';
+      senderName = json['sender_name'];
+      senderProfilePic = json['sender_profile_pic'];
+    }
+
     return ChatMessageModel(
-      id: json['id']?.toString() ?? '',
-      senderId:
-          json['sender_id']?.toString() ?? json['sender']?.toString() ?? '',
-      text: json['text']?.toString() ?? json['message']?.toString() ?? '',
-      timestamp: json['timestamp'] != null
-          ? DateTime.tryParse(json['timestamp']) ?? DateTime.now()
-          : json['created_at'] != null
+      id: json['id']?.toString() ?? json['message_id']?.toString() ?? '',
+      senderId: senderId,
+      text:
+          json['content']?.toString() ??
+          json['text']?.toString() ??
+          json['message']?.toString() ??
+          '',
+      timestamp: json['created_at'] != null
           ? DateTime.tryParse(json['created_at']) ?? DateTime.now()
+          : json['timestamp'] != null
+          ? DateTime.tryParse(json['timestamp']) ?? DateTime.now()
           : DateTime.now(),
-      senderName: json['sender_name'],
-      senderProfilePic: json['sender_profile_pic'],
+      senderName: senderName,
+      senderProfilePic: senderProfilePic,
       isRead: json['is_read'] ?? false,
     );
   }

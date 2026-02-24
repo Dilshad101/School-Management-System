@@ -175,18 +175,24 @@ class ChatRepository {
   /// Sends a message in a conversation.
   ///
   /// [conversationId] - The ID of the conversation.
-  /// [message] - The message text to send.
+  /// [userId] - The ID of the current user sending the message.
+  /// [content] - The message content to send.
   ///
   /// Returns the sent message.
   /// Throws [ApiException] if the request fails.
   Future<ChatMessageModel> sendMessage({
     required String conversationId,
-    required String message,
+    required String userId,
+    required String content,
   }) async {
     try {
       final response = await _apiClient.post(
-        Endpoints.chatConversation(conversationId),
-        data: {'message': message},
+        Endpoints.chatSendMessage,
+        data: {
+          'conversation_id': conversationId,
+          'user_id': userId,
+          'content': content,
+        },
       );
 
       if (response.statusCode != null &&
