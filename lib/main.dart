@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: providers,
       child: MaterialApp.router(
-        title: 'TaxHi',
+        title: 'Waad',
         debugShowCheckedModeBanner: false,
         builder: (context, child) {
           final toastBuilder = FToastBuilder();
