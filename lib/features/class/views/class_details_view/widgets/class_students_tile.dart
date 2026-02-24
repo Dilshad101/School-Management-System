@@ -129,6 +129,17 @@ class ClassStudentTile extends StatelessWidget {
             ],
           ),
           Divider(color: AppColors.border, height: 24),
+          // Fee Information Row
+          Row(
+            children: [
+              Expanded(child: _buildFeeColumn('TOTAL FEES', '₹1,200')),
+              Expanded(child: _buildFeeColumn('PAID', '₹1,000')),
+              Expanded(
+                child: _buildFeeColumn('DUE', '₹200', isHighlighted: true),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             spacing: 8,
@@ -136,6 +147,35 @@ class ClassStudentTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFeeColumn(
+    String label,
+    String value, {
+    bool isHighlighted = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTextStyles.labelSmall.copyWith(
+            color: AppColors.textPrimary.withAlpha(160),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: AppTextStyles.bodyLarge.copyWith(
+            fontWeight: FontWeight.w600,
+            color: isHighlighted
+                ? const Color(0xFFEF4444)
+                : AppColors.textPrimary,
+          ),
+        ),
+      ],
     );
   }
 }
