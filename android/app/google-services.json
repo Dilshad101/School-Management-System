@@ -1,0 +1,29 @@
+{
+    "project_info": {
+        "project_number": "986005050127",
+        "project_id": "waad-8dd52",
+        "storage_bucket": "waad-8dd52.firebasestorage.app"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:986005050127:android:fc2d0d877a21717771247a",
+                "android_client_info": {
+                    "package_name": "com.waad.school_management_system"
+                }
+            },
+            "oauth_client": [],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyCV-Z5ZiCMwyfnANyLTfQUWefzKCReCHlI"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": []
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}
