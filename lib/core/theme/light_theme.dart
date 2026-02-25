@@ -26,9 +26,16 @@ final lightTheme = ThemeData(
     unselectedItemColor: AppColors.textSecondary,
   ),
   dropdownMenuTheme: DropdownMenuThemeData(
+    menuStyle: MenuStyle(
+      backgroundColor: WidgetStatePropertyAll(AppColors.white),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.white,
+
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     ),
     textStyle: AppTextStyles.bodySmall,

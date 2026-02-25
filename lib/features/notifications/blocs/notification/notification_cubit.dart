@@ -4,6 +4,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/tenant/tenant_context.dart';
+import '../../../../core/utils/di.dart';
+import '../../../students/models/class_room_model.dart';
+import '../../../students/models/student_model.dart';
+import '../../models/create_notification_request.dart';
 import '../../repositories/notification_repository.dart';
 import 'notification_state.dart';
 
@@ -163,21 +168,36 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  /// Update selected class.
-  void updateSelectedClass(String? value) {
-    emit(
-      state.copyWith(selectedClass: value, clearSelectedClass: value == null),
-    );
+  /// Add a class to selected classes.
+  void addClass(ClassRoomModel classroom) {
+    if (!state.selectedClasses.any((c) => c.id == classroom.id)) {
+      final updatedClasses = [...state.selectedClasses, classroom];
+      emit(state.copyWith(selectedClasses: updatedClasses));
+    }
   }
 
-  /// Update selected division.
-  void updateSelectedDivision(String? value) {
-    emit(
-      state.copyWith(
-        selectedDivision: value,
-        clearSelectedDivision: value == null,
-      ),
-    );
+  /// Remove a class from selected classes.
+  void removeClass(ClassRoomModel classroom) {
+    final updatedClasses = state.selectedClasses
+        .where((c) => c.id != classroom.id)
+        .toList();
+    emit(state.copyWith(selectedClasses: updatedClasses));
+  }
+
+  /// Add a student to selected students.
+  void addStudent(StudentModel student) {
+    if (!state.selectedStudents.any((s) => s.id == student.id)) {
+      final updatedStudents = [...state.selectedStudents, student];
+      emit(state.copyWith(selectedStudents: updatedStudents));
+    }
+  }
+
+  /// Remove a student from selected students.
+  void removeStudent(StudentModel student) {
+    final updatedStudents = state.selectedStudents
+        .where((s) => s.id != student.id)
+        .toList();
+    emit(state.copyWith(selectedStudents: updatedStudents));
   }
 
   /// Update notification title.
@@ -188,6 +208,37 @@ class NotificationCubit extends Cubit<NotificationState> {
   /// Update notification message.
   void updateMessage(String value) {
     emit(state.copyWith(message: value));
+  }
+
+  /// Update scheduled date time.
+  void updateScheduledDateTime(DateTime? value) {
+    if (value != null) {
+      emit(state.copyWith(scheduledDateTime: value));
+    } else {
+      emit(state.copyWith(clearScheduledDateTime: true));
+    }
+  }
+
+  // ==================== Search APIs ====================
+
+  /// Search for classrooms.
+  Future<List<ClassRoomModel>> searchClassrooms(String query) async {
+    try {
+      final response = await _repository.searchClassrooms(search: query);
+      return response.results;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Search for students.
+  Future<List<StudentModel>> searchStudents(String query) async {
+    try {
+      final response = await _repository.searchStudents(search: query);
+      return response.results;
+    } catch (e) {
+      return [];
+    }
   }
 
   // ==================== Attachment ====================
@@ -233,9 +284,26 @@ class NotificationCubit extends Cubit<NotificationState> {
     );
 
     try {
-      // TODO: Implement actual API call when endpoint is available
-      // For now, simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      final schoolId = locator<TenantContext>().selectedSchoolId;
+      if (schoolId == null) {
+        throw const ApiException(message: 'School ID not found');
+      }
+
+      final request = CreateNotificationRequest(
+        title: state.title.trim(),
+        message: state.message.trim(),
+        notificationType: state.sentTo.apiValue,
+        school: schoolId,
+        attachment: state.attachment,
+        dateTime: state.scheduledDateTime,
+        classes: state.selectedClasses.map((c) => c.id).toList(),
+        students: state.selectedStudents
+            .map((s) => s.id ?? '')
+            .where((id) => id.isNotEmpty)
+            .toList(),
+      );
+
+      await _repository.createNotification(request);
 
       emit(
         state.copyWith(submissionStatus: NotificationSubmissionStatus.success),
@@ -270,8 +338,9 @@ class NotificationCubit extends Cubit<NotificationState> {
       state.copyWith(
         submissionStatus: NotificationSubmissionStatus.initial,
         sentTo: NotificationAudience.all,
-        clearSelectedClass: true,
-        clearSelectedDivision: true,
+        clearSelectedClasses: true,
+        clearSelectedStudents: true,
+        clearScheduledDateTime: true,
         title: '',
         message: '',
         clearAttachment: true,

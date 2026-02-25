@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 
+import '../../../students/models/class_room_model.dart';
+import '../../../students/models/student_model.dart';
 import '../../models/notification_models.dart';
 
 export '../../models/notification_models.dart';
@@ -29,16 +31,15 @@ class NotificationState extends Equatable {
     this.totalPages = 1,
     this.totalCount = 0,
     this.hasMore = false,
-    // Add notification form
+    // Add notification form fields
     this.sentTo = NotificationAudience.all,
-    this.selectedClass,
-    this.selectedDivision,
+    this.selectedClasses = const [],
+    this.selectedStudents = const [],
     this.title = '',
     this.message = '',
     this.attachment,
+    this.scheduledDateTime,
     // Dropdown data (fetched from API)
-    this.classes = const [],
-    this.divisions = const [],
     this.audiences = const [],
   });
 
@@ -62,15 +63,14 @@ class NotificationState extends Equatable {
 
   // Add notification form fields
   final NotificationAudience sentTo;
-  final String? selectedClass;
-  final String? selectedDivision;
+  final List<ClassRoomModel> selectedClasses;
+  final List<StudentModel> selectedStudents;
   final String title;
   final String message;
   final File? attachment;
+  final DateTime? scheduledDateTime;
 
   // Dropdown data
-  final List<String> classes;
-  final List<String> divisions;
   final List<NotificationAudience> audiences;
 
   /// Check if initial loading.
@@ -97,6 +97,7 @@ class NotificationState extends Equatable {
   }
 
   /// Check if form is valid for submission.
+  /// Required fields: Sent To, Title, Message
   bool get isFormValid => title.trim().isNotEmpty && message.trim().isNotEmpty;
 
   /// Check if currently submitting.
@@ -118,18 +119,18 @@ class NotificationState extends Equatable {
     int? totalCount,
     bool? hasMore,
     NotificationAudience? sentTo,
-    String? selectedClass,
-    String? selectedDivision,
+    List<ClassRoomModel>? selectedClasses,
+    List<StudentModel>? selectedStudents,
     String? title,
     String? message,
     File? attachment,
-    List<String>? classes,
-    List<String>? divisions,
+    DateTime? scheduledDateTime,
     List<NotificationAudience>? audiences,
     bool clearAttachment = false,
     bool clearErrorMessage = false,
-    bool clearSelectedClass = false,
-    bool clearSelectedDivision = false,
+    bool clearSelectedClasses = false,
+    bool clearSelectedStudents = false,
+    bool clearScheduledDateTime = false,
   }) {
     return NotificationState(
       loadStatus: loadStatus ?? this.loadStatus,
@@ -145,17 +146,18 @@ class NotificationState extends Equatable {
       totalCount: totalCount ?? this.totalCount,
       hasMore: hasMore ?? this.hasMore,
       sentTo: sentTo ?? this.sentTo,
-      selectedClass: clearSelectedClass
-          ? null
-          : (selectedClass ?? this.selectedClass),
-      selectedDivision: clearSelectedDivision
-          ? null
-          : (selectedDivision ?? this.selectedDivision),
+      selectedClasses: clearSelectedClasses
+          ? const []
+          : (selectedClasses ?? this.selectedClasses),
+      selectedStudents: clearSelectedStudents
+          ? const []
+          : (selectedStudents ?? this.selectedStudents),
       title: title ?? this.title,
       message: message ?? this.message,
       attachment: clearAttachment ? null : (attachment ?? this.attachment),
-      classes: classes ?? this.classes,
-      divisions: divisions ?? this.divisions,
+      scheduledDateTime: clearScheduledDateTime
+          ? null
+          : (scheduledDateTime ?? this.scheduledDateTime),
       audiences: audiences ?? this.audiences,
     );
   }
@@ -173,13 +175,12 @@ class NotificationState extends Equatable {
     totalCount,
     hasMore,
     sentTo,
-    selectedClass,
-    selectedDivision,
+    selectedClasses,
+    selectedStudents,
     title,
     message,
     attachment?.path,
-    classes,
-    divisions,
+    scheduledDateTime,
     audiences,
   ];
 }

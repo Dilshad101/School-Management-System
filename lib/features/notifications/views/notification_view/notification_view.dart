@@ -6,7 +6,7 @@ import '../../../../shared/styles/app_styles.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
 import '../../blocs/notification/notification_cubit.dart';
 import '../../repositories/notification_repository.dart';
-import 'widgets/add_notification_dialog.dart';
+import 'widgets/add_notification_bottom_sheet.dart';
 import 'widgets/notification_tile.dart';
 
 class NotificationView extends StatelessWidget {
@@ -42,13 +42,6 @@ class _NotificationViewContent extends StatelessWidget {
                 content: Text(state.errorMessage!),
                 backgroundColor: Colors.red,
                 behavior: SnackBarBehavior.floating,
-                action: SnackBarAction(
-                  label: 'Retry',
-                  textColor: Colors.white,
-                  onPressed: () {
-                    context.read<NotificationCubit>().initialize();
-                  },
-                ),
               ),
             );
             context.read<NotificationCubit>().clearError();
@@ -60,7 +53,7 @@ class _NotificationViewContent extends StatelessWidget {
       ),
       floatingActionButton: MyFloatingActionButton(
         onPressed: () {
-          AddNotificationDialog.show(context);
+          AddNotificationBottomSheet.show(context);
         },
       ),
     );
