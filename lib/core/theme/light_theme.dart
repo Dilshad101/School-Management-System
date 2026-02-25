@@ -33,4 +33,24 @@ final lightTheme = ThemeData(
     ),
     textStyle: AppTextStyles.bodySmall,
   ),
+  dialogTheme: DialogThemeData(
+    backgroundColor: AppColors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    titleTextStyle: AppTextStyles.heading3,
+    contentTextStyle: AppTextStyles.bodyMedium,
+  ),
+  datePickerTheme: DatePickerThemeData(
+    backgroundColor: AppColors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  ),
+  timePickerTheme: TimePickerThemeData(
+    backgroundColor: AppColors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  ),
+  bottomSheetTheme: BottomSheetThemeData(
+    backgroundColor: AppColors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+    ),
+  ),
 );
