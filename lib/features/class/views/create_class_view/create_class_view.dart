@@ -2,29 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
+import 'package:school_management_system/core/utils/di.dart';
 import 'package:school_management_system/features/class/blocs/create_class/create_class_cubit.dart';
+import 'package:school_management_system/features/class/repositories/classroom_repository.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/gradient_button.dart';
 
 import 'widgets/class_created_dialog.dart';
 import 'widgets/class_details_step.dart';
-import 'widgets/step_indicator.dart';
-import 'widgets/subjects_step.dart';
 
 class CreateClassView extends StatelessWidget {
-  const CreateClassView({super.key});
+  const CreateClassView({super.key, this.classroomId});
+
+  /// The classroom ID for edit mode. If null, creates a new class.
+  final String? classroomId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CreateClassCubit()..initialize(),
-      child: const _CreateClassViewContent(),
+      create: (context) {
+        final cubit = CreateClassCubit(
+          repository: locator<ClassroomRepository>(),
+        );
+        if (classroomId != null) {
+          cubit.initializeForEdit(classroomId!);
+        } else {
+          cubit.initialize();
+        }
+        return cubit;
+      },
+      child: _CreateClassViewContent(isEditMode: classroomId != null),
     );
   }
 }
 
 class _CreateClassViewContent extends StatefulWidget {
-  const _CreateClassViewContent();
+  const _CreateClassViewContent({required this.isEditMode});
+
+  final bool isEditMode;
 
   @override
   State<_CreateClassViewContent> createState() =>
@@ -32,8 +47,7 @@ class _CreateClassViewContent extends StatefulWidget {
 }
 
 class _CreateClassViewContentState extends State<_CreateClassViewContent> {
-  final _step1FormKey = GlobalKey<FormState>();
-  final _step2FormKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -55,15 +69,18 @@ class _CreateClassViewContentState extends State<_CreateClassViewContent> {
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.background,
-          appBar: AppBar(title: const Text('Add class'), centerTitle: true),
+          appBar: AppBar(
+            title: Text(state.isEditMode ? 'Edit Class' : 'Add Class'),
+            centerTitle: true,
+          ),
           body: state.isInitialLoading
               ? const Center(child: CircularProgressIndicator())
               : Column(
                   children: [
                     // Main content
-                    Expanded(child: _buildStepContent(context, state)),
+                    Expanded(child: _buildFormContent(context, state)),
 
-                    // Bottom section with step indicator and buttons
+                    // Bottom section with submit button
                     _buildBottomSection(context, state),
                   ],
                 ),
@@ -72,35 +89,22 @@ class _CreateClassViewContentState extends State<_CreateClassViewContent> {
     );
   }
 
-  Widget _buildStepContent(BuildContext context, CreateClassState state) {
+  Widget _buildFormContent(BuildContext context, CreateClassState state) {
     final cubit = context.read<CreateClassCubit>();
 
-    if (state.isOnClassDetailsStep) {
-      return ClassDetailsStep(
-        formKey: _step1FormKey,
-        className: state.className,
-        roomNo: state.roomNo,
-        academicYear: state.academicYear,
-        classTeacher: state.classTeacher,
-        selectedDivision: state.selectedDivision,
-        divisions: state.divisions,
-        onClassNameChanged: cubit.updateClassName,
-        onRoomNoChanged: cubit.updateRoomNo,
-        onAcademicYearChanged: cubit.updateAcademicYear,
-        onClassTeacherChanged: cubit.updateClassTeacher,
-        onDivisionChanged: cubit.updateDivision,
-      );
-    } else {
-      return SubjectsStep(
-        formKey: _step2FormKey,
-        subjects: state.subjects,
-        teachers: state.teachers,
-        onAddSubject: cubit.addSubject,
-        onRemoveSubject: cubit.removeSubject,
-        onSubjectChanged: cubit.updateSubjectName,
-        onTeacherChanged: cubit.updateSubjectTeacher,
-      );
-    }
+    return ClassDetailsStep(
+      formKey: _formKey,
+      className: state.className,
+      roomNo: state.roomNo,
+      selectedAcademicYear: state.selectedAcademicYear,
+      selectedClassTeacher: state.selectedClassTeacher,
+      onClassNameChanged: cubit.updateClassName,
+      onRoomNoChanged: cubit.updateRoomNo,
+      onAcademicYearChanged: cubit.updateAcademicYear,
+      onClassTeacherChanged: cubit.updateClassTeacher,
+      searchAcademicYears: cubit.searchAcademicYears,
+      searchSchoolUsers: cubit.searchSchoolUsers,
+    );
   }
 
   Widget _buildBottomSection(BuildContext context, CreateClassState state) {
@@ -119,64 +123,42 @@ class _CreateClassViewContentState extends State<_CreateClassViewContent> {
         ],
       ),
       child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Step indicator
-            StepIndicator(
-              currentStep: state.isOnClassDetailsStep ? 0 : 1,
-              totalSteps: 2,
-            ),
-            const SizedBox(height: 16),
-
-            // Buttons
-            if (state.isOnClassDetailsStep)
-              GradientButton(
-                label: 'Next',
-                onPressed: () => _onNextPressed(context),
-              )
-            else
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlineButton(
-                      label: 'Previous',
-                      onPressed: cubit.goToPreviousStep,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: GradientButton(
-                      label: 'Submit',
-                      isLoading: state.isSubmitting,
-                      onPressed: state.isSubmitting ? null : cubit.submitForm,
-                    ),
-                  ),
-                ],
-              ),
-          ],
+        child: GradientButton(
+          label: state.isEditMode ? 'Update' : 'Submit',
+          isLoading: state.isSubmitting,
+          onPressed: state.isSubmitting
+              ? null
+              : () {
+                  if (_formKey.currentState?.validate() ?? false) {
+                    cubit.submitForm();
+                  }
+                },
         ),
       ),
     );
   }
 
-  void _onNextPressed(BuildContext context) {
-    if (_step1FormKey.currentState?.validate() ?? false) {
-      context.read<CreateClassCubit>().goToNextStep();
-    }
-  }
-
   void _showSuccessDialog(BuildContext context, CreateClassState state) {
     final cubit = context.read<CreateClassCubit>();
 
+    if (state.isEditMode) {
+      // For edit mode, just go back
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Class updated successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      cubit.resetSubmissionStatus();
+      context.pop();
+      return;
+    }
+
+    // For create mode, show success dialog
     ClassCreatedDialog.show(
       context: context,
-      className: state.formattedClassName.isNotEmpty
-          ? state.formattedClassName
-          : '8 - B',
-      classTeacher: state.classTeacher.isNotEmpty
-          ? state.classTeacher
-          : 'Thomas',
+      className: state.className,
+      classTeacher: state.selectedClassTeacher?.fullName ?? '',
       onViewClass: () {
         Navigator.pop(context); // Close dialog
         cubit.resetSubmissionStatus();

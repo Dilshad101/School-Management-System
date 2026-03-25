@@ -96,6 +96,13 @@ class NavigationService {
           builder: (context, state) => const CreateClassView(),
         ),
         GoRoute(
+          path: Routes.editClass,
+          builder: (context, state) {
+            final classroomId = state.extra as String?;
+            return CreateClassView(classroomId: classroomId);
+          },
+        ),
+        GoRoute(
           path: Routes.guardians,
           builder: (context, state) => const GuardianView(),
         ),

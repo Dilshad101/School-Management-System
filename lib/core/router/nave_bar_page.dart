@@ -42,10 +42,12 @@ class NavBarScreen extends StatelessWidget {
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/chat.svg'),
+              activeIcon: SvgPicture.asset('assets/icons/chat_feature.svg'),
               label: 'Chat',
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/profile.svg'),
+              activeIcon: SvgPicture.asset('assets/icons/person.svg'),
               label: 'Profile',
             ),
           ],

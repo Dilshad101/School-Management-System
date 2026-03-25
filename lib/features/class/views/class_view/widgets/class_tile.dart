@@ -1,9 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
+import 'package:school_management_system/core/utils/helpers.dart';
 import 'package:school_management_system/features/class/models/classroom_model.dart';
+import 'package:school_management_system/shared/widgets/buttons/micro_delete_button.dart';
+import 'package:school_management_system/shared/widgets/buttons/micro_edit_button.dart';
 
 import '../../../../../shared/styles/app_styles.dart';
+import '../../../blocs/classroom/classroom_bloc.dart';
 
 class ClassTile extends StatelessWidget {
   const ClassTile({
@@ -41,16 +48,23 @@ class ClassTile extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  classroom.name,
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    classroom.name,
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                Text(
-                  classroom.code.toUpperCase(),
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
+                Expanded(
+                  child: Text(
+                    classroom.code.toUpperCase(),
+                    textAlign: TextAlign.end,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               ],
@@ -96,10 +110,30 @@ class ClassTile extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (daysLeft != null && !hasTimetable)
-                  _buildDaysLeftBadge()
-                else
-                  _buildManageTimetableButton(),
+                if (daysLeft != null && !hasTimetable) _buildDaysLeftBadge(),
+                // else
+                // _buildManageTimetableButton(),
+                MicroEditButton(
+                  onTap: () {
+                    log(classroom.id);
+                    context.push(Routes.editClass, extra: classroom.id);
+                  },
+                ),
+                MicroDeleteButton(
+                  onTap: () {
+                    Helpers.showWarningBottomSheet(
+                      context,
+                      title: 'Delete Class',
+                      message: 'Are you sure you want to delete this class?',
+                      confirmText: 'Delete',
+                      onConfirm: () {
+                        context.read<ClassroomBloc>().add(
+                          DeleteClassroom(classroom.id),
+                        );
+                      },
+                    );
+                  },
+                ),
               ],
             ),
           ],
@@ -108,25 +142,25 @@ class ClassTile extends StatelessWidget {
     );
   }
 
-  Widget _buildManageTimetableButton() {
-    return InkWell(
-      onTap: onManageTimetable,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.table_chart_outlined, size: 20, color: Colors.blue),
-          const SizedBox(width: 6),
-          Text(
-            'Manage Timetable',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: Colors.blue,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildManageTimetableButton() {
+  //   return InkWell(
+  //     onTap: onManageTimetable,
+  //     child: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         Icon(Icons.table_chart_outlined, size: 20, color: Colors.blue),
+  //         const SizedBox(width: 6),
+  //         Text(
+  //           'Manage Timetable',
+  //           style: AppTextStyles.bodyMedium.copyWith(
+  //             color: Colors.blue,
+  //             fontWeight: FontWeight.w600,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildDaysLeftBadge() {
     return Row(

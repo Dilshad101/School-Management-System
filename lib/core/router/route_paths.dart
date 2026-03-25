@@ -20,6 +20,7 @@ class Routes {
   static const String classes = '/classes';
   static const String classDetail = '/classes/:id';
   static const String createClass = '/classes-create';
+  static const String editClass = '/classes-edit/:id';
   static const String timeTable = '/classes-timetable';
   static const String guardians = '/guardians';
   static const String createGuardian = '/guardians-create';

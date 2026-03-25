@@ -280,7 +280,7 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
         ),
       );
       cubit.resetSubmissionStatus();
-      context.pop();
+      context.pop(true); // Return true to indicate success
       return;
     }
 
@@ -291,7 +291,7 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
       onViewStudent: () {
         Navigator.pop(context); // Close dialog
         cubit.resetSubmissionStatus();
-        context.pop(); // Navigate back to students list
+        context.pop(true); // Return true to indicate success
       },
       onAddAnother: () {
         Navigator.pop(context); // Close dialog
@@ -300,7 +300,7 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
       onClose: () {
         Navigator.pop(context); // Close dialog
         cubit.resetSubmissionStatus();
-        context.pop(); // Go back
+        context.pop(true); // Return true to indicate success
       },
     );
   }

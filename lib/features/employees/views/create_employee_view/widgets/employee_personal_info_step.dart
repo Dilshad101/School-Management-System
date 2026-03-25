@@ -340,13 +340,13 @@ class _EmployeePersonalInfoStepState extends State<EmployeePersonalInfoStep> {
             const SizedBox(height: 16),
 
             // Employee ID (auto-generated)
-            IconFormField(
-              controller: _employeeIdController,
-              label: 'Employee ID (Auto Generated)',
-              hint: 'Enter Employee ID',
-              icon: Icons.badge_outlined,
-              enabled: false,
-            ),
+            // IconFormField(
+            //   controller: _employeeIdController,
+            //   label: 'Employee ID (Auto Generated)',
+            //   hint: 'Enter Employee ID',
+            //   icon: Icons.badge_outlined,
+            //   enabled: false,
+            // ),
             const SizedBox(height: 24),
           ],
         ),

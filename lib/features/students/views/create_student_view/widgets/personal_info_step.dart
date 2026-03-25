@@ -285,33 +285,33 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
             ),
             const SizedBox(height: 16),
 
-            // Student ID (Auto Generated)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text('Student ID', style: AppTextStyles.labelMedium),
-                    const SizedBox(width: 4),
-                    Text(
-                      '(Auto Generated)',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                IconFormField(
-                  controller: _studentIdController,
-                  label: '',
-                  hint: 'Enter student ID',
-                  icon: Icons.badge_outlined,
-                  enabled: false,
-                  showLabel: false,
-                ),
-              ],
-            ),
+            // // Student ID (Auto Generated)
+            // Column(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     Row(
+            //       children: [
+            //         Text('Student ID', style: AppTextStyles.labelMedium),
+            //         const SizedBox(width: 4),
+            //         Text(
+            //           '(Auto Generated)',
+            //           style: AppTextStyles.caption.copyWith(
+            //             color: AppColors.textSecondary,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //     const SizedBox(height: 8),
+            //     IconFormField(
+            //       controller: _studentIdController,
+            //       label: '',
+            //       hint: 'Enter student ID',
+            //       icon: Icons.badge_outlined,
+            //       enabled: false,
+            //       showLabel: false,
+            //     ),
+            //   ],
+            // ),
             const SizedBox(height: 24),
           ],
         ),

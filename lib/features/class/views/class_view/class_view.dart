@@ -206,6 +206,7 @@ class _ClassViewContentState extends State<_ClassViewContent> {
                           }
 
                           final classroom = state.classrooms[index];
+
                           return ClassTile(
                             classroom: classroom,
                             onManageTimetable: () {

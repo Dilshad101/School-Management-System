@@ -234,11 +234,16 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
                         final student = state.students[index];
                         return StudentTile(
                           student: student,
-                          onEdit: () {
-                            context.push(
+                          onEdit: () async {
+                            final result = await context.push<bool>(
                               Routes.createStudent,
                               extra: student.id,
                             );
+                            if (result == true && context.mounted) {
+                              context.read<StudentsBloc>().add(
+                                const StudentsFetchRequested(refresh: true),
+                              );
+                            }
                           },
                           onDelete: () {
                             Helpers.showWarningBottomSheet(
@@ -267,8 +272,13 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
         ),
       ),
       floatingActionButton: MyFloatingActionButton(
-        onPressed: () {
-          context.push(Routes.createStudent);
+        onPressed: () async {
+          final result = await context.push<bool>(Routes.createStudent);
+          if (result == true && context.mounted) {
+            context.read<StudentsBloc>().add(
+              const StudentsFetchRequested(refresh: true),
+            );
+          }
         },
       ),
     );

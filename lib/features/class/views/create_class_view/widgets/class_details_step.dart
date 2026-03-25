@@ -1,37 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
-import 'package:school_management_system/shared/widgets/dropdowns/bottom_sheet_dropdown.dart';
 import 'package:school_management_system/shared/widgets/input_fields/simple_form_field.dart';
+import 'package:school_management_system/shared/widgets/input_fields/suggestion_form_field.dart';
 
-/// Step 1 of Create Class flow - Basic class details.
+import '../../../models/academic_year_model.dart';
+import '../../../models/school_user_model.dart';
+
+/// Single step class form - Basic class details with suggestion fields.
 class ClassDetailsStep extends StatefulWidget {
   const ClassDetailsStep({
     super.key,
     required this.className,
     required this.roomNo,
-    required this.academicYear,
-    required this.classTeacher,
-    required this.selectedDivision,
+    required this.selectedAcademicYear,
+    required this.selectedClassTeacher,
     required this.onClassNameChanged,
     required this.onRoomNoChanged,
     required this.onAcademicYearChanged,
     required this.onClassTeacherChanged,
-    required this.onDivisionChanged,
-    required this.divisions,
+    required this.searchAcademicYears,
+    required this.searchSchoolUsers,
     required this.formKey,
   });
 
   final String className;
   final String roomNo;
-  final String academicYear;
-  final String classTeacher;
-  final String? selectedDivision;
+  final AcademicYearModel? selectedAcademicYear;
+  final SchoolUserModel? selectedClassTeacher;
   final ValueChanged<String> onClassNameChanged;
   final ValueChanged<String> onRoomNoChanged;
-  final ValueChanged<String> onAcademicYearChanged;
-  final ValueChanged<String> onClassTeacherChanged;
-  final ValueChanged<String?> onDivisionChanged;
-  final List<String> divisions;
+  final ValueChanged<AcademicYearModel?> onAcademicYearChanged;
+  final ValueChanged<SchoolUserModel?> onClassTeacherChanged;
+  final Future<List<AcademicYearModel>> Function(String) searchAcademicYears;
+  final Future<List<SchoolUserModel>> Function(String) searchSchoolUsers;
   final GlobalKey<FormState> formKey;
 
   @override
@@ -49,8 +50,12 @@ class _ClassDetailsStepState extends State<ClassDetailsStep> {
     super.initState();
     _classNameController = TextEditingController(text: widget.className);
     _roomNoController = TextEditingController(text: widget.roomNo);
-    _academicYearController = TextEditingController(text: widget.academicYear);
-    _classTeacherController = TextEditingController(text: widget.classTeacher);
+    _academicYearController = TextEditingController(
+      text: widget.selectedAcademicYear?.name ?? '',
+    );
+    _classTeacherController = TextEditingController(
+      text: widget.selectedClassTeacher?.fullName ?? '',
+    );
   }
 
   @override
@@ -65,13 +70,12 @@ class _ClassDetailsStepState extends State<ClassDetailsStep> {
         widget.roomNo != _roomNoController.text) {
       _roomNoController.text = widget.roomNo;
     }
-    if (widget.academicYear != oldWidget.academicYear &&
-        widget.academicYear != _academicYearController.text) {
-      _academicYearController.text = widget.academicYear;
+    if (widget.selectedAcademicYear != oldWidget.selectedAcademicYear) {
+      _academicYearController.text = widget.selectedAcademicYear?.name ?? '';
     }
-    if (widget.classTeacher != oldWidget.classTeacher &&
-        widget.classTeacher != _classTeacherController.text) {
-      _classTeacherController.text = widget.classTeacher;
+    if (widget.selectedClassTeacher != oldWidget.selectedClassTeacher) {
+      _classTeacherController.text =
+          widget.selectedClassTeacher?.fullName ?? '';
     }
   }
 
@@ -106,8 +110,8 @@ class _ClassDetailsStepState extends State<ClassDetailsStep> {
             // Class name field
             SimpleFormField(
               controller: _classNameController,
-              label: 'Class',
-              hint: 'Enter class name',
+              label: 'Class Name',
+              hint: 'Enter class name (e.g., 5A)',
               onChanged: widget.onClassNameChanged,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -118,61 +122,147 @@ class _ClassDetailsStepState extends State<ClassDetailsStep> {
             ),
             const SizedBox(height: 16),
 
-            // Division dropdown
-            BottomSheetDropdown<String>(
-              label: 'Division',
-              hint: 'Select Division',
-              items: widget.divisions,
-              value: widget.selectedDivision,
-              onChanged: widget.onDivisionChanged,
-              validator: (value) {
-                if (value == null) {
-                  return 'Please select a division';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
             // Room number field
             SimpleFormField(
               controller: _roomNoController,
-              label: 'Room NO',
-              hint: 'Enter room no',
+              label: 'Room Number',
+              hint: 'Enter room number (optional)',
               onChanged: widget.onRoomNoChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Room number is required';
-                }
-                return null;
-              },
             ),
             const SizedBox(height: 16),
 
-            // Academic year field
-            SimpleFormField(
+            // Academic year suggestion field
+            SuggestionFormField<AcademicYearModel>(
               controller: _academicYearController,
               label: 'Academic Year',
-              hint: '0000 - 0000',
-              onChanged: widget.onAcademicYearChanged,
+              hint: 'Search academic year',
+              isRequired: true,
+              suggestionsCallback: widget.searchAcademicYears,
+              itemBuilder: (context, academicYear) {
+                return ListTile(
+                  dense: true,
+                  title: Text(
+                    academicYear.name,
+                    style: AppTextStyles.bodyMedium,
+                  ),
+                  subtitle:
+                      academicYear.startDate != null &&
+                          academicYear.endDate != null
+                      ? Text(
+                          '${academicYear.startDate} - ${academicYear.endDate}',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        )
+                      : null,
+                  trailing: academicYear.isCurrent
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.green.withAlpha(30),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'Current',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.green,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        )
+                      : null,
+                );
+              },
+              onSelected: (academicYear) {
+                _academicYearController.text = academicYear.name;
+                widget.onAcademicYearChanged(academicYear);
+              },
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Academic year is required';
+                if (widget.selectedAcademicYear == null) {
+                  return 'Please select an academic year';
                 }
                 return null;
               },
             ),
             const SizedBox(height: 16),
 
-            // Class teacher field
-            SimpleFormField(
+            // Class teacher suggestion field
+            SuggestionFormField<SchoolUserModel>(
               controller: _classTeacherController,
               label: 'Class Teacher',
-              hint: 'Enter name or ID',
-              onChanged: widget.onClassTeacherChanged,
+              hint: 'Search teacher by name or email',
+              isRequired: true,
+              suggestionsCallback: widget.searchSchoolUsers,
+              itemBuilder: (context, user) {
+                return ListTile(
+                  dense: true,
+                  leading: CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.primary.withAlpha(30),
+                    backgroundImage: user.profile?.profilePic != null
+                        ? NetworkImage(user.profile!.profilePic!)
+                        : null,
+                    child: user.profile?.profilePic == null
+                        ? Text(
+                            user.firstName.isNotEmpty
+                                ? user.firstName[0].toUpperCase()
+                                : '?',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                        : null,
+                  ),
+                  title: Text(user.fullName, style: AppTextStyles.bodyMedium),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        user.email,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      // if (user.rolesDetails.isNotEmpty)
+                      //   Wrap(
+                      //     spacing: 4,
+                      //     children: user.rolesDetails.map((role) {
+                      //       return Container(
+                      //         margin: const EdgeInsets.only(top: 4),
+                      //         padding: const EdgeInsets.symmetric(
+                      //           horizontal: 6,
+                      //           vertical: 2,
+                      //         ),
+                      //         decoration: BoxDecoration(
+                      //           color: AppColors.primary.withAlpha(20),
+                      //           borderRadius: BorderRadius.circular(4),
+                      //         ),
+                      //         child: Text(
+                      //           role.name,
+                      //           style: AppTextStyles.bodySmall.copyWith(
+                      //             color: AppColors.primary,
+                      //             fontSize: 10,
+                      //           ),
+                      //         ),
+                      //       );
+                      //     }).toList(),
+                      //   ),
+                    ],
+                  ),
+                );
+              },
+              onSelected: (user) {
+                _classTeacherController.text = user.fullName;
+                widget.onClassTeacherChanged(user);
+              },
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Class teacher is required';
+                if (widget.selectedClassTeacher == null) {
+                  return 'Please select a class teacher';
                 }
                 return null;
               },
