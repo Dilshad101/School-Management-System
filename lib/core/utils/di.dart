@@ -16,6 +16,7 @@ import '../../features/employees/repositories/subjects_repository.dart';
 import '../../features/fees/repositories/fees_repository.dart';
 import '../../features/guardians/repositories/guardians_repository.dart';
 import '../../features/notifications/repositories/notification_repository.dart';
+import '../../features/settings/repositories/academic_year_repository.dart';
 import '../../features/settings/repositories/period_repository.dart';
 import '../../features/settings/repositories/subject_repository.dart';
 import '../../features/students/repositories/students_repository.dart';
@@ -113,6 +114,10 @@ Future<void> setupDependency() async {
 
   locator.registerLazySingleton<SubjectRepository>(
     () => SubjectRepository(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<AcademicYearRepository>(
+    () => AcademicYearRepository(apiClient: locator<ApiClient>()),
   );
 }
 

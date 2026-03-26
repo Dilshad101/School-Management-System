@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/tenant/tenant_context.dart';
 import '../../../../core/utils/di.dart';
 import '../../../../shared/styles/app_styles.dart';
+import 'tab_views/academic_year_tab_view/academic_year_tab_view.dart';
 import 'tab_views/period_tab_view/period_tab_view.dart';
 import 'tab_views/subject_tab_view/subject_tab_view.dart';
 
@@ -17,7 +18,7 @@ class _SettingsViewState extends State<SettingsView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<String> _tabs = ['General Settings', 'Subjects', 'Periods'];
+  final List<String> _tabs = ['Academic Year', 'Subjects', 'Periods'];
 
   /// Gets the current school ID from session or tenant context
   String get _schoolId {
@@ -54,7 +55,7 @@ class _SettingsViewState extends State<SettingsView>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildGeneralSettingsTab(),
+                AcademicYearTabView(schoolId: _schoolId),
                 SubjectTabView(schoolId: _schoolId),
                 PeriodTabView(schoolId: _schoolId),
               ],
@@ -90,9 +91,5 @@ class _SettingsViewState extends State<SettingsView>
         tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
       ),
     );
-  }
-
-  Widget _buildGeneralSettingsTab() {
-    return const Center(child: Text('General Settings - Coming Soon'));
   }
 }
