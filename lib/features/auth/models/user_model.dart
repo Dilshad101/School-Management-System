@@ -7,16 +7,20 @@ class UserSchoolRole extends Equatable {
     required this.user,
     required this.school,
     required this.roles,
+    required this.roleNames,
     required this.status,
     this.joinedAt,
+    this.commonId,
   });
 
   final String id;
   final String user;
   final String school;
   final List<String> roles;
+  final List<String> roleNames;
   final String status;
   final DateTime? joinedAt;
+  final String? commonId;
 
   factory UserSchoolRole.fromJson(Map<String, dynamic> json) {
     return UserSchoolRole(
@@ -24,15 +28,26 @@ class UserSchoolRole extends Equatable {
       user: json['user']?.toString() ?? '',
       school: json['school']?.toString() ?? '',
       roles: List<String>.from(json['roles'] ?? []),
+      roleNames: List<String>.from(json['role_names'] ?? []),
       status: json['status']?.toString() ?? '',
       joinedAt: json['joined_at'] != null
           ? DateTime.tryParse(json['joined_at'])
           : null,
+      commonId: json['common_id']?.toString(),
     );
   }
 
   @override
-  List<Object?> get props => [id, user, school, roles, status, joinedAt];
+  List<Object?> get props => [
+    id,
+    user,
+    school,
+    roles,
+    roleNames,
+    status,
+    joinedAt,
+    commonId,
+  ];
 }
 
 /// Model for user details.
