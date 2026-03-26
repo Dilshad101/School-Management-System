@@ -182,6 +182,38 @@ class PeriodCubit extends Cubit<PeriodState> {
     }
   }
 
+  /// Deletes a period.
+  Future<bool> deletePeriod({required String id}) async {
+    emit(state.copyWith(actionStatus: PeriodActionStatus.loading));
+
+    try {
+      await _periodRepository.deletePeriod(id: id);
+
+      // Remove the period from the list
+      final updatedPeriods = state.periods
+          .where((period) => period.id != id)
+          .toList();
+
+      emit(
+        state.copyWith(
+          actionStatus: PeriodActionStatus.success,
+          periods: updatedPeriods,
+          totalCount: state.totalCount - 1,
+        ),
+      );
+
+      return true;
+    } catch (e) {
+      emit(
+        state.copyWith(
+          actionStatus: PeriodActionStatus.failure,
+          actionError: _getErrorMessage(e),
+        ),
+      );
+      return false;
+    }
+  }
+
   /// Clears the action status.
   void clearActionStatus() {
     emit(

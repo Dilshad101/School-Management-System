@@ -6,8 +6,14 @@ import '../../../../../models/period_model.dart';
 class PeriodCard extends StatelessWidget {
   final PeriodModel periodModel;
   final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
-  const PeriodCard({super.key, required this.periodModel, this.onEdit});
+  const PeriodCard({
+    super.key,
+    required this.periodModel,
+    this.onEdit,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,18 +61,38 @@ class PeriodCard extends StatelessWidget {
             ),
           ),
 
-          // Edit Icon
-          InkWell(
-            onTap: onEdit,
-            borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: Icon(
-                Icons.edit_outlined,
-                size: 20,
-                color: AppColors.textSecondary,
+          // Action Icons
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Edit Icon
+              InkWell(
+                onTap: onEdit,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              // Delete Icon
+              InkWell(
+                onTap: onDelete,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.delete_outline,
+                    size: 20,
+                    color: AppColors.borderError,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

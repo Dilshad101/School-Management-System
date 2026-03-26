@@ -175,6 +175,7 @@ class _PeriodTabViewContentState extends State<_PeriodTabViewContent> {
         return PeriodCard(
           periodModel: period,
           onEdit: () => _onEditPeriod(period),
+          onDelete: () => _onDeletePeriod(period),
         );
       },
     );
@@ -207,6 +208,31 @@ class _PeriodTabViewContentState extends State<_PeriodTabViewContent> {
         endTime: result.endTime,
         order: result.order ?? period.order,
       );
+    }
+  }
+
+  Future<void> _onDeletePeriod(dynamic period) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Period'),
+        content: Text('Are you sure you want to delete Order ${period.order}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.borderError),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      context.read<PeriodCubit>().deletePeriod(id: period.id);
     }
   }
 

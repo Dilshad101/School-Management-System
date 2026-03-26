@@ -153,4 +153,30 @@ class PeriodRepository {
       throw ApiException(message: 'Failed to update period: ${e.toString()}');
     }
   }
+
+  /// Deletes a period.
+  ///
+  /// [id] - The period ID to delete.
+  ///
+  /// Throws [ApiException] if the request fails.
+  Future<void> deletePeriod({required String id}) async {
+    try {
+      final response = await _apiClient.delete('${Endpoints.periods}$id/');
+
+      // 204 No Content is success for delete
+      if (response.statusCode != null &&
+          response.statusCode != 204 &&
+          (response.statusCode! < 200 || response.statusCode! >= 300)) {
+        throw ApiException(
+          message: 'Failed to delete period',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException(message: 'Failed to delete period: ${e.toString()}');
+    }
+  }
 }
