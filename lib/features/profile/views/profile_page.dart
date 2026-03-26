@@ -34,6 +34,22 @@ class ProfilePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
+                // Settings Section
+                const _SectionTitle(title: 'Settings'),
+                const SizedBox(height: 8),
+                _SettingsCard(
+                  children: [
+                    _SettingsTile(
+                      icon: Icons.settings_outlined,
+                      title: 'Settings',
+                      onTap: () {
+                        context.push(Routes.settings);
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
                 // Legal Section
                 const _SectionTitle(title: 'Legal'),
                 const SizedBox(height: 8),

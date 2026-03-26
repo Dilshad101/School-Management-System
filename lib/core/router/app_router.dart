@@ -23,6 +23,7 @@ import 'package:school_management_system/features/subscriptions/views/subscripti
 import 'package:school_management_system/features/user_request/views/user_request_view.dart';
 
 import '../../features/auth/views/splash_page.dart';
+import '../../features/settings/views/settings_view/settings_view.dart';
 import '../utils/di.dart';
 import 'nave_bar_page.dart';
 import 'route_paths.dart';
@@ -147,6 +148,10 @@ class NavigationService {
             final args = state.extra as Map<String, dynamic>;
             return ChatDetailPage(args: ChatDetailArgs.fromMap(args));
           },
+        ),
+        GoRoute(
+          path: Routes.settings,
+          builder: (context, state) => const SettingsView(),
         ),
 
         /// Bottom Navigation Bar with nested routes

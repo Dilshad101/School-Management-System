@@ -36,4 +36,5 @@ class Routes {
   static const String subscriptions = '/subscriptions';
 
   static const String userRequests = '/user-requests';
+  static const String settings = '/settings';
 }

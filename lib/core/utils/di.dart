@@ -16,6 +16,7 @@ import '../../features/employees/repositories/subjects_repository.dart';
 import '../../features/fees/repositories/fees_repository.dart';
 import '../../features/guardians/repositories/guardians_repository.dart';
 import '../../features/notifications/repositories/notification_repository.dart';
+import '../../features/settings/repositories/period_repository.dart';
 import '../../features/students/repositories/students_repository.dart';
 
 final locator = GetIt.instance;
@@ -103,6 +104,10 @@ Future<void> setupDependency() async {
 
   locator.registerLazySingleton<FeesRepository>(
     () => FeesRepository(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<PeriodRepository>(
+    () => PeriodRepository(apiClient: locator<ApiClient>()),
   );
 }
 

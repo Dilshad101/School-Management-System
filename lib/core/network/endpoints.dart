@@ -49,6 +49,9 @@ class Endpoints {
   // Finance/Fees endpoints
   static const String studentFees = '/v1/finance/student-fees-list/';
 
+  // Periods/Timetable endpoints
+  static const String periods = '/v1/academics/periods/';
+
   // Chat/Communication endpoints
   static const String chat = '/v1/communication/chat/';
   static const String chatStartChat = '/v1/communication/chat/start_chat/';
