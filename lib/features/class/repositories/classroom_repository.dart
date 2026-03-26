@@ -8,6 +8,7 @@ import '../../../core/network/endpoints.dart';
 import '../models/academic_year_model.dart';
 import '../models/classroom_model.dart';
 import '../models/school_user_model.dart';
+import '../models/timetable_model.dart';
 
 /// Repository for handling classroom-related API operations.
 class ClassroomRepository {
@@ -330,4 +331,137 @@ class ClassroomRepository {
       );
     }
   }
+
+  /// Fetches the timetable for a classroom.
+  ///
+  /// [classroomId] - The ID of the classroom.
+  /// [academicYearId] - The ID of the academic year.
+  ///
+  /// Throws [ApiException] if the request fails.
+  Future<TimetableResponse> getClassroomTimetable({
+    required String classroomId,
+    required String academicYearId,
+  }) async {
+    try {
+      // Fetch both periods and timetable data in parallel
+      final results = await Future.wait([
+        _apiClient.get(Endpoints.periods),
+        _apiClient.get(
+          Endpoints.timetables,
+          queryParameters: {
+            'classroom': classroomId,
+            'academic_year': academicYearId,
+          },
+        ),
+      ]);
+
+      final periodsResponse = results[0];
+      final timetableResponse = results[1];
+
+      if (periodsResponse.statusCode != null &&
+          (periodsResponse.statusCode! < 200 ||
+              periodsResponse.statusCode! >= 300)) {
+        throw ApiException(
+          message: 'Failed to fetch periods',
+          statusCode: periodsResponse.statusCode,
+        );
+      }
+
+      if (timetableResponse.statusCode != null &&
+          (timetableResponse.statusCode! < 200 ||
+              timetableResponse.statusCode! >= 300)) {
+        throw ApiException(
+          message: 'Failed to fetch timetable',
+          statusCode: timetableResponse.statusCode,
+        );
+      }
+
+      if (periodsResponse.data == null || timetableResponse.data == null) {
+        throw const ApiException(message: 'Empty response from server');
+      }
+
+      return TimetableResponse.fromJsonWithPeriods(
+        timetableJson: timetableResponse.data as Map<String, dynamic>,
+        periodsJson: periodsResponse.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    } catch (e, s) {
+      log('ClassroomRepository.getClassroomTimetable error: $e trace: $s');
+      if (e is ApiException) rethrow;
+      throw ApiException(message: 'Failed to fetch timetable: ${e.toString()}');
+    }
+  }
+
+  /// Creates or updates timetable entries in bulk.
+  ///
+  /// [schoolId] - The school ID.
+  /// [academicYearId] - The academic year ID.
+  /// [classroomId] - The classroom ID.
+  /// [entries] - List of timetable entries to save.
+  ///
+  /// Throws [ApiException] if the request fails.
+  Future<int> saveTimetableEntries({
+    required String schoolId,
+    required String academicYearId,
+    required String classroomId,
+    required List<TimetableEntryPayload> entries,
+  }) async {
+    try {
+      final payload = {
+        'school': schoolId,
+        'academic_year': academicYearId,
+        'classroom': classroomId,
+        'timetable': entries.map((e) => e.toJson()).toList(),
+      };
+
+      final response = await _apiClient.post(
+        Endpoints.timetables,
+        data: payload,
+      );
+
+      if (response.statusCode != null &&
+          (response.statusCode! < 200 || response.statusCode! >= 300)) {
+        throw ApiException(
+          message: 'Failed to save timetable entries',
+          statusCode: response.statusCode,
+        );
+      }
+
+      // Parse the response to get entries_created count
+      final responseData = response.data as Map<String, dynamic>?;
+      final data = responseData?['data'] as Map<String, dynamic>?;
+      return data?['entries_created'] as int? ?? entries.length;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    } catch (e, s) {
+      log('ClassroomRepository.saveTimetableEntries error: $e trace: $s');
+      if (e is ApiException) rethrow;
+      throw ApiException(
+        message: 'Failed to save timetable entries: ${e.toString()}',
+      );
+    }
+  }
+}
+
+/// Payload model for creating timetable entries.
+class TimetableEntryPayload {
+  const TimetableEntryPayload({
+    required this.dayOfWeek,
+    required this.periodId,
+    required this.teacherId,
+    required this.subjectId,
+  });
+
+  final int dayOfWeek;
+  final String periodId;
+  final String teacherId;
+  final String subjectId;
+
+  Map<String, dynamic> toJson() => {
+    'day_of_week': dayOfWeek,
+    'period': periodId,
+    'teacher': teacherId,
+    'subject': subjectId,
+  };
 }

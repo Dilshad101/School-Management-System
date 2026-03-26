@@ -1,153 +1,146 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/utils/di.dart';
 import '../../../../shared/styles/app_styles.dart';
-import 'tabs/students_tab.dart';
-import 'tabs/teachers_tab.dart';
+import '../../blocs/class_details/class_details_cubit.dart';
+import '../../blocs/class_details/class_details_state.dart';
+import '../../repositories/classroom_repository.dart';
 import 'tabs/time_table_tab.dart';
 import 'widgets/class_detail_info_card.dart';
 
 class ClassDetailsView extends StatelessWidget {
   const ClassDetailsView({super.key, required this.classId});
   final String? classId;
+
+  @override
+  Widget build(BuildContext context) {
+    if (classId == null || classId!.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Class Details')),
+        body: const Center(child: Text('Invalid class ID')),
+      );
+    }
+
+    return BlocProvider(
+      create: (context) =>
+          ClassDetailsCubit(classroomRepository: locator<ClassroomRepository>())
+            ..fetchClassroomDetails(classId!),
+      child: _ClassDetailsContent(classId: classId!),
+    );
+  }
+}
+
+class _ClassDetailsContent extends StatelessWidget {
+  const _ClassDetailsContent({required this.classId});
+
+  final String classId;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Class Details')),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // header
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 10,
-              children: [
-                Expanded(
-                  child: ClassDetailInfoCard(
-                    label: 'Class Teacher',
-                    value: 'Lakshmi Presad',
+      appBar: AppBar(title: const Text('Class Details')),
+      body: BlocBuilder<ClassDetailsCubit, ClassDetailsState>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.borderError,
                   ),
-                ),
-                Expanded(
-                  child: ClassDetailInfoCard(
-                    label: 'Total Students',
-                    value: '30',
+                  const SizedBox(height: 16),
+                  Text(
+                    'Failed to load class details',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.borderError,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 10,
-              children: [
-                Expanded(
-                  child: ClassDetailInfoCard(label: 'Room No', value: '101 C'),
-                ),
-                Expanded(
-                  child: ClassDetailInfoCard(
-                    label: 'Batch Year',
-                    value: '2023-2024',
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () => context
+                        .read<ClassDetailsCubit>()
+                        .fetchClassroomDetails(classId),
+                    child: const Text('Retry'),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Tab bar
-            Expanded(child: ClassDetailsTabBarView()),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ClassDetailsTabBarView extends StatefulWidget {
-  const ClassDetailsTabBarView({super.key});
-
-  @override
-  State<ClassDetailsTabBarView> createState() => _ClassDetailsTabBarViewState();
-}
-
-class _ClassDetailsTabBarViewState extends State<ClassDetailsTabBarView>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
-  late ValueNotifier<int> _tabNotifier;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _tabController = TabController(length: 3, vsync: this);
-    _tabNotifier = ValueNotifier(0);
-
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        _tabNotifier.value = _tabController.index;
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ValueListenableBuilder(
-          valueListenable: _tabNotifier,
-          builder: (context, value, child) {
-            return TabBar(
-              controller: _tabController,
-              indicator: const BoxDecoration(),
-              dividerColor: Colors.transparent,
-              labelPadding: EdgeInsets.zero,
-              onTap: (value) => _tabNotifier.value = value,
-              tabs: [
-                _buildTab('Students', 0, value),
-                _buildTab('Teachers', 1, value),
-                _buildTab('Timetable', 2, value),
-              ],
+                ],
+              ),
             );
-          },
-        ),
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              ClassStudentsTabView(),
-              ClassTeachersTabView(),
-              ClassTimetableTabView(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+          }
 
-  Tab _buildTab(String title, int index, int value) {
-    final bool isSelected = value == index;
+          final classroom = state.classroom;
+          if (classroom == null) {
+            return const Center(child: Text('No data available'));
+          }
 
-    return Tab(
-      height: 36,
-      child: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          gradient: isSelected ? AppColors.primaryGradient : null,
-          color: isSelected ? null : Colors.white,
-        ),
-        child: Text(
-          title,
-          style: AppTextStyles.linkSmall.copyWith(
-            color: isSelected ? Colors.white : Colors.black,
-            fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-          ),
-        ),
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Header info cards
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: ClassDetailInfoCard(
+                        label: 'Class Teacher',
+                        value:
+                            classroom.classTeacherDetails?.name ??
+                            'Not Assigned',
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ClassDetailInfoCard(
+                        label: 'Total Students',
+                        value: '${classroom.studentCount}',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: ClassDetailInfoCard(
+                        label: 'Class Name',
+                        value: classroom.name,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ClassDetailInfoCard(
+                        label: 'Academic Year',
+                        value: classroom.academicYearDetails?.name ?? '---',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Timetable section header
+                Row(
+                  children: [Text('Timetable', style: AppTextStyles.heading4)],
+                ),
+                // Timetable tab
+                Expanded(
+                  child: ClassTimetableTabView(
+                    classroomId: classId,
+                    academicYearId: classroom.academicYear,
+                    schoolId: classroom.school,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
