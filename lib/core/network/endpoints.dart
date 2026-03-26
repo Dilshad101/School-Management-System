@@ -48,6 +48,7 @@ class Endpoints {
 
   // Finance/Fees endpoints
   static const String studentFees = '/v1/finance/student-fees-list/';
+  static const String feeComponents = '/v1/finance/fee-component/';
 
   // Periods/Timetable endpoints
   static const String periods = '/v1/academics/periods/';
