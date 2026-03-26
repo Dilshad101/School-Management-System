@@ -18,10 +18,7 @@ class SubjectRepository {
     String? search,
   }) async {
     try {
-      final queryParams = <String, dynamic>{
-        'page': page,
-        'pagesize': pageSize,
-      };
+      final queryParams = <String, dynamic>{'page': page, 'pagesize': pageSize};
 
       if (search != null && search.isNotEmpty) {
         queryParams['search'] = search;
@@ -70,10 +67,7 @@ class SubjectRepository {
         'school': schoolId,
       };
 
-      final response = await _apiClient.post(
-        Endpoints.subjects,
-        data: payload,
-      );
+      final response = await _apiClient.post(Endpoints.subjects, data: payload);
 
       if (response.statusCode != null &&
           (response.statusCode! < 200 || response.statusCode! >= 300)) {
@@ -107,11 +101,7 @@ class SubjectRepository {
     required bool isLab,
   }) async {
     try {
-      final payload = {
-        'name': name,
-        'code': code,
-        'is_lab': isLab,
-      };
+      final payload = {'name': name, 'code': code, 'is_lab': isLab};
 
       final response = await _apiClient.patch(
         '${Endpoints.subjects}$id/',

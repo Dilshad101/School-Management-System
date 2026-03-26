@@ -27,12 +27,7 @@ class SubjectModel extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'code': code,
-      'is_lab': isLab,
-      'school': school,
-    };
+    return {'name': name, 'code': code, 'is_lab': isLab, 'school': school};
   }
 
   SubjectModel copyWith({
@@ -88,7 +83,8 @@ class SubjectListResponse extends Equatable {
       totalPages: data['total_pages'] as int? ?? 1,
       next: data['next'] as String?,
       previous: data['previous'] as String?,
-      results: (data['results'] as List<dynamic>?)
+      results:
+          (data['results'] as List<dynamic>?)
               ?.map((e) => SubjectModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
@@ -97,12 +93,12 @@ class SubjectListResponse extends Equatable {
 
   @override
   List<Object?> get props => [
-        count,
-        page,
-        pageSize,
-        totalPages,
-        next,
-        previous,
-        results,
-      ];
+    count,
+    page,
+    pageSize,
+    totalPages,
+    next,
+    previous,
+    results,
+  ];
 }

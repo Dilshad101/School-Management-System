@@ -45,10 +45,7 @@ class SubjectCard extends StatelessWidget {
                 Row(
                   children: [
                     // Code
-                    _InfoColumn(
-                      label: 'Code',
-                      value: subject.code ?? '-',
-                    ),
+                    _InfoColumn(label: 'Code', value: subject.code ?? '-'),
                     const SizedBox(width: 32),
                     // Lab Status
                     _InfoColumn(
@@ -104,10 +101,7 @@ class _InfoColumn extends StatelessWidget {
   final String label;
   final String value;
 
-  const _InfoColumn({
-    required this.label,
-    required this.value,
-  });
+  const _InfoColumn({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -123,9 +117,7 @@ class _InfoColumn extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: AppTextStyles.bodyMedium.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
+          style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
         ),
       ],
     );

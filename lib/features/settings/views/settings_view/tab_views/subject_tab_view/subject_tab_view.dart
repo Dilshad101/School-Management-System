@@ -139,11 +139,7 @@ class _SubjectTabViewContentState extends State<_SubjectTabViewContent> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.book_outlined,
-              size: 64,
-              color: AppColors.textSecondary,
-            ),
+            Icon(Icons.book_outlined, size: 64, color: AppColors.textSecondary),
             const SizedBox(height: 16),
             Text(
               'No subjects found.\nTap "Add Subject" to create one.',
@@ -204,11 +200,11 @@ class _SubjectTabViewContentState extends State<_SubjectTabViewContent> {
 
     if (result != null && mounted) {
       context.read<SubjectCubit>().updateSubject(
-            id: subject.id,
-            name: result.name,
-            code: result.code,
-            isLab: result.isLab,
-          );
+        id: subject.id,
+        name: result.name,
+        code: result.code,
+        isLab: result.isLab,
+      );
     }
   }
 
@@ -217,9 +213,7 @@ class _SubjectTabViewContentState extends State<_SubjectTabViewContent> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Subject'),
-        content: Text(
-          'Are you sure you want to delete "${subject.name}"?',
-        ),
+        content: Text('Are you sure you want to delete "${subject.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -227,9 +221,7 @@ class _SubjectTabViewContentState extends State<_SubjectTabViewContent> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.borderError,
-            ),
+            style: TextButton.styleFrom(foregroundColor: AppColors.borderError),
             child: const Text('Delete'),
           ),
         ],
@@ -246,10 +238,10 @@ class _SubjectTabViewContentState extends State<_SubjectTabViewContent> {
 
     if (result != null && mounted) {
       context.read<SubjectCubit>().createSubject(
-            name: result.name,
-            code: result.code,
-            isLab: result.isLab,
-          );
+        name: result.name,
+        code: result.code,
+        isLab: result.isLab,
+      );
     }
   }
 }

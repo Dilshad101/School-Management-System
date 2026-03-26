@@ -9,9 +9,9 @@ class SubjectCubit extends Cubit<SubjectState> {
   SubjectCubit({
     required SubjectRepository subjectRepository,
     required String schoolId,
-  })  : _subjectRepository = subjectRepository,
-        _schoolId = schoolId,
-        super(const SubjectState());
+  }) : _subjectRepository = subjectRepository,
+       _schoolId = schoolId,
+       super(const SubjectState());
 
   final SubjectRepository _subjectRepository;
   final String _schoolId;
@@ -28,10 +28,12 @@ class SubjectCubit extends Cubit<SubjectState> {
 
   /// Fetches the initial list of subjects.
   Future<void> fetchSubjects({String? search}) async {
-    emit(state.copyWith(
-      status: SubjectStatus.loading,
-      searchQuery: search ?? state.searchQuery,
-    ));
+    emit(
+      state.copyWith(
+        status: SubjectStatus.loading,
+        searchQuery: search ?? state.searchQuery,
+      ),
+    );
 
     try {
       final response = await _subjectRepository.getSubjects(
@@ -40,19 +42,23 @@ class SubjectCubit extends Cubit<SubjectState> {
         search: search ?? state.searchQuery,
       );
 
-      emit(state.copyWith(
-        status: SubjectStatus.success,
-        subjects: response.results,
-        currentPage: response.page,
-        totalPages: response.totalPages,
-        totalCount: response.count,
-        hasMore: response.hasNext,
-      ));
+      emit(
+        state.copyWith(
+          status: SubjectStatus.success,
+          subjects: response.results,
+          currentPage: response.page,
+          totalPages: response.totalPages,
+          totalCount: response.count,
+          hasMore: response.hasNext,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: SubjectStatus.failure,
-        error: _getErrorMessage(e),
-      ));
+      emit(
+        state.copyWith(
+          status: SubjectStatus.failure,
+          error: _getErrorMessage(e),
+        ),
+      );
     }
   }
 
@@ -72,19 +78,23 @@ class SubjectCubit extends Cubit<SubjectState> {
         search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
       );
 
-      emit(state.copyWith(
-        status: SubjectStatus.success,
-        subjects: [...state.subjects, ...response.results],
-        currentPage: response.page,
-        totalPages: response.totalPages,
-        totalCount: response.count,
-        hasMore: response.hasNext,
-      ));
+      emit(
+        state.copyWith(
+          status: SubjectStatus.success,
+          subjects: [...state.subjects, ...response.results],
+          currentPage: response.page,
+          totalPages: response.totalPages,
+          totalCount: response.count,
+          hasMore: response.hasNext,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: SubjectStatus.success,
-        error: _getErrorMessage(e),
-      ));
+      emit(
+        state.copyWith(
+          status: SubjectStatus.success,
+          error: _getErrorMessage(e),
+        ),
+      );
     }
   }
 
@@ -109,18 +119,22 @@ class SubjectCubit extends Cubit<SubjectState> {
       // Sort by name
       updatedSubjects.sort((a, b) => a.name.compareTo(b.name));
 
-      emit(state.copyWith(
-        actionStatus: SubjectActionStatus.success,
-        subjects: updatedSubjects,
-        totalCount: state.totalCount + 1,
-      ));
+      emit(
+        state.copyWith(
+          actionStatus: SubjectActionStatus.success,
+          subjects: updatedSubjects,
+          totalCount: state.totalCount + 1,
+        ),
+      );
 
       return true;
     } catch (e) {
-      emit(state.copyWith(
-        actionStatus: SubjectActionStatus.failure,
-        actionError: _getErrorMessage(e),
-      ));
+      emit(
+        state.copyWith(
+          actionStatus: SubjectActionStatus.failure,
+          actionError: _getErrorMessage(e),
+        ),
+      );
       return false;
     }
   }
@@ -149,17 +163,21 @@ class SubjectCubit extends Cubit<SubjectState> {
       // Sort by name
       updatedSubjects.sort((a, b) => a.name.compareTo(b.name));
 
-      emit(state.copyWith(
-        actionStatus: SubjectActionStatus.success,
-        subjects: updatedSubjects,
-      ));
+      emit(
+        state.copyWith(
+          actionStatus: SubjectActionStatus.success,
+          subjects: updatedSubjects,
+        ),
+      );
 
       return true;
     } catch (e) {
-      emit(state.copyWith(
-        actionStatus: SubjectActionStatus.failure,
-        actionError: _getErrorMessage(e),
-      ));
+      emit(
+        state.copyWith(
+          actionStatus: SubjectActionStatus.failure,
+          actionError: _getErrorMessage(e),
+        ),
+      );
       return false;
     }
   }
@@ -172,31 +190,35 @@ class SubjectCubit extends Cubit<SubjectState> {
       await _subjectRepository.deleteSubject(id: id);
 
       // Remove the subject from the list
-      final updatedSubjects =
-          state.subjects.where((subject) => subject.id != id).toList();
+      final updatedSubjects = state.subjects
+          .where((subject) => subject.id != id)
+          .toList();
 
-      emit(state.copyWith(
-        actionStatus: SubjectActionStatus.success,
-        subjects: updatedSubjects,
-        totalCount: state.totalCount - 1,
-      ));
+      emit(
+        state.copyWith(
+          actionStatus: SubjectActionStatus.success,
+          subjects: updatedSubjects,
+          totalCount: state.totalCount - 1,
+        ),
+      );
 
       return true;
     } catch (e) {
-      emit(state.copyWith(
-        actionStatus: SubjectActionStatus.failure,
-        actionError: _getErrorMessage(e),
-      ));
+      emit(
+        state.copyWith(
+          actionStatus: SubjectActionStatus.failure,
+          actionError: _getErrorMessage(e),
+        ),
+      );
       return false;
     }
   }
 
   /// Clears the action status.
   void clearActionStatus() {
-    emit(state.copyWith(
-      actionStatus: SubjectActionStatus.idle,
-      actionError: null,
-    ));
+    emit(
+      state.copyWith(actionStatus: SubjectActionStatus.idle, actionError: null),
+    );
   }
 
   /// Clears any error.

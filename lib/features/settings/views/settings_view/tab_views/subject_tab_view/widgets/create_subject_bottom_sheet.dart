@@ -106,19 +106,13 @@ class _CreateSubjectBottomSheetState extends State<CreateSubjectBottomSheet> {
           // Name Field
           _buildLabel('Enter Name'),
           const SizedBox(height: 8),
-          _buildTextField(
-            controller: _nameController,
-            hintText: 'Enter Name',
-          ),
+          _buildTextField(controller: _nameController, hintText: 'Enter Name'),
           const SizedBox(height: 16),
 
           // Code Field
           _buildLabel('Enter Code'),
           const SizedBox(height: 8),
-          _buildTextField(
-            controller: _codeController,
-            hintText: 'Enter Code',
-          ),
+          _buildTextField(controller: _codeController, hintText: 'Enter Code'),
           const SizedBox(height: 16),
 
           // Lab Included Checkbox
@@ -141,10 +135,7 @@ class _CreateSubjectBottomSheetState extends State<CreateSubjectBottomSheet> {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                'Lab Included',
-                style: AppTextStyles.bodyMedium,
-              ),
+              Text('Lab Included', style: AppTextStyles.bodyMedium),
             ],
           ),
           const SizedBox(height: 24),
@@ -189,9 +180,7 @@ class _CreateSubjectBottomSheetState extends State<CreateSubjectBottomSheet> {
   Widget _buildLabel(String text) {
     return Text(
       text,
-      style: AppTextStyles.bodyMedium.copyWith(
-        fontWeight: FontWeight.w500,
-      ),
+      style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
     );
   }
 
@@ -231,26 +220,22 @@ class _CreateSubjectBottomSheetState extends State<CreateSubjectBottomSheet> {
     final code = _codeController.text.trim();
 
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a name')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter a name')));
       return;
     }
 
     if (code.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a code')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter a code')));
       return;
     }
 
     Navigator.pop(
       context,
-      CreateSubjectResult(
-        name: name,
-        code: code,
-        isLab: _isLab,
-      ),
+      CreateSubjectResult(name: name, code: code, isLab: _isLab),
     );
   }
 }

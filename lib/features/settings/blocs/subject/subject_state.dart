@@ -89,15 +89,15 @@ class SubjectState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        subjects,
-        currentPage,
-        totalPages,
-        totalCount,
-        hasMore,
-        searchQuery,
-        error,
-        actionStatus,
-        actionError,
-      ];
+    status,
+    subjects,
+    currentPage,
+    totalPages,
+    totalCount,
+    hasMore,
+    searchQuery,
+    error,
+    actionStatus,
+    actionError,
+  ];
 }
