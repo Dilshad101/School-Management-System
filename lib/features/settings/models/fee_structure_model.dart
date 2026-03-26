@@ -215,19 +215,22 @@ class FeeStructureListResponse extends Equatable {
   bool get hasMore => next != null;
 
   factory FeeStructureListResponse.fromJson(Map<String, dynamic> json) {
+    // Handle nested data object from API response
+    final data = json['data'] as Map<String, dynamic>? ?? json;
+
     final resultsList =
-        (json['results'] as List<dynamic>?)
+        (data['results'] as List<dynamic>?)
             ?.map((e) => FeeStructureModel.fromJson(e as Map<String, dynamic>))
             .toList() ??
         [];
 
     return FeeStructureListResponse(
-      count: json['count'] ?? 0,
-      page: json['page'] ?? 1,
-      pageSize: json['page_size'] ?? 10,
-      totalPages: json['total_pages'] ?? 1,
-      next: json['next'],
-      previous: json['previous'],
+      count: data['count'] ?? 0,
+      page: data['page'] ?? 1,
+      pageSize: data['page_size'] ?? 10,
+      totalPages: data['total_pages'] ?? 1,
+      next: data['next'],
+      previous: data['previous'],
       results: resultsList,
     );
   }

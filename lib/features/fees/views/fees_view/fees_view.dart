@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/tenant/tenant_context.dart';
 import '../../../../core/utils/di.dart';
 import '../../../../shared/styles/app_styles.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
@@ -10,6 +11,7 @@ import '../../blocs/fees/fees_bloc.dart';
 import '../../blocs/fees/fees_event.dart';
 import '../../blocs/fees/fees_state.dart';
 import '../../repositories/fees_repository.dart';
+import 'widgets/create_fee_bottom_sheet.dart';
 import 'widgets/fee_summary_card.dart';
 import 'widgets/fee_tile.dart';
 
@@ -320,8 +322,32 @@ class _FeesViewContentState extends State<_FeesViewContent> {
           const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
-      floatingActionButton: MyFloatingActionButton(onPressed: () {}),
+      floatingActionButton: MyFloatingActionButton(onPressed: _onCreateFee),
     );
+  }
+
+  Future<void> _onCreateFee() async {
+    final schoolId = _getSchoolId();
+    if (schoolId.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('School not selected')));
+      return;
+    }
+
+    final result = await CreateFeeBottomSheet.show(context, schoolId: schoolId);
+    if (result == true && mounted) {
+      // Refresh the fees list
+      context.read<FeesBloc>().add(const FeesFetchRequested(refresh: true));
+    }
+  }
+
+  String _getSchoolId() {
+    final session = locator<SessionHolder>().session;
+    if (session?.schoolId != null && session!.schoolId!.isNotEmpty) {
+      return session.schoolId!;
+    }
+    return locator<TenantContext>().selectedSchoolId ?? '';
   }
 
   Widget _buildAllChip(bool isSelected) {
