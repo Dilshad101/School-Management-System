@@ -4,6 +4,7 @@ import '../../../../core/tenant/tenant_context.dart';
 import '../../../../core/utils/di.dart';
 import '../../../../shared/styles/app_styles.dart';
 import 'tab_views/period_tab_view/period_tab_view.dart';
+import 'tab_views/subject_tab_view/subject_tab_view.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -16,11 +17,7 @@ class _SettingsViewState extends State<SettingsView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<String> _tabs = [
-    'General Settings',
-    'Subject Management',
-    'Period',
-  ];
+  final List<String> _tabs = ['General Settings', 'Subjects', 'Periods'];
 
   /// Gets the current school ID from session or tenant context
   String get _schoolId {
@@ -58,7 +55,7 @@ class _SettingsViewState extends State<SettingsView>
               controller: _tabController,
               children: [
                 _buildGeneralSettingsTab(),
-                _buildSubjectManagementTab(),
+                SubjectTabView(schoolId: _schoolId),
                 PeriodTabView(schoolId: _schoolId),
               ],
             ),
@@ -97,9 +94,5 @@ class _SettingsViewState extends State<SettingsView>
 
   Widget _buildGeneralSettingsTab() {
     return const Center(child: Text('General Settings - Coming Soon'));
-  }
-
-  Widget _buildSubjectManagementTab() {
-    return const Center(child: Text('Subject Management - Coming Soon'));
   }
 }
