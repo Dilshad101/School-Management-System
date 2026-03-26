@@ -44,12 +44,85 @@ class ApiClient {
         responseBody: true,
         requestHeader: true,
         responseHeader: false,
+        logPrint: (object) => log(object.toString()),
       ),
     );
 
     return ApiClient._(dio);
   }
-
+  var d = {
+    "success": true,
+    "data": {
+      "count": 4,
+      "page": 1,
+      "page_size": 10,
+      "total_pages": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "12044e56-d2f4-49de-acee-38e368fd70f2",
+          "total_paid": "200.00",
+          "student_name": "Student1",
+          "academic_year_details": {
+            "id": "0c53a22f-b8af-497d-9df1-23d1d6891b77",
+            "name": "20225-2026",
+          },
+          "classroom_name": "4A",
+          "total_fee": "0.00",
+          "paid_fee": "200.00",
+          "dues": -200.0,
+          "academic_year": "0c53a22f-b8af-497d-9df1-23d1d6891b77",
+        },
+        {
+          "id": "ca5467b7-7d03-4cd0-b37c-98d07e3e7cdd",
+          "total_paid": "0.00",
+          "student_name": "Student1",
+          "academic_year_details": {
+            "id": "0c53a22f-b8af-497d-9df1-23d1d6891b77",
+            "name": "20225-2026",
+          },
+          "classroom_name": "4A",
+          "total_fee": "0.00",
+          "paid_fee": "0.00",
+          "dues": 0.0,
+          "academic_year": "0c53a22f-b8af-497d-9df1-23d1d6891b77",
+        },
+        {
+          "id": "846c984f-6e42-4c50-8900-425d63e947ef",
+          "total_paid": "1000.00",
+          "student_name": "Dilshad",
+          "academic_year_details": {
+            "id": "0c53a22f-b8af-497d-9df1-23d1d6891b77",
+            "name": "20225-2026",
+          },
+          "classroom_name": "6A",
+          "total_fee": "0.00",
+          "paid_fee": "1000.00",
+          "dues": -1000.0,
+          "academic_year": "0c53a22f-b8af-497d-9df1-23d1d6891b77",
+        },
+        {
+          "id": "3ce45c5d-4430-4f8d-a78e-9993649dc65e",
+          "total_paid": "7500.00",
+          "student_name": "Dilshad",
+          "academic_year_details": {
+            "id": "0c53a22f-b8af-497d-9df1-23d1d6891b77",
+            "name": "20225-2026",
+          },
+          "classroom_name": "6A",
+          "total_fee": "15000.00",
+          "paid_fee": "7500.00",
+          "dues": 7500.0,
+          "academic_year": "0c53a22f-b8af-497d-9df1-23d1d6891b77",
+        },
+      ],
+    },
+    "meta": {
+      "request_id": "32436cab-1bd5-42ea-b257-5e3612daf687",
+      "timestamp": "2026-03-26T06:05:58.849628+00:00",
+    },
+  };
   // Convenience methods (optional)
   Future<Response<T>> get<T>(
     String path, {
@@ -162,7 +235,7 @@ class _AuthTenantInterceptor extends Interceptor {
     // Attach bearer token if available
     if (session != null && session.accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer ${session.accessToken}';
-      log('Attached Authorization header: ${options.headers['Authorization']}');
+      // log('Attached Authorization header: ${options.headers['Authorization']}');
     }
 
     handler.next(options);

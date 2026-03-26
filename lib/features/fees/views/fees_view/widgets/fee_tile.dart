@@ -1,27 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../shared/styles/app_styles.dart';
-
-enum FeeStatus { paid, partial, unpaid }
+import '../../../models/student_fee_model.dart';
 
 class FeeTile extends StatelessWidget {
-  const FeeTile({
-    super.key,
-    this.className = '10 - C',
-    this.classTeacher = 'Ananthu',
-    this.totalFees = '6,000',
-    this.paidAmount = '4,000',
-    this.dueAmount = '2,000',
-    this.status = FeeStatus.partial,
-    this.onTap,
-  });
+  const FeeTile({super.key, required this.fee, this.onTap});
 
-  final String className;
-  final String classTeacher;
-  final String totalFees;
-  final String paidAmount;
-  final String dueAmount;
-  final FeeStatus status;
+  final StudentFeeModel fee;
   final VoidCallback? onTap;
 
   @override
@@ -47,14 +32,14 @@ class FeeTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        className,
+                        fee.studentName,
                         style: AppTextStyles.bodyLarge.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Class Teacher : $classTeacher',
+                        'Class: ${fee.classroomName}',
                         style: AppTextStyles.labelMedium.copyWith(
                           fontWeight: FontWeight.w400,
                           color: AppColors.textPrimary.withAlpha(160),
@@ -73,22 +58,22 @@ class FeeTile extends StatelessWidget {
                 Expanded(
                   child: _buildFeeInfo(
                     label: 'TOTAL FEES',
-                    value: totalFees,
+                    value: fee.formattedTotalFee,
                     valueColor: AppColors.textPrimary,
                   ),
                 ),
                 Expanded(
                   child: _buildFeeInfo(
                     label: 'PAID',
-                    value: paidAmount,
+                    value: fee.formattedPaidFee,
                     valueColor: AppColors.textPrimary,
                   ),
                 ),
                 Expanded(
                   child: _buildFeeInfo(
                     label: 'DUE',
-                    value: dueAmount,
-                    valueColor: status == FeeStatus.paid
+                    value: fee.formattedDues,
+                    valueColor: fee.status == FeeStatus.paid
                         ? AppColors.textPrimary
                         : const Color(0xFFEF4444),
                   ),
@@ -106,7 +91,7 @@ class FeeTile extends StatelessWidget {
     Color textColor;
     String text;
 
-    switch (status) {
+    switch (fee.status) {
       case FeeStatus.paid:
         backgroundColor = AppColors.green.withAlpha(40);
         textColor = AppColors.green;

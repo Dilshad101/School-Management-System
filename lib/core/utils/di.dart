@@ -13,6 +13,7 @@ import '../../features/chat/repositories/chat_repository.dart';
 import '../../features/employees/repositories/employees_repository.dart';
 import '../../features/employees/repositories/roles_repository.dart';
 import '../../features/employees/repositories/subjects_repository.dart';
+import '../../features/fees/repositories/fees_repository.dart';
 import '../../features/guardians/repositories/guardians_repository.dart';
 import '../../features/notifications/repositories/notification_repository.dart';
 import '../../features/students/repositories/students_repository.dart';
@@ -98,6 +99,10 @@ Future<void> setupDependency() async {
 
   locator.registerLazySingleton<NotificationRepository>(
     () => NotificationRepository(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<FeesRepository>(
+    () => FeesRepository(apiClient: locator<ApiClient>()),
   );
 }
 

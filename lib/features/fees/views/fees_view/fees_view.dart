@@ -1,71 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/utils/di.dart';
 import '../../../../shared/styles/app_styles.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
 import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../../shared/widgets/input_fields/search_field.dart';
+import '../../blocs/fees/fees_bloc.dart';
+import '../../blocs/fees/fees_event.dart';
+import '../../blocs/fees/fees_state.dart';
+import '../../repositories/fees_repository.dart';
 import 'widgets/fee_summary_card.dart';
 import 'widgets/fee_tile.dart';
 
-class FeesView extends StatefulWidget {
+class FeesView extends StatelessWidget {
   const FeesView({super.key});
 
   @override
-  State<FeesView> createState() => _FeesViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          FeesBloc(feesRepository: locator<FeesRepository>())
+            ..add(const FeesFetchRequested()),
+      child: const _FeesViewContent(),
+    );
+  }
 }
 
-class _FeesViewState extends State<FeesView> {
-  final List<Map<String, dynamic>> feesData = [
-    {
-      'className': '10 - C',
-      'classTeacher': 'Ananthu',
-      'totalFees': '6,000',
-      'paid': '4,000',
-      'due': '2,000',
-      'status': FeeStatus.partial,
-    },
-    {
-      'className': '10 - C',
-      'classTeacher': 'Ananthu',
-      'totalFees': '6,000',
-      'paid': '6,000',
-      'due': '0',
-      'status': FeeStatus.paid,
-    },
-    {
-      'className': '10 - C',
-      'classTeacher': 'Ananthu',
-      'totalFees': '6,000',
-      'paid': '6,000',
-      'due': '0',
-      'status': FeeStatus.paid,
-    },
-    {
-      'className': '9 - A',
-      'classTeacher': 'Priya',
-      'totalFees': '5,500',
-      'paid': '0',
-      'due': '5,500',
-      'status': FeeStatus.unpaid,
-    },
-    {
-      'className': '8 - B',
-      'classTeacher': 'Vikram',
-      'totalFees': '5,000',
-      'paid': '2,500',
-      'due': '2,500',
-      'status': FeeStatus.partial,
-    },
-    {
-      'className': '7 - A',
-      'classTeacher': 'Lakshmi',
-      'totalFees': '4,500',
-      'paid': '4,500',
-      'due': '0',
-      'status': FeeStatus.paid,
-    },
-  ];
+class _FeesViewContent extends StatefulWidget {
+  const _FeesViewContent();
 
+  @override
+  State<_FeesViewContent> createState() => _FeesViewContentState();
+}
+
+class _FeesViewContentState extends State<_FeesViewContent> {
   final _classes = const ['Class 1', 'Class 2', 'Class 3'];
   final _divisions = const ['Division A', 'Division B', 'Division C'];
   final _paymentStatuses = const ['Paid', 'Unpaid', 'Partial'];
@@ -74,6 +43,7 @@ class _FeesViewState extends State<FeesView> {
   String? _selectedPaymentStatus;
 
   late ValueNotifier<bool> _allSelectedNotifier;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
@@ -82,21 +52,41 @@ class _FeesViewState extends State<FeesView> {
     _selectedDivision = _divisions.isNotEmpty ? _divisions.first : null;
     _selectedPaymentStatus = 'Paid';
     _allSelectedNotifier = ValueNotifier<bool>(true);
+    _scrollController = ScrollController();
+
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _allSelectedNotifier.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      context.read<FeesBloc>().add(const FeesLoadMoreRequested());
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
+  }
+
+  void _onSearchChanged(String query) {
+    context.read<FeesBloc>().add(FeesSearchRequested(query: query));
   }
 
   @override
   Widget build(BuildContext context) {
-    // Sample data for demonstration
-
     return Scaffold(
       appBar: AppBar(title: const Text('Fees Management')),
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           // Summary cards - Scrollable (hides on scroll)
           SliverToBoxAdapter(
@@ -166,9 +156,8 @@ class _FeesViewState extends State<FeesView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // const SizedBox(height: 8),
                     // Search bar
-                    AppSearchBar(onChanged: (value) {}),
+                    AppSearchBar(onChanged: _onSearchChanged),
                     const SizedBox(height: 4),
                     // Filter chips
                     SingleChildScrollView(
@@ -184,7 +173,6 @@ class _FeesViewState extends State<FeesView> {
                                 items: _paymentStatuses,
                                 value: _selectedPaymentStatus,
                                 onChanged: (value) {
-                                  print('payment status - $value');
                                   if (value == null) return;
                                   _selectedPaymentStatus = value;
                                   _allSelectedNotifier.value = false;
@@ -195,7 +183,6 @@ class _FeesViewState extends State<FeesView> {
                                 items: _classes,
                                 value: _selectedClass,
                                 onChanged: (value) {
-                                  print('class - $value');
                                   if (value == null) return;
                                   _selectedClass = value;
                                   _allSelectedNotifier.value = false;
@@ -206,7 +193,6 @@ class _FeesViewState extends State<FeesView> {
                                 items: _divisions,
                                 value: _selectedDivision,
                                 onChanged: (value) {
-                                  print('division - $value');
                                   if (value == null) return;
                                   _selectedDivision = value;
                                   _allSelectedNotifier.value = false;
@@ -225,25 +211,109 @@ class _FeesViewState extends State<FeesView> {
             ),
           ),
 
-          // Fees list
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            sliver: SliverList.separated(
-              itemCount: feesData.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 10),
-              itemBuilder: (context, index) {
-                final data = feesData[index];
-                return FeeTile(
-                  className: data['className'],
-                  classTeacher: data['classTeacher'],
-                  totalFees: data['totalFees'],
-                  paidAmount: data['paid'],
-                  dueAmount: data['due'],
-                  status: data['status'],
-                  onTap: () {},
+          // Fees list with BLoC
+          BlocConsumer<FeesBloc, FeesState>(
+            listenWhen: (previous, current) =>
+                previous.error != current.error && current.error != null,
+            listener: (context, state) {
+              if (state.error != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.error!),
+                    backgroundColor: AppColors.borderError,
+                  ),
                 );
-              },
-            ),
+                context.read<FeesBloc>().add(const FeesErrorCleared());
+              }
+            },
+            builder: (context, state) {
+              if (state.isLoading) {
+                return const SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              if (state.hasError) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Error: ${state.error}',
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.borderError,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            context.read<FeesBloc>().add(
+                              const FeesFetchRequested(refresh: true),
+                            );
+                          },
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              if (state.isEmpty) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.receipt_long_outlined,
+                          size: 64,
+                          color: AppColors.textSecondary,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          state.isSearching
+                              ? 'No fees found for "${state.searchQuery}"'
+                              : 'No fees found',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              return SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                sliver: SliverList.separated(
+                  itemCount: state.fees.length + (state.isLoadingMore ? 1 : 0),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    if (index >= state.fees.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    final fee = state.fees[index];
+                    return FeeTile(
+                      fee: fee,
+                      onTap: () {
+                        // TODO: Navigate to fee details
+                      },
+                    );
+                  },
+                ),
+              );
+            },
           ),
 
           // Bottom padding
@@ -258,6 +328,7 @@ class _FeesViewState extends State<FeesView> {
     return InkWell(
       onTap: () {
         _allSelectedNotifier.value = true;
+        context.read<FeesBloc>().add(const FeesSearchCleared());
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

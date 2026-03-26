@@ -46,6 +46,9 @@ class Endpoints {
   // Notifications endpoints
   static const String notifications = '/v1/notification/notification/';
 
+  // Finance/Fees endpoints
+  static const String studentFees = '/v1/finance/student-fees-list/';
+
   // Chat/Communication endpoints
   static const String chat = '/v1/communication/chat/';
   static const String chatStartChat = '/v1/communication/chat/start_chat/';
