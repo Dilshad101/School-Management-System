@@ -9,35 +9,39 @@ class EmployeeTile extends StatelessWidget {
   const EmployeeTile({
     super.key,
     required this.employee,
+    this.onTap,
     this.onEdit,
     this.onDelete,
   });
 
   final EmployeeModel employee;
+  final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: AppColors.white,
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            spacing: 10,
-            children: [
-              _buildProfileImage(),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: AppColors.white,
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              spacing: 10,
+              children: [
+                _buildProfileImage(),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                     Row(
                       spacing: 8,
                       children: [
@@ -119,6 +123,7 @@ class EmployeeTile extends StatelessWidget {
             ],
           ),
         ],
+      ),
       ),
     );
   }

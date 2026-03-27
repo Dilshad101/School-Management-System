@@ -187,6 +187,17 @@ class _EmployeesViewContentState extends State<_EmployeesViewContent> {
                           final employee = state.employees[index];
                           return EmployeeTile(
                             employee: employee,
+                            onTap: () async {
+                              // Navigate to employee details
+                              final result = await context.push<bool>(
+                                '/employees/${employee.id}',
+                              );
+                              if (result == true && context.mounted) {
+                                context.read<EmployeesBloc>().add(
+                                  const RefreshEmployees(),
+                                );
+                              }
+                            },
                             onEdit: () async {
                               // Navigate to edit employee
                               final result = await context.push<bool>(

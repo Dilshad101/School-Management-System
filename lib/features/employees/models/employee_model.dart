@@ -9,13 +9,14 @@ class EmployeeRoleModel extends Equatable {
 
   factory EmployeeRoleModel.fromJson(Map<String, dynamic> json) {
     return EmployeeRoleModel(
-      roleId: json['role__id'] ?? '',
-      roleName: json['role__name'] ?? '',
+      // Support both formats: 'id'/'name' (detail API) and 'role__id'/'role__name' (list API)
+      roleId: json['id']?.toString() ?? json['role__id']?.toString() ?? '',
+      roleName: json['name'] ?? json['role__name'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'role__id': roleId, 'role__name': roleName};
+    return {'id': roleId, 'name': roleName};
   }
 
   @override
@@ -149,6 +150,34 @@ class EmployeeDocumentApiModel extends Equatable {
   ];
 }
 
+/// Model for employee subject assignment.
+class EmployeeSubjectModel extends Equatable {
+  const EmployeeSubjectModel({
+    required this.id,
+    required this.subjectId,
+    required this.subjectName,
+  });
+
+  final String id;
+  final String subjectId;
+  final String subjectName;
+
+  factory EmployeeSubjectModel.fromJson(Map<String, dynamic> json) {
+    return EmployeeSubjectModel(
+      id: json['id']?.toString() ?? '',
+      subjectId: json['subject_id']?.toString() ?? '',
+      subjectName: json['subject_name'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'subject_id': subjectId, 'subject_name': subjectName};
+  }
+
+  @override
+  List<Object?> get props => [id, subjectId, subjectName];
+}
+
 /// Model for an employee/school user.
 class EmployeeModel extends Equatable {
   const EmployeeModel({
@@ -161,6 +190,8 @@ class EmployeeModel extends Equatable {
     this.rolesDetails = const [],
     this.profile,
     this.documents = const [],
+    this.subjectsList = const [],
+    this.commonId,
   });
 
   final String id;
@@ -172,6 +203,8 @@ class EmployeeModel extends Equatable {
   final List<EmployeeRoleModel> rolesDetails;
   final EmployeeProfileModel? profile;
   final List<EmployeeDocumentApiModel> documents;
+  final List<EmployeeSubjectModel> subjectsList;
+  final String? commonId;
 
   /// Get the employee's full name.
   String get fullName {
@@ -220,6 +253,14 @@ class EmployeeModel extends Equatable {
               )
               .toList() ??
           [],
+      subjectsList:
+          (json['subjects_list'] as List<dynamic>?)
+              ?.map(
+                (e) => EmployeeSubjectModel.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          [],
+      commonId: json['common_id'],
     );
   }
 
@@ -234,6 +275,8 @@ class EmployeeModel extends Equatable {
       'roles_details': rolesDetails.map((e) => e.toJson()).toList(),
       'profile': profile?.toJson(),
       'documents': documents.map((e) => e.toJson()).toList(),
+      'subjects_list': subjectsList.map((e) => e.toJson()).toList(),
+      'common_id': commonId,
     };
   }
 
@@ -248,6 +291,8 @@ class EmployeeModel extends Equatable {
     rolesDetails,
     profile,
     documents,
+    subjectsList,
+    commonId,
   ];
 }
 

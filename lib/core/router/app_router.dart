@@ -11,6 +11,7 @@ import 'package:school_management_system/features/class/views/class_view/class_v
 import 'package:school_management_system/features/class/views/create_class_view/create_class_view.dart';
 import 'package:school_management_system/features/dashboard/views/dashboard_page.dart';
 import 'package:school_management_system/features/employees/views/create_employee_view/create_employee_view.dart';
+import 'package:school_management_system/features/employees/views/employee_details_view/employee_details_view.dart';
 import 'package:school_management_system/features/employees/views/employees_view/employees_view.dart';
 import 'package:school_management_system/features/fees/views/fees_view/fees_view.dart';
 import 'package:school_management_system/features/guardians/view/add_guardian_view.dart';
@@ -57,6 +58,13 @@ class NavigationService {
         GoRoute(
           path: Routes.employees,
           builder: (context, state) => const EmployeesView(),
+        ),
+        GoRoute(
+          path: Routes.employeeDetail,
+          builder: (context, state) {
+            final employeeId = state.pathParameters['id'];
+            return EmployeeDetailsView(employeeId: employeeId);
+          },
         ),
         GoRoute(
           path: Routes.createEmployee,
