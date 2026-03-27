@@ -42,88 +42,88 @@ class EmployeeTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                    Row(
-                      spacing: 8,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            employee.fullName,
-                            style: AppTextStyles.bodyLarge.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        if (employee.isActive)
-                          Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.green.withAlpha(20),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 2,
-                            ),
+                      Row(
+                        spacing: 8,
+                        children: [
+                          Expanded(
                             child: Text(
-                              'Active',
-                              style: AppTextStyles.bodySmall.copyWith(
+                              employee.fullName,
+                              style: AppTextStyles.bodyLarge.copyWith(
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.green,
                               ),
                             ),
                           ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        if (employee.primaryRole != null) ...[
-                          Text(
-                            employee.primaryRole!,
-                            style: AppTextStyles.labelMedium.copyWith(
-                              fontWeight: FontWeight.w500,
+                          if (employee.isActive)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.green.withAlpha(20),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 2,
+                              ),
+                              child: Text(
+                                'Active',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.green,
+                                ),
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 18,
-                            child: VerticalDivider(color: AppColors.border),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          if (employee.primaryRole != null) ...[
+                            Text(
+                              employee.primaryRole!,
+                              style: AppTextStyles.labelMedium.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 18,
+                              child: VerticalDivider(color: AppColors.border),
+                            ),
+                          ],
+                          Expanded(
+                            child: Text(
+                              employee.displayId,
+                              style: AppTextStyles.labelMedium.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textPrimary.withAlpha(160),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
                         ],
-                        Expanded(
-                          child: Text(
-                            employee.displayId,
-                            style: AppTextStyles.labelMedium.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textPrimary.withAlpha(160),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (employee.email.isNotEmpty)
-                      Text(
-                        employee.email,
-                        style: AppTextStyles.bodyMedium.apply(
-                          color: AppColors.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                  ],
+                      if (employee.email.isNotEmpty)
+                        Text(
+                          employee.email,
+                          style: AppTextStyles.bodyMedium.apply(
+                            color: AppColors.textSecondary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Divider(color: AppColors.border, height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            spacing: 8,
-            children: [
-              MicroDeleteButton(onTap: onDelete),
-              MicroEditButton(onTap: onEdit),
-            ],
-          ),
-        ],
-      ),
+              ],
+            ),
+            Divider(color: AppColors.border, height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              spacing: 8,
+              children: [
+                MicroDeleteButton(onTap: onDelete),
+                MicroEditButton(onTap: onEdit),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
