@@ -110,4 +110,40 @@ class FeesRepository {
       );
     }
   }
+
+  /// Creates a new payment for a student fee.
+  ///
+  /// [amount] - The payment amount.
+  /// [paymentMode] - The payment mode (cash, upi, card, net_banking).
+  /// [studentFeeId] - The student fee ID.
+  ///
+  /// Throws [ApiException] if the request fails.
+  Future<void> createPayment({
+    required String amount,
+    required String paymentMode,
+    required String studentFeeId,
+  }) async {
+    try {
+      final payload = {
+        'amount': amount,
+        'payment_mode': paymentMode,
+        'student_fee': studentFeeId,
+      };
+
+      final response = await _apiClient.post(Endpoints.payments, data: payload);
+
+      if (response.statusCode != null &&
+          (response.statusCode! < 200 || response.statusCode! >= 300)) {
+        throw ApiException(
+          message: 'Failed to create payment',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException(message: 'Failed to create payment: ${e.toString()}');
+    }
+  }
 }

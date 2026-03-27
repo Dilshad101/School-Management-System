@@ -10,7 +10,9 @@ import '../../../../shared/widgets/input_fields/search_field.dart';
 import '../../blocs/fees/fees_bloc.dart';
 import '../../blocs/fees/fees_event.dart';
 import '../../blocs/fees/fees_state.dart';
+import '../../models/student_fee_model.dart';
 import '../../repositories/fees_repository.dart';
+import 'widgets/add_payment_bottom_sheet.dart';
 import 'widgets/create_fee_bottom_sheet.dart';
 import 'widgets/fee_summary_card.dart';
 import 'widgets/fee_tile.dart';
@@ -311,6 +313,7 @@ class _FeesViewContentState extends State<_FeesViewContent> {
                       onTap: () {
                         // TODO: Navigate to fee details
                       },
+                      onAddPayment: () => _onAddPayment(fee),
                     );
                   },
                 ),
@@ -338,6 +341,14 @@ class _FeesViewContentState extends State<_FeesViewContent> {
     final result = await CreateFeeBottomSheet.show(context, schoolId: schoolId);
     if (result == true && mounted) {
       // Refresh the fees list
+      context.read<FeesBloc>().add(const FeesFetchRequested(refresh: true));
+    }
+  }
+
+  Future<void> _onAddPayment(StudentFeeModel fee) async {
+    final result = await AddPaymentBottomSheet.show(context, fee);
+    if (result == true && mounted) {
+      // Refresh the fees list after successful payment
       context.read<FeesBloc>().add(const FeesFetchRequested(refresh: true));
     }
   }

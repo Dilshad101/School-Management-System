@@ -4,10 +4,11 @@ import '../../../../../shared/styles/app_styles.dart';
 import '../../../models/student_fee_model.dart';
 
 class FeeTile extends StatelessWidget {
-  const FeeTile({super.key, required this.fee, this.onTap});
+  const FeeTile({super.key, required this.fee, this.onTap, this.onAddPayment});
 
   final StudentFeeModel fee;
   final VoidCallback? onTap;
+  final VoidCallback? onAddPayment;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,14 @@ class FeeTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                _buildStatusBadge(),
+                Row(
+                  children: [
+                    _buildStatusBadge(),
+                    const SizedBox(width: 8),
+                    // Payment button
+                    _PaymentButton(onTap: onAddPayment),
+                  ],
+                ),
               ],
             ),
             const Divider(color: AppColors.border, height: 24),
@@ -149,6 +157,31 @@ class FeeTile extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PaymentButton extends StatelessWidget {
+  const _PaymentButton({this.onTap});
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withAlpha(20),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Icon(
+          Icons.add_card_rounded,
+          color: AppColors.primary,
+          size: 20,
+        ),
+      ),
     );
   }
 }
