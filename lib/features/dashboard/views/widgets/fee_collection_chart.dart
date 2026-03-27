@@ -42,13 +42,54 @@ class FeeCollectionChart extends StatelessWidget {
   double get _totalCash =>
       _chartData.fold(0, (sum, item) => sum + item.cashAmount);
 
+  /// Calculates appropriate interval for Y-axis based on max value.
+  double get _yInterval {
+    final maxVal = _maxY;
+    if (maxVal <= 0) return 1;
+
+    // Calculate a nice interval that gives us ~5 labels
+    final rawInterval = maxVal / 5;
+
+    // Find the appropriate rounding factor
+    if (rawInterval >= 100000) {
+      return (rawInterval / 100000).ceil() * 100000;
+    } else if (rawInterval >= 10000) {
+      return (rawInterval / 10000).ceil() * 10000;
+    } else if (rawInterval >= 1000) {
+      return (rawInterval / 1000).ceil() * 1000;
+    } else if (rawInterval >= 100) {
+      return (rawInterval / 100).ceil() * 100;
+    } else if (rawInterval >= 10) {
+      return (rawInterval / 10).ceil() * 10;
+    }
+    return rawInterval.ceilToDouble();
+  }
+
   double get _maxY {
-    if (_chartData.isEmpty) return 120000;
+    if (_chartData.isEmpty) return 100;
     final maxValue = _chartData
         .map((d) => d.bankAmount > d.cashAmount ? d.bankAmount : d.cashAmount)
         .reduce((a, b) => a > b ? a : b);
-    // Round up to nearest 20k for cleaner axis
-    return ((maxValue / 20000).ceil() * 20000).toDouble();
+
+    if (maxValue <= 0) return 100;
+
+    // Dynamically calculate round-up factor based on magnitude
+    double roundFactor;
+    if (maxValue >= 100000) {
+      roundFactor = 50000;
+    } else if (maxValue >= 10000) {
+      roundFactor = 5000;
+    } else if (maxValue >= 1000) {
+      roundFactor = 500;
+    } else if (maxValue >= 100) {
+      roundFactor = 50;
+    } else if (maxValue >= 10) {
+      roundFactor = 5;
+    } else {
+      roundFactor = 1;
+    }
+
+    return ((maxValue / roundFactor).ceil() * roundFactor).toDouble();
   }
 
   @override
@@ -149,7 +190,7 @@ class FeeCollectionChart extends StatelessWidget {
                     showTitles: true,
                     getTitlesWidget: (value, meta) => _buildLeftTitle(value),
                     reservedSize: 40,
-                    interval: _maxY / 5,
+                    interval: _yInterval,
                   ),
                 ),
                 topTitles: const AxisTitles(
@@ -162,7 +203,7 @@ class FeeCollectionChart extends StatelessWidget {
               gridData: FlGridData(
                 show: true,
                 drawVerticalLine: false,
-                horizontalInterval: _maxY / 5,
+                horizontalInterval: _yInterval,
                 getDrawingHorizontalLine: (value) => FlLine(
                   color: AppColors.border.withAlpha(100),
                   strokeWidth: 1,
