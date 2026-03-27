@@ -154,7 +154,7 @@ class _CreateFeeBottomSheetState extends State<CreateFeeBottomSheet> {
                         );
                       },
                       onSelected: (student) {
-                        _selectedStudentId = student.id;
+                        _selectedStudentId = student.userSchoolId;
                         _studentController.text = student.fullName;
                       },
                     ),
@@ -341,3 +341,64 @@ class _CreateFeeBottomSheetState extends State<CreateFeeBottomSheet> {
     );
   }
 }
+
+var d = {
+  "success": true,
+  "data": {
+    "id": "bb42fb3a-5fc2-4c88-9980-f350aab40dd8",
+    "email": "arshad@gmail.com",
+    "phone": "89333223333",
+    "first_name": "Arshad",
+    "last_name": null,
+    "is_active": true,
+    "roles_details": [
+      {
+        "role__id": "bb811be3-38d7-4f1d-b17a-084bdc2e6952",
+        "role__name": "Student",
+      },
+    ],
+    "profile": {
+      "id": "ee33a66a-7feb-4360-a0d4-5771750d8139",
+      "user": "bb42fb3a-5fc2-4c88-9980-f350aab40dd8",
+      "profile_pic":
+          "https://school-mgmt-media.s3.amazonaws.com/media/user_profiles/71feb2fb-8bbb-4dc0-b043-2fc73425e93b.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAX4B3W6DXSJ5C4EUA%2F20260327%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20260327T064038Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=cf39ac4d136ce53b5942b0158be1601254f735c222c20a37b52b5e1f9146968c",
+      "date_of_birth": "2016-03-10",
+      "address": "adfad",
+      "agent_id": null,
+      "blood_group": "A-",
+      "gender": "Female",
+      "created_at": "2026-03-27T06:36:13.452891Z",
+      "updated_at": "2026-03-27T06:36:13.452908Z",
+    },
+    "documents": [
+      {
+        "id": "819f196b-b533-4e44-ab9a-d56597b01223",
+        "user": "bb42fb3a-5fc2-4c88-9980-f350aab40dd8",
+        "document_file":
+            "https://school-mgmt-media.s3.amazonaws.com/media/user_documents/62fa29ff-98e8-4bbd-97ad-faa9a0fd09f4.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAX4B3W6DXSJ5C4EUA%2F20260327%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20260327T064038Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=b928c1a1249d67e9d35a104c36b442b638f99e162cf9086b869fc32cc582effc",
+        "document_name": "adhaar",
+        "document_number": null,
+        "is_verified": false,
+        "uploaded_at": "2026-03-27T06:36:13.500428Z",
+      },
+    ],
+    "relation_details": [],
+    "classroom_name": "9A",
+    "student_enrolment_details": [
+      {
+        "id": "0cba2f9c-d0df-4f30-bd83-96bee784b00b",
+        "classroom": "9ffa3181-8525-4664-93a6-af3fac97512b",
+        "academic_year": "fd0663b0-15b9-43de-b9d6-c68cc109f12d",
+        "classroom_name": "9A",
+        "academic_year_name": "2025 - 2026",
+        "roll_no": "2",
+      },
+    ],
+    "user_school_id": "fa5da765-d33d-4e4f-befd-24c954f2f51d",
+    "common_id": null,
+  },
+  "meta": {
+    "request_id": "dace7db5-99a3-4766-969f-8e41590177a8",
+    "timestamp": "2026-03-27T06:40:38.634652+00:00",
+  },
+};

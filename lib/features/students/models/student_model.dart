@@ -1,5 +1,8 @@
 import 'package:equatable/equatable.dart';
 
+import 'document_model.dart';
+import 'guardian_model.dart';
+
 /// Model for student role details.
 class RoleDetailModel extends Equatable {
   const RoleDetailModel({required this.roleId, required this.roleName});
@@ -127,6 +130,10 @@ class StudentModel extends Equatable {
     this.profile,
     this.documents = const [],
     this.enrollment,
+    this.guardians = const [],
+    this.classroomName,
+    this.commonId,
+    this.userSchoolId,
   });
 
   final String? id;
@@ -137,8 +144,12 @@ class StudentModel extends Equatable {
   final bool isActive;
   final List<RoleDetailModel> rolesDetails;
   final StudentProfileModel? profile;
-  final List<dynamic> documents;
+  final List<DocumentModel> documents;
   final StudentEnrollmentModel? enrollment;
+  final List<GuardianModel> guardians;
+  final String? classroomName;
+  final String? commonId;
+  final String? userSchoolId;
 
   /// Get the student's full name.
   String get fullName {
@@ -162,6 +173,22 @@ class StudentModel extends Equatable {
       );
     }
 
+    // Parse guardians from relation_details array
+    final relationDetails = json['relation_details'] as List<dynamic>?;
+    final guardians =
+        relationDetails
+            ?.map((e) => GuardianModel.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
+
+    // Parse documents
+    final documentsList = json['documents'] as List<dynamic>?;
+    final documents =
+        documentsList
+            ?.map((e) => DocumentModel.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
+
     return StudentModel(
       id: json['id']?.toString() ?? '',
       email: json['email'] ?? '',
@@ -179,8 +206,12 @@ class StudentModel extends Equatable {
               json['profile'] as Map<String, dynamic>,
             )
           : null,
-      documents: json['documents'] as List<dynamic>? ?? [],
+      documents: documents,
       enrollment: enrollment,
+      guardians: guardians,
+      classroomName: json['classroom_name']?.toString(),
+      commonId: json['common_id']?.toString(),
+      userSchoolId: json['user_school_id']?.toString(),
     );
   }
 
@@ -196,6 +227,10 @@ class StudentModel extends Equatable {
     profile,
     documents,
     enrollment,
+    guardians,
+    classroomName,
+    commonId,
+    userSchoolId,
   ];
 }
 

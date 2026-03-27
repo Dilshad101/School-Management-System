@@ -6,6 +6,7 @@ import '../../../core/network/endpoints.dart';
 import '../models/academic_year_model.dart';
 import '../models/class_room_model.dart';
 import '../models/create_student_request.dart';
+import '../models/fee_details_model.dart';
 import '../models/student_model.dart';
 
 /// Repository for handling student-related API operations.
@@ -269,6 +270,45 @@ class StudentsRepository {
     } catch (e) {
       if (e is ApiException) rethrow;
       throw ApiException(message: 'Failed to delete student: ${e.toString()}');
+    }
+  }
+
+  /// Fetches fee details for a student.
+  ///
+  /// [studentId] - The student's ID.
+  ///
+  /// Throws [ApiException] if the request fails.
+  Future<StudentFeeDetailsResponse> getStudentFeeDetails(
+    String studentId,
+  ) async {
+    try {
+      final response = await _apiClient.get(
+        Endpoints.studentFeeDetails,
+        queryParameters: {'student_id': studentId},
+      );
+
+      if (response.statusCode != null &&
+          (response.statusCode! < 200 || response.statusCode! >= 300)) {
+        throw ApiException(
+          message: 'Failed to fetch fee details',
+          statusCode: response.statusCode,
+        );
+      }
+
+      if (response.data == null) {
+        throw const ApiException(message: 'Empty response from server');
+      }
+
+      return StudentFeeDetailsResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException(
+        message: 'Failed to fetch fee details: ${e.toString()}',
+      );
     }
   }
 }

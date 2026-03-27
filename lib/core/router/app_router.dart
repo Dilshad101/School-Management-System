@@ -18,6 +18,7 @@ import 'package:school_management_system/features/guardians/view/guardian_view.d
 import 'package:school_management_system/features/notifications/views/notification_view/notification_view.dart';
 import 'package:school_management_system/features/profile/views/profile_page.dart';
 import 'package:school_management_system/features/students/views/create_student_view/create_student_view.dart';
+import 'package:school_management_system/features/students/views/student_details_view/student_details_view.dart';
 import 'package:school_management_system/features/students/views/students_view/students_view.dart';
 import 'package:school_management_system/features/subscriptions/views/subscription_view/subscription_view.dart';
 import 'package:school_management_system/features/user_request/views/user_request_view.dart';
@@ -71,6 +72,13 @@ class NavigationService {
         GoRoute(
           path: Routes.students,
           builder: (context, state) => const StudentsView(),
+        ),
+        GoRoute(
+          path: Routes.studentDetail,
+          builder: (context, state) {
+            final studentId = state.pathParameters['id'];
+            return StudentDetailsView(studentId: studentId);
+          },
         ),
         GoRoute(
           path: Routes.createStudent,

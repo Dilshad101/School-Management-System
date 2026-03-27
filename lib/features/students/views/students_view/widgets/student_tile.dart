@@ -9,88 +9,94 @@ class StudentTile extends StatelessWidget {
   const StudentTile({
     super.key,
     required this.student,
+    this.onTap,
     this.onEdit,
     this.onDelete,
   });
 
   final StudentModel student;
+  final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: AppColors.white,
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            spacing: 10,
-            children: [
-              _buildAvatar(),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      spacing: 8,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            student.fullName,
-                            style: AppTextStyles.bodyLarge.copyWith(
-                              fontWeight: FontWeight.w500,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: AppColors.white,
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              spacing: 10,
+              children: [
+                _buildAvatar(),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        spacing: 8,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              student.fullName,
+                              style: AppTextStyles.bodyLarge.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ),
-                        _buildStatusBadge(),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          _getRoleName(),
-                          style: AppTextStyles.labelMedium.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 18,
-                          child: VerticalDivider(color: AppColors.border),
-                        ),
-                        Expanded(
-                          child: Text(
-                            'ID ${student.id}',
+                          _buildStatusBadge(),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            _getRoleName(),
                             style: AppTextStyles.labelMedium.copyWith(
                               fontWeight: FontWeight.w500,
-                              color: AppColors.textPrimary.withAlpha(160),
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          SizedBox(
+                            height: 18,
+                            child: VerticalDivider(color: AppColors.border),
+                          ),
+                          Expanded(
+                            child: Text(
+                              'ID ${student.id}',
+                              style: AppTextStyles.labelMedium.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textPrimary.withAlpha(160),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Divider(color: AppColors.border, height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            spacing: 8,
-            children: [
-              MicroDeleteButton(onTap: onDelete),
-              MicroEditButton(onTap: onEdit),
-            ],
-          ),
-        ],
+              ],
+            ),
+            Divider(color: AppColors.border, height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              spacing: 8,
+              children: [
+                MicroDeleteButton(onTap: onDelete),
+                MicroEditButton(onTap: onEdit),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

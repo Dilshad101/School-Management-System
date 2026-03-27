@@ -234,6 +234,14 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
                         final student = state.students[index];
                         return StudentTile(
                           student: student,
+                          onTap: () {
+                            context.push(
+                              Routes.studentDetail.replaceFirst(
+                                ':id',
+                                student.id!,
+                              ),
+                            );
+                          },
                           onEdit: () async {
                             final result = await context.push<bool>(
                               Routes.createStudent,
