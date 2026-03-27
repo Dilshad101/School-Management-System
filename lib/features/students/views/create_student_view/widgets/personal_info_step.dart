@@ -39,6 +39,7 @@ class PersonalInfoStep extends StatefulWidget {
     required this.onAddressChanged,
     required this.onEmailChanged,
     required this.onPhoneChanged,
+    required this.onStudentIdChanged,
   });
 
   final GlobalKey<FormState> formKey;
@@ -67,6 +68,7 @@ class PersonalInfoStep extends StatefulWidget {
   final ValueChanged<String> onAddressChanged;
   final ValueChanged<String> onEmailChanged;
   final ValueChanged<String> onPhoneChanged;
+  final ValueChanged<String> onStudentIdChanged;
 
   @override
   State<PersonalInfoStep> createState() => _PersonalInfoStepState();
@@ -160,6 +162,19 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
               isRequired: true,
               validator: (value) =>
                   Validations.validateRequiredField(value, 'Full name'),
+            ),
+            const SizedBox(height: 16),
+
+            // Student ID
+            IconFormField(
+              controller: _studentIdController,
+              label: 'Student ID',
+              hint: 'Enter student ID',
+              icon: Icons.badge_outlined,
+              onChanged: widget.onStudentIdChanged,
+              isRequired: true,
+              validator: (value) =>
+                  Validations.validateRequiredField(value, 'Student ID'),
             ),
             const SizedBox(height: 16),
 
@@ -283,35 +298,6 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
               keyboardType: TextInputType.phone,
               onChanged: widget.onPhoneChanged,
             ),
-            const SizedBox(height: 16),
-
-            // // Student ID (Auto Generated)
-            // Column(
-            //   crossAxisAlignment: CrossAxisAlignment.start,
-            //   children: [
-            //     Row(
-            //       children: [
-            //         Text('Student ID', style: AppTextStyles.labelMedium),
-            //         const SizedBox(width: 4),
-            //         Text(
-            //           '(Auto Generated)',
-            //           style: AppTextStyles.caption.copyWith(
-            //             color: AppColors.textSecondary,
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //     const SizedBox(height: 8),
-            //     IconFormField(
-            //       controller: _studentIdController,
-            //       label: '',
-            //       hint: 'Enter student ID',
-            //       icon: Icons.badge_outlined,
-            //       enabled: false,
-            //       showLabel: false,
-            //     ),
-            //   ],
-            // ),
             const SizedBox(height: 24),
           ],
         ),

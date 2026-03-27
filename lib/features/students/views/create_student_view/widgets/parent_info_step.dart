@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_management_system/core/utils/validations.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
+import 'package:school_management_system/shared/widgets/dropdowns/bottom_sheet_dropdown.dart';
 
 import 'icon_form_field.dart';
 
@@ -12,22 +13,24 @@ class ParentInfoStep extends StatefulWidget {
     required this.fullName,
     required this.email,
     required this.contactNo,
-    required this.address,
+    required this.selectedRelation,
+    required this.relations,
     required this.onFullNameChanged,
     required this.onEmailChanged,
     required this.onContactNoChanged,
-    required this.onAddressChanged,
+    required this.onRelationChanged,
   });
 
   final GlobalKey<FormState> formKey;
   final String fullName;
   final String email;
   final String contactNo;
-  final String address;
+  final String? selectedRelation;
+  final List<Map<String, String>> relations;
   final ValueChanged<String> onFullNameChanged;
   final ValueChanged<String> onEmailChanged;
   final ValueChanged<String> onContactNoChanged;
-  final ValueChanged<String> onAddressChanged;
+  final ValueChanged<String?> onRelationChanged;
 
   @override
   State<ParentInfoStep> createState() => _ParentInfoStepState();
@@ -37,7 +40,6 @@ class _ParentInfoStepState extends State<ParentInfoStep> {
   late TextEditingController _fullNameController;
   late TextEditingController _emailController;
   late TextEditingController _contactNoController;
-  late TextEditingController _addressController;
 
   @override
   void initState() {
@@ -45,7 +47,6 @@ class _ParentInfoStepState extends State<ParentInfoStep> {
     _fullNameController = TextEditingController(text: widget.fullName);
     _emailController = TextEditingController(text: widget.email);
     _contactNoController = TextEditingController(text: widget.contactNo);
-    _addressController = TextEditingController(text: widget.address);
   }
 
   @override
@@ -58,7 +59,6 @@ class _ParentInfoStepState extends State<ParentInfoStep> {
       widget.contactNo,
       oldWidget.contactNo,
     );
-    _syncController(_addressController, widget.address, oldWidget.address);
   }
 
   void _syncController(
@@ -76,7 +76,6 @@ class _ParentInfoStepState extends State<ParentInfoStep> {
     _fullNameController.dispose();
     _emailController.dispose();
     _contactNoController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -134,15 +133,27 @@ class _ParentInfoStepState extends State<ParentInfoStep> {
             ),
             const SizedBox(height: 16),
 
-            // Address
-            IconFormField(
-              controller: _addressController,
-              label: 'Address',
-              hint: 'Enter your address',
-              keyboardType: TextInputType.streetAddress,
-              icon: Icons.location_on_outlined,
-              onChanged: widget.onAddressChanged,
-              maxLines: 3,
+            // Relation
+            BottomSheetDropdown<String>(
+              label: 'Relation',
+              hint: 'Select relation',
+              items: widget.relations.map((e) => e['value']!).toList(),
+              value: widget.selectedRelation,
+              onChanged: widget.onRelationChanged,
+              itemLabelBuilder: (item) {
+                final relation = widget.relations.firstWhere(
+                  (e) => e['value'] == item,
+                  orElse: () => {'value': item, 'label': item},
+                );
+                return relation['label'] ?? item;
+              },
+              isRequired: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a relation';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 24),
           ],

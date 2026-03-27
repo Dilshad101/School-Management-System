@@ -20,6 +20,8 @@ class CreateStudentRequest {
     this.rollNo,
     this.classroomId,
     this.academicYearId,
+    this.commonId,
+    this.guardians,
   });
 
   final String email;
@@ -36,6 +38,8 @@ class CreateStudentRequest {
   final String? rollNo;
   final String? classroomId;
   final String? academicYearId;
+  final String? commonId;
+  final List<GuardianRequest>? guardians;
 
   /// Converts the request to JSON format for API submission.
   Future<Map<String, dynamic>> toJson() async {
@@ -99,6 +103,12 @@ class CreateStudentRequest {
     if (studentEnrolment.isNotEmpty) {
       json['student_enrolment'] = studentEnrolment;
     }
+    if (commonId != null && commonId!.isNotEmpty) {
+      json['common_id'] = commonId;
+    }
+    if (guardians != null && guardians!.isNotEmpty) {
+      json['guardians'] = guardians!.map((g) => g.toJson()).toList();
+    }
 
     return json;
   }
@@ -125,6 +135,33 @@ class DocumentRequest {
   final File? file;
 }
 
+/// Model for guardian in create student request.
+class GuardianRequest {
+  const GuardianRequest({
+    required this.firstName,
+    this.email,
+    required this.phone,
+    required this.relation,
+  });
+
+  final String firstName;
+  final String? email;
+  final String phone;
+  final String relation;
+
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{
+      'first_name': firstName,
+      'phone': phone,
+      'relation': relation,
+    };
+    if (email != null && email!.isNotEmpty) {
+      json['email'] = email;
+    }
+    return json;
+  }
+}
+
 /// Request model for updating a student.
 class UpdateStudentRequest {
   UpdateStudentRequest({
@@ -142,6 +179,8 @@ class UpdateStudentRequest {
     this.rollNo,
     this.classroomId,
     this.academicYearId,
+    this.commonId,
+    this.guardians,
   });
 
   final String? email;
@@ -158,6 +197,8 @@ class UpdateStudentRequest {
   final String? rollNo;
   final String? classroomId;
   final String? academicYearId;
+  final String? commonId;
+  final List<GuardianRequest>? guardians;
 
   /// Converts the request to JSON format for API submission.
   Future<Map<String, dynamic>> toJson() async {
@@ -229,6 +270,13 @@ class UpdateStudentRequest {
     }
     if (studentEnrolment.isNotEmpty) {
       json['student_enrolment'] = studentEnrolment;
+    }
+
+    if (commonId != null && commonId!.isNotEmpty) {
+      json['common_id'] = commonId;
+    }
+    if (guardians != null && guardians!.isNotEmpty) {
+      json['guardians'] = guardians!.map((g) => g.toJson()).toList();
     }
 
     return json;

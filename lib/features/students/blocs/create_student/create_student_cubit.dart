@@ -54,6 +54,7 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
           academicYears: academicYearsResponse.results,
           genders: _getGenders(),
           bloodGroups: _getBloodGroups(),
+          relations: _getRelations(),
           studentId: studentId,
           documents: [],
           schoolId: schoolId,
@@ -140,6 +141,7 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
           academicYears: academicYearsResponse.results,
           genders: _getGenders(),
           bloodGroups: _getBloodGroups(),
+          relations: _getRelations(),
           schoolId: schoolId,
           // Populate form with student data
           fullName: student.firstName ?? '',
@@ -151,8 +153,8 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
           selectedBloodGroup: student.profile?.bloodGroup,
           existingPhotoUrl: student.profile?.profilePic,
           documents: documents,
-          // Student ID for display purposes
-          studentId: 'STU${student.id}',
+          // Student ID (common_id from API)
+          studentId: student.commonId ?? '',
           // Enrollment data
           selectedClassRoom: selectedClassRoom,
           selectedAcademicYear: selectedAcademicYear,
@@ -208,6 +210,13 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
     'O-',
   ];
 
+  /// Static list of relations.
+  List<Map<String, String>> _getRelations() => [
+    {'value': 'father', 'label': 'Father'},
+    {'value': 'mother', 'label': 'Mother'},
+    {'value': 'guardian', 'label': 'Guardian'},
+  ];
+
   /// Generates a unique student ID.
   String _generateStudentId() {
     final year = DateTime.now().year;
@@ -261,6 +270,10 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
 
   void updateRoleNumber(String value) {
     emit(state.copyWith(roleNumber: value));
+  }
+
+  void updateStudentId(String value) {
+    emit(state.copyWith(studentId: value));
   }
 
   void updateDateOfBirth(DateTime? value) {
@@ -388,8 +401,12 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
     emit(state.copyWith(parentContactNo: value));
   }
 
-  void updateParentAddress(String value) {
-    emit(state.copyWith(parentAddress: value));
+  void updateParentRelation(String? value) {
+    if (value != null) {
+      emit(state.copyWith(parentRelation: value));
+    } else {
+      emit(state.copyWith(clearParentRelation: true));
+    }
   }
 
   // ==================== Step 4: Photo ====================
@@ -504,6 +521,19 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
         .map((doc) => DocumentRequest(name: doc.name, file: doc.file))
         .toList();
 
+    // Build guardians list if parent info is provided
+    List<GuardianRequest>? guardians;
+    if (state.parentFullName.isNotEmpty || state.parentContactNo.isNotEmpty) {
+      guardians = [
+        GuardianRequest(
+          firstName: state.parentFullName,
+          email: state.parentEmail.isNotEmpty ? state.parentEmail : null,
+          phone: state.parentContactNo,
+          relation: state.parentRelation ?? 'guardian',
+        ),
+      ];
+    }
+
     final request = CreateStudentRequest(
       email: state.email,
       phone: state.phone.isNotEmpty ? state.phone : null,
@@ -518,6 +548,8 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
       rollNo: state.roleNumber.isNotEmpty ? state.roleNumber : null,
       classroomId: state.selectedClassRoom?.id,
       academicYearId: state.selectedAcademicYear?.id,
+      commonId: state.studentId.isNotEmpty ? state.studentId : null,
+      guardians: guardians,
     );
 
     await _studentsRepository.createStudent(request);
@@ -530,6 +562,19 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
         .where((doc) => doc.file != null)
         .map((doc) => DocumentRequest(name: doc.name, file: doc.file))
         .toList();
+
+    // Build guardians list if parent info is provided
+    List<GuardianRequest>? guardians;
+    if (state.parentFullName.isNotEmpty || state.parentContactNo.isNotEmpty) {
+      guardians = [
+        GuardianRequest(
+          firstName: state.parentFullName,
+          email: state.parentEmail.isNotEmpty ? state.parentEmail : null,
+          phone: state.parentContactNo,
+          relation: state.parentRelation ?? 'guardian',
+        ),
+      ];
+    }
 
     final request = UpdateStudentRequest(
       email: state.email,
@@ -545,6 +590,8 @@ class CreateStudentCubit extends Cubit<CreateStudentState> {
       rollNo: state.roleNumber.isNotEmpty ? state.roleNumber : null,
       classroomId: state.selectedClassRoom?.id,
       academicYearId: state.selectedAcademicYear?.id,
+      commonId: state.studentId.isNotEmpty ? state.studentId : null,
+      guardians: guardians,
     );
 
     await _studentsRepository.updateStudent(state.editingStudentId!, request);

@@ -91,7 +91,8 @@ class CreateStudentState extends Equatable {
     this.parentFullName = '',
     this.parentEmail = '',
     this.parentContactNo = '',
-    this.parentAddress = '',
+    this.parentRelation,
+    this.relations = const [],
     // Step 4: Photo
     this.photo,
     this.existingPhotoUrl,
@@ -135,7 +136,8 @@ class CreateStudentState extends Equatable {
   final String parentFullName;
   final String parentEmail;
   final String parentContactNo;
-  final String parentAddress;
+  final String? parentRelation;
+  final List<Map<String, String>> relations;
 
   // Step 4: Photo
   final File? photo;
@@ -208,7 +210,9 @@ class CreateStudentState extends Equatable {
     String? parentFullName,
     String? parentEmail,
     String? parentContactNo,
-    String? parentAddress,
+    String? parentRelation,
+    bool clearParentRelation = false,
+    List<Map<String, String>>? relations,
     // Step 4
     File? photo,
     bool clearPhoto = false,
@@ -259,7 +263,10 @@ class CreateStudentState extends Equatable {
       parentFullName: parentFullName ?? this.parentFullName,
       parentEmail: parentEmail ?? this.parentEmail,
       parentContactNo: parentContactNo ?? this.parentContactNo,
-      parentAddress: parentAddress ?? this.parentAddress,
+      parentRelation: clearParentRelation
+          ? null
+          : (parentRelation ?? this.parentRelation),
+      relations: relations ?? this.relations,
       // Step 4
       photo: clearPhoto ? null : (photo ?? this.photo),
       existingPhotoUrl: clearExistingPhotoUrl
@@ -299,7 +306,8 @@ class CreateStudentState extends Equatable {
     parentFullName,
     parentEmail,
     parentContactNo,
-    parentAddress,
+    parentRelation,
+    relations,
     photo?.path,
     existingPhotoUrl,
     classRooms,

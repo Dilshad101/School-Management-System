@@ -121,6 +121,7 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
           onAddressChanged: cubit.updateAddress,
           onEmailChanged: cubit.updateEmail,
           onPhoneChanged: cubit.updatePhone,
+          onStudentIdChanged: cubit.updateStudentId,
         );
 
       case CreateStudentStep.documents:
@@ -139,11 +140,12 @@ class _CreateStudentViewContentState extends State<_CreateStudentViewContent> {
           fullName: state.parentFullName,
           email: state.parentEmail,
           contactNo: state.parentContactNo,
-          address: state.parentAddress,
+          selectedRelation: state.parentRelation,
+          relations: state.relations,
           onFullNameChanged: cubit.updateParentFullName,
           onEmailChanged: cubit.updateParentEmail,
           onContactNoChanged: cubit.updateParentContactNo,
-          onAddressChanged: cubit.updateParentAddress,
+          onRelationChanged: cubit.updateParentRelation,
         );
 
       case CreateStudentStep.photo:
