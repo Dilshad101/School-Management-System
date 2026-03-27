@@ -63,7 +63,11 @@ class NavigationService {
           path: Routes.employeeDetail,
           builder: (context, state) {
             final employeeId = state.pathParameters['id'];
-            return EmployeeDetailsView(employeeId: employeeId);
+            final isFromProfile = state.extra as bool? ?? false;
+            return EmployeeDetailsView(
+              employeeId: employeeId,
+              isFromProfile: isFromProfile,
+            );
           },
         ),
         GoRoute(

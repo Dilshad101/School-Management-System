@@ -29,7 +29,10 @@ class ProfilePage extends StatelessWidget {
                 _ProfileHeaderCard(
                   userName: userName,
                   onTap: () {
-                    // TODO: Navigate to profile details
+                    final userId = user?.id;
+                    if (userId != null && userId.isNotEmpty) {
+                      context.push('/employees/$userId', extra: true);
+                    }
                   },
                 ),
                 const SizedBox(height: 24),
@@ -167,45 +170,91 @@ class _ProfileHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.primary.withAlpha(20),
-        borderRadius: BorderRadius.circular(12),
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withAlpha(60),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                Icon(
-                  Icons.person_outline,
-                  color: AppColors.textPrimary,
-                  size: 24,
+                // Avatar with border
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withAlpha(180),
+                      width: 2,
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.white.withAlpha(40),
+                    child: Text(
+                      userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                      style: AppTextStyles.heading3.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         userName,
-                        style: AppTextStyles.bodyLarge.copyWith(
+                        style: AppTextStyles.heading4.copyWith(
+                          color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'View profile details',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.edit_outlined,
+                            color: Colors.white.withAlpha(200),
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'View profile',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: Colors.white.withAlpha(200),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right, color: AppColors.textSecondary),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(40),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
               ],
             ),
           ),

@@ -15,9 +15,14 @@ import 'widgets/employee_header.dart';
 import 'widgets/employee_info_section.dart';
 
 class EmployeeDetailsView extends StatelessWidget {
-  const EmployeeDetailsView({super.key, required this.employeeId});
+  const EmployeeDetailsView({
+    super.key,
+    required this.employeeId,
+    this.isFromProfile = false,
+  });
 
   final String? employeeId;
+  final bool isFromProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -32,21 +37,28 @@ class EmployeeDetailsView extends StatelessWidget {
       create: (context) => EmployeeDetailsCubit(
         employeesRepository: locator<EmployeesRepository>(),
       )..fetchEmployeeDetails(employeeId!),
-      child: _EmployeeDetailsContent(employeeId: employeeId!),
+      child: _EmployeeDetailsContent(
+        employeeId: employeeId!,
+        isFromProfile: isFromProfile,
+      ),
     );
   }
 }
 
 class _EmployeeDetailsContent extends StatelessWidget {
-  const _EmployeeDetailsContent({required this.employeeId});
+  const _EmployeeDetailsContent({
+    required this.employeeId,
+    this.isFromProfile = false,
+  });
 
   final String employeeId;
+  final bool isFromProfile;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Teacher'),
+        title: Text(isFromProfile ? 'Profile' : 'Teacher'),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
