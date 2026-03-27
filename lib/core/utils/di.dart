@@ -10,6 +10,7 @@ import '../../features/auth/repositories/auth_repository.dart';
 import '../../features/auth/repositories/user_repository.dart';
 import '../../features/class/repositories/classroom_repository.dart';
 import '../../features/chat/repositories/chat_repository.dart';
+import '../../features/dashboard/repositories/dashboard_repository.dart';
 import '../../features/employees/repositories/employees_repository.dart';
 import '../../features/employees/repositories/roles_repository.dart';
 import '../../features/employees/repositories/subjects_repository.dart';
@@ -128,6 +129,10 @@ Future<void> setupDependency() async {
 
   locator.registerLazySingleton<FeeStructureRepository>(
     () => FeeStructureRepository(apiClient: locator<ApiClient>()),
+  );
+
+  locator.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepository(apiClient: locator<ApiClient>()),
   );
 }
 

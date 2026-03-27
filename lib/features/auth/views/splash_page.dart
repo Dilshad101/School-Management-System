@@ -10,19 +10,32 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        // Only navigate when auth check is complete (not initial or loading)
-        if (state.isAuthenticated) {
-          // User is logged in, fetch user details and go home
-          context.read<UserBloc>().add(const UserDetailsFetchRequested());
-          context.go(Routes.home);
-        } else if (state.isUnauthenticated) {
-          // User is not logged in, go to login
-          context.go(Routes.login);
-        }
-        // If state.status == AuthStatus.initial, wait for AuthCheckRequested to complete
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state.isAuthenticated) {
+              // User is logged in, fetch user details
+              context.read<UserBloc>().add(const UserDetailsFetchRequested());
+            } else if (state.isUnauthenticated) {
+              // User is not logged in, go to login
+              context.go(Routes.login);
+            }
+          },
+        ),
+        BlocListener<UserBloc, UserState>(
+          listener: (context, state) {
+            // Navigate to home only after user details are fetched
+            if (state.status == UserStatus.success) {
+              context.go(Routes.home);
+            } else if (state.status == UserStatus.failure) {
+              // If user details fail, still go to home (will show error there)
+              // or alternatively go to login
+              context.go(Routes.home);
+            }
+          },
+        ),
+      ],
       child: const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
   }

@@ -54,6 +54,14 @@ class Endpoints {
   static const String feeStructures = '/v1/finance/structures/';
   static const String payments = '/v1/finance/payments/';
 
+  // Dashboard endpoints
+  static const String dashboardStudentEmployeeCount =
+      '/v1/finance/dashboard/total-student-employee-count/';
+  static const String dashboardPendingFees =
+      '/v1/finance/dashboard/total-pending-fees/';
+  static const String dashboardLastSixMonthsPayments =
+      '/v1/finance/dashboard/last-six-months-payments/';
+
   // Periods/Timetable endpoints
   static const String periods = '/v1/academics/periods/';
   static const String timetables = '/v1/academics/timetables/';
