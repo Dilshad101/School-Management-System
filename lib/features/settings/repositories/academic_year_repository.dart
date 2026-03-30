@@ -61,6 +61,7 @@ class AcademicYearRepository {
     required String startDate,
     required String endDate,
     required String schoolId,
+    bool isCurrent = false,
   }) async {
     try {
       final payload = {
@@ -68,6 +69,7 @@ class AcademicYearRepository {
         'start_date': startDate,
         'end_date': endDate,
         'school': schoolId,
+        'is_current': isCurrent,
       };
 
       final response = await _apiClient.post(
@@ -107,12 +109,14 @@ class AcademicYearRepository {
     required String name,
     required String startDate,
     required String endDate,
+    bool? isCurrent,
   }) async {
     try {
       final payload = {
         'name': name,
         'start_date': startDate,
         'end_date': endDate,
+        if (isCurrent != null) 'is_current': isCurrent,
       };
 
       final response = await _apiClient.patch(

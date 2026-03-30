@@ -10,6 +10,7 @@ class CreateAcademicYearBottomSheet extends StatefulWidget {
   final String? initialStartDate;
   final String? initialEndDate;
   final bool isEditing;
+  final bool initialIsCurrent;
 
   const CreateAcademicYearBottomSheet({
     super.key,
@@ -17,6 +18,7 @@ class CreateAcademicYearBottomSheet extends StatefulWidget {
     this.initialStartDate,
     this.initialEndDate,
     this.isEditing = false,
+    this.initialIsCurrent = false,
   });
 
   /// Shows the bottom sheet and returns the result
@@ -26,6 +28,7 @@ class CreateAcademicYearBottomSheet extends StatefulWidget {
     String? initialStartDate,
     String? initialEndDate,
     bool isEditing = false,
+    bool initialIsCurrent = false,
   }) {
     return showModalBottomSheet<CreateAcademicYearResult>(
       context: context,
@@ -39,6 +42,7 @@ class CreateAcademicYearBottomSheet extends StatefulWidget {
         initialStartDate: initialStartDate,
         initialEndDate: initialEndDate,
         isEditing: isEditing,
+        initialIsCurrent: initialIsCurrent,
       ),
     );
   }
@@ -53,6 +57,7 @@ class _CreateAcademicYearBottomSheetState
   final _nameController = TextEditingController();
   DateTime? _startDate;
   DateTime? _endDate;
+  bool _isCurrent = false;
 
   final _dateFormat = DateFormat('yyyy-MM-dd');
   final _displayFormat = DateFormat('dd/MM/yyyy');
@@ -69,6 +74,7 @@ class _CreateAcademicYearBottomSheetState
     if (widget.initialEndDate != null) {
       _endDate = _parseDate(widget.initialEndDate!);
     }
+    _isCurrent = widget.initialIsCurrent;
   }
 
   DateTime? _parseDate(String dateStr) {
@@ -148,6 +154,10 @@ class _CreateAcademicYearBottomSheetState
             onTap: () => _pickDate(isStartDate: false),
             displayFormat: _displayFormat,
           ),
+          const SizedBox(height: 16),
+
+          // Is Current Checkbox
+          _buildIsCurrentCheckbox(),
           const SizedBox(height: 24),
 
           // Action Buttons
@@ -225,6 +235,65 @@ class _CreateAcademicYearBottomSheetState
     );
   }
 
+  Widget _buildIsCurrentCheckbox() {
+    return InkWell(
+      onTap: () => setState(() => _isCurrent = !_isCurrent),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: _isCurrent ? AppColors.primary : AppColors.border,
+          ),
+          color: _isCurrent ? AppColors.primary.withAlpha(10) : null,
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Checkbox(
+                value: _isCurrent,
+                onChanged: (value) =>
+                    setState(() => _isCurrent = value ?? false),
+                activeColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                side: BorderSide(color: AppColors.border, width: 1.5),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Set as Current Academic Year',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: _isCurrent
+                          ? AppColors.primary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Enable this to mark as the active batch year',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _pickDate({required bool isStartDate}) async {
     final initialDate = isStartDate
         ? (_startDate ?? DateTime.now())
@@ -278,6 +347,7 @@ class _CreateAcademicYearBottomSheetState
         name: name,
         startDate: _dateFormat.format(_startDate!),
         endDate: _dateFormat.format(_endDate!),
+        isCurrent: _isCurrent,
       ),
     );
   }
@@ -336,10 +406,12 @@ class CreateAcademicYearResult {
   final String name;
   final String startDate;
   final String endDate;
+  final bool isCurrent;
 
   CreateAcademicYearResult({
     required this.name,
     required this.startDate,
     required this.endDate,
+    this.isCurrent = false,
   });
 }

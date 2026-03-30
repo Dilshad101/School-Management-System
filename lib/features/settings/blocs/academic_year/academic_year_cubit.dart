@@ -103,6 +103,7 @@ class AcademicYearCubit extends Cubit<AcademicYearState> {
     required String name,
     required String startDate,
     required String endDate,
+    bool isCurrent = false,
   }) async {
     emit(state.copyWith(actionStatus: AcademicYearActionStatus.loading));
 
@@ -112,6 +113,7 @@ class AcademicYearCubit extends Cubit<AcademicYearState> {
         startDate: startDate,
         endDate: endDate,
         schoolId: _schoolId,
+        isCurrent: isCurrent,
       );
 
       // Add the new academic year to the list
@@ -145,6 +147,7 @@ class AcademicYearCubit extends Cubit<AcademicYearState> {
     required String name,
     required String startDate,
     required String endDate,
+    bool? isCurrent,
   }) async {
     emit(state.copyWith(actionStatus: AcademicYearActionStatus.loading));
 
@@ -155,6 +158,7 @@ class AcademicYearCubit extends Cubit<AcademicYearState> {
             name: name,
             startDate: startDate,
             endDate: endDate,
+            isCurrent: isCurrent,
           );
 
       // Update the academic year in the list

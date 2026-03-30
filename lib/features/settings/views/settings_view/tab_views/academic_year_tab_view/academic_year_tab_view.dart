@@ -203,6 +203,7 @@ class _AcademicYearTabViewContentState
       initialName: academicYear.name,
       initialStartDate: academicYear.startDate,
       initialEndDate: academicYear.endDate,
+      initialIsCurrent: academicYear.isCurrent,
     );
 
     if (result != null && mounted) {
@@ -211,6 +212,7 @@ class _AcademicYearTabViewContentState
         name: result.name,
         startDate: result.startDate,
         endDate: result.endDate,
+        isCurrent: result.isCurrent,
       );
     }
   }
@@ -250,6 +252,7 @@ class _AcademicYearTabViewContentState
         name: result.name,
         startDate: result.startDate,
         endDate: result.endDate,
+        isCurrent: result.isCurrent,
       );
     }
   }
