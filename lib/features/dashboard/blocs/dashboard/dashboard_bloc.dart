@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../models/dashboard_models.dart';
 import '../../repositories/dashboard_repository.dart';
 import 'dashboard_event.dart';
 import 'dashboard_state.dart';
@@ -35,7 +36,14 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         _dashboardRepository.getStudentEmployeeCount(),
         _dashboardRepository.getPendingFees(),
         _dashboardRepository.getLastSixMonthsPayments(),
+        // TODO: Uncomment when API is ready
+        // _dashboardRepository.getTimetable(),
+        // _dashboardRepository.getRecentlyPaid(),
       ]);
+
+      // Get mock data for timetable and recently paid
+      final mockTimetable = _getMockTimetable();
+      final mockRecentlyPaid = _getMockRecentlyPaid();
 
       emit(
         state.copyWith(
@@ -43,6 +51,11 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
           studentEmployeeCount: results[0] as dynamic,
           pendingFees: results[1] as dynamic,
           lastSixMonthsPayments: results[2] as dynamic,
+          // TODO: Replace with API data when ready
+          // timetable: results[3] as DashboardTimetable,
+          // recentlyPaid: results[4] as DashboardRecentlyPaid,
+          timetable: mockTimetable,
+          recentlyPaid: mockRecentlyPaid,
         ),
       );
     } on ApiException catch (e, s) {
@@ -70,7 +83,14 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         _dashboardRepository.getStudentEmployeeCount(),
         _dashboardRepository.getPendingFees(),
         _dashboardRepository.getLastSixMonthsPayments(),
+        // TODO: Uncomment when API is ready
+        // _dashboardRepository.getTimetable(),
+        // _dashboardRepository.getRecentlyPaid(),
       ]);
+
+      // Get mock data for timetable and recently paid
+      final mockTimetable = _getMockTimetable();
+      final mockRecentlyPaid = _getMockRecentlyPaid();
 
       emit(
         state.copyWith(
@@ -78,6 +98,11 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
           studentEmployeeCount: results[0] as dynamic,
           pendingFees: results[1] as dynamic,
           lastSixMonthsPayments: results[2] as dynamic,
+          // TODO: Replace with API data when ready
+          // timetable: results[3] as DashboardTimetable,
+          // recentlyPaid: results[4] as DashboardRecentlyPaid,
+          timetable: mockTimetable,
+          recentlyPaid: mockRecentlyPaid,
           clearError: true,
         ),
       );
@@ -96,5 +121,106 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     Emitter<DashboardState> emit,
   ) {
     emit(state.copyWith(clearError: true));
+  }
+
+  /// Returns mock timetable data.
+  /// TODO: Remove when API is ready
+  DashboardTimetable _getMockTimetable() {
+    return const DashboardTimetable(
+      periods: [
+        TimetablePeriod(
+          id: '1',
+          periodNumber: 1,
+          startTime: '08:30 AM',
+          endTime: '09:15 AM',
+          subjectName: 'Mathematics',
+          className: 'Class 10 A',
+          roomName: 'Room A 3',
+          status: TimetablePeriodStatus.completed,
+        ),
+        TimetablePeriod(
+          id: '2',
+          periodNumber: 2,
+          startTime: '08:30 AM',
+          endTime: '09:15 AM',
+          subjectName: 'Mathematics',
+          className: 'Class 10 A',
+          roomName: 'Room A 3',
+          status: TimetablePeriodStatus.completed,
+        ),
+        TimetablePeriod(
+          id: '3',
+          periodNumber: 2,
+          startTime: '08:30 AM',
+          endTime: '09:15 AM',
+          subjectName: 'Mathematics',
+          className: 'Class 10 A',
+          roomName: 'Room A 3',
+          status: TimetablePeriodStatus.liveNow,
+        ),
+        TimetablePeriod(
+          id: '4',
+          periodNumber: 4,
+          startTime: '08:30 AM',
+          endTime: '09:15 AM',
+          subjectName: 'Mathematics',
+          className: 'Class 10 A',
+          roomName: 'Room A 3',
+          status: TimetablePeriodStatus.upcoming,
+        ),
+        TimetablePeriod(
+          id: '5',
+          periodNumber: 5,
+          startTime: '08:30 AM',
+          endTime: '09:15 AM',
+          subjectName: 'Mathematics',
+          className: 'Class 10 A',
+          roomName: 'Room A 3',
+          status: TimetablePeriodStatus.upcoming,
+        ),
+      ],
+    );
+  }
+
+  /// Returns mock recently paid data.
+  /// TODO: Remove when API is ready
+  DashboardRecentlyPaid _getMockRecentlyPaid() {
+    return DashboardRecentlyPaid(
+      payments: [
+        RecentlyPaidFee(
+          id: '1',
+          studentName: 'Priya',
+          className: '8 A',
+          studentId: 'ID 64452',
+          totalFees: 1200,
+          paidAmount: 1000,
+          dueAmount: 200,
+          paymentMethod: PaymentMethod.bank,
+          paidAt: DateTime.now().subtract(const Duration(hours: 2)),
+        ),
+        RecentlyPaidFee(
+          id: '2',
+          studentName: 'Priya',
+          className: '8 A',
+          studentId: 'ID 64452',
+          totalFees: 1200,
+          paidAmount: 1000,
+          dueAmount: 200,
+          paymentMethod: PaymentMethod.cash,
+          paidAt: DateTime.now().subtract(const Duration(hours: 5)),
+        ),
+        RecentlyPaidFee(
+          id: '3',
+          studentName: 'Priya',
+          className: '8 A',
+          studentId: 'ID 64452',
+          totalFees: 1200,
+          paidAmount: 1000,
+          dueAmount: 200,
+          paymentMethod: PaymentMethod.bank,
+          paidAt: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+      ],
+    );
   }
 }

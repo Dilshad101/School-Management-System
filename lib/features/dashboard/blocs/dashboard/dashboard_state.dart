@@ -10,6 +10,8 @@ class DashboardState extends Equatable {
     this.studentEmployeeCount,
     this.pendingFees,
     this.lastSixMonthsPayments,
+    this.timetable,
+    this.recentlyPaid,
     this.error,
   });
 
@@ -17,6 +19,8 @@ class DashboardState extends Equatable {
   final StudentEmployeeCount? studentEmployeeCount;
   final PendingFees? pendingFees;
   final LastSixMonthsPayments? lastSixMonthsPayments;
+  final DashboardTimetable? timetable;
+  final DashboardRecentlyPaid? recentlyPaid;
   final String? error;
 
   // Status helpers
@@ -30,11 +34,21 @@ class DashboardState extends Equatable {
   double get totalPendingFees => pendingFees?.totalPending ?? 0;
   String get formattedPendingFees => pendingFees?.formattedAmount ?? '₹0';
 
+  // Timetable helpers
+  List<TimetablePeriod> get periods => timetable?.periods ?? [];
+  bool get hasTimetable => periods.isNotEmpty;
+
+  // Recently paid helpers
+  List<RecentlyPaidFee> get recentPayments => recentlyPaid?.payments ?? [];
+  bool get hasRecentPayments => recentPayments.isNotEmpty;
+
   DashboardState copyWith({
     DashboardStatus? status,
     StudentEmployeeCount? studentEmployeeCount,
     PendingFees? pendingFees,
     LastSixMonthsPayments? lastSixMonthsPayments,
+    DashboardTimetable? timetable,
+    DashboardRecentlyPaid? recentlyPaid,
     String? error,
     bool clearError = false,
   }) {
@@ -44,6 +58,8 @@ class DashboardState extends Equatable {
       pendingFees: pendingFees ?? this.pendingFees,
       lastSixMonthsPayments:
           lastSixMonthsPayments ?? this.lastSixMonthsPayments,
+      timetable: timetable ?? this.timetable,
+      recentlyPaid: recentlyPaid ?? this.recentlyPaid,
       error: clearError ? null : (error ?? this.error),
     );
   }
@@ -54,6 +70,8 @@ class DashboardState extends Equatable {
     studentEmployeeCount,
     pendingFees,
     lastSixMonthsPayments,
+    timetable,
+    recentlyPaid,
     error,
   ];
 }

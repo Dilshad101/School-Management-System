@@ -109,4 +109,72 @@ class DashboardRepository {
       );
     }
   }
+
+  // TODO: Uncomment when API is ready
+  // /// Fetches today's timetable for dashboard.
+  // Future<DashboardTimetable> getTimetable() async {
+  //   try {
+  //     final response = await _apiClient.get(
+  //       Endpoints.dashboardTimetable, // TODO: Add endpoint
+  //     );
+  //
+  //     if (response.statusCode != null &&
+  //         (response.statusCode! < 200 || response.statusCode! >= 300)) {
+  //       throw ApiException(
+  //         message: 'Failed to fetch timetable',
+  //         statusCode: response.statusCode,
+  //       );
+  //     }
+  //
+  //     if (response.data == null) {
+  //       throw const ApiException(message: 'Empty response from server');
+  //     }
+  //
+  //     final responseData = response.data as Map<String, dynamic>;
+  //     final data = responseData['data'] as Map<String, dynamic>? ?? {};
+  //     return DashboardTimetable.fromJson(data);
+  //   } on DioException catch (e) {
+  //     throw ApiException.fromDioException(e);
+  //   } catch (e, s) {
+  //     log('DashboardRepository.getTimetable error: $e trace: $s');
+  //     if (e is ApiException) rethrow;
+  //     throw ApiException(
+  //       message: 'Failed to fetch timetable: ${e.toString()}',
+  //     );
+  //   }
+  // }
+
+  // TODO: Uncomment when API is ready
+  // /// Fetches recently paid fees for dashboard.
+  // Future<DashboardRecentlyPaid> getRecentlyPaid() async {
+  //   try {
+  //     final response = await _apiClient.get(
+  //       Endpoints.dashboardRecentlyPaid, // TODO: Add endpoint
+  //     );
+  //
+  //     if (response.statusCode != null &&
+  //         (response.statusCode! < 200 || response.statusCode! >= 300)) {
+  //       throw ApiException(
+  //         message: 'Failed to fetch recently paid',
+  //         statusCode: response.statusCode,
+  //       );
+  //     }
+  //
+  //     if (response.data == null) {
+  //       throw const ApiException(message: 'Empty response from server');
+  //     }
+  //
+  //     final responseData = response.data as Map<String, dynamic>;
+  //     final data = responseData['data'] as Map<String, dynamic>? ?? {};
+  //     return DashboardRecentlyPaid.fromJson(data);
+  //   } on DioException catch (e) {
+  //     throw ApiException.fromDioException(e);
+  //   } catch (e, s) {
+  //     log('DashboardRepository.getRecentlyPaid error: $e trace: $s');
+  //     if (e is ApiException) rethrow;
+  //     throw ApiException(
+  //       message: 'Failed to fetch recently paid: ${e.toString()}',
+  //     );
+  //   }
+  // }
 }
