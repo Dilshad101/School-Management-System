@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
 import 'package:school_management_system/core/router/app_router.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
 import 'package:school_management_system/core/utils/di.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 
 import 'widgets/feature_grid_tile.dart';
@@ -14,6 +17,7 @@ class FeaturesPage extends StatelessWidget {
     FeatureData(
       name: 'Employee',
       iconPath: 'assets/icons/employee.svg',
+      permission: Permissions.viewUser,
       onTap: () {
         final ctx = locator<NavigationService>().navigatorKey.currentContext;
         if (ctx != null) {
@@ -24,6 +28,7 @@ class FeaturesPage extends StatelessWidget {
     FeatureData(
       name: 'Class',
       iconPath: 'assets/icons/class.svg',
+      permission: Permissions.viewClassroom,
       onTap: () {
         final ctx = locator<NavigationService>().navigatorKey.currentContext;
         if (ctx != null) {
@@ -34,6 +39,7 @@ class FeaturesPage extends StatelessWidget {
     FeatureData(
       name: 'Students',
       iconPath: 'assets/icons/students.svg',
+      permission: Permissions.viewStudent,
       onTap: () {
         final ctx = locator<NavigationService>().navigatorKey.currentContext;
         if (ctx != null) {
@@ -44,6 +50,7 @@ class FeaturesPage extends StatelessWidget {
     FeatureData(
       name: 'Guardian',
       iconPath: 'assets/icons/guardian.svg',
+      permission: Permissions.viewGuardian,
       onTap: () {
         final ctx = locator<NavigationService>().navigatorKey.currentContext;
         if (ctx != null) {
@@ -54,6 +61,7 @@ class FeaturesPage extends StatelessWidget {
     FeatureData(
       name: 'Attendance',
       iconPath: 'assets/icons/attendance.svg',
+      permission: Permissions.viewAttendance,
       onTap: () {
         final ctx = locator<NavigationService>().navigatorKey.currentContext;
         if (ctx != null) {
@@ -64,6 +72,7 @@ class FeaturesPage extends StatelessWidget {
     FeatureData(
       name: 'Manage Fees',
       iconPath: 'assets/icons/fees.svg',
+      permission: Permissions.viewFee,
       onTap: () {
         final ctx = locator<NavigationService>().navigatorKey.currentContext;
         if (ctx != null && ctx.mounted) {
@@ -74,6 +83,7 @@ class FeaturesPage extends StatelessWidget {
     FeatureData(
       name: 'Notification',
       iconPath: 'assets/icons/notification.svg',
+      permission: Permissions.viewNotification,
       onTap: () {
         final ctx = locator<NavigationService>().navigatorKey.currentContext;
         if (ctx != null) {
@@ -84,6 +94,7 @@ class FeaturesPage extends StatelessWidget {
     FeatureData(
       name: 'Subscription',
       iconPath: 'assets/icons/subscription.svg',
+      permission: Permissions.viewSubscription,
       onTap: () {
         final ctx = locator<NavigationService>().navigatorKey.currentContext;
         if (ctx != null) {
@@ -110,18 +121,29 @@ class FeaturesPage extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: GridView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 1,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                itemCount: _features.length,
-                itemBuilder: (context, index) {
-                  final feature = _features[index];
-                  return FeatureGridTile(feature: feature);
+              child: BlocBuilder<UserBloc, UserState>(
+                builder: (context, userState) {
+                  // Filter features based on user permissions
+                  final permittedFeatures = _features.where((feature) {
+                    if (feature.permission == null) return true;
+                    return userState.hasPermission(feature.permission!);
+                  }).toList();
+
+                  return GridView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                    itemCount: permittedFeatures.length,
+                    itemBuilder: (context, index) {
+                      final feature = permittedFeatures[index];
+                      return FeatureGridTile(feature: feature);
+                    },
+                  );
                 },
               ),
             ),

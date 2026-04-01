@@ -43,6 +43,12 @@ class FeatureData {
   final String name;
   final String iconPath;
   final VoidCallback? onTap;
+  final String? permission;
 
-  FeatureData({required this.name, required this.iconPath, this.onTap});
+  FeatureData({
+    required this.name,
+    required this.iconPath,
+    this.onTap,
+    this.permission,
+  });
 }
