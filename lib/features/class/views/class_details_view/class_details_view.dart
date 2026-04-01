@@ -6,6 +6,7 @@ import '../../../../shared/styles/app_styles.dart';
 import '../../blocs/class_details/class_details_cubit.dart';
 import '../../blocs/class_details/class_details_state.dart';
 import '../../repositories/classroom_repository.dart';
+import 'tabs/students_tab.dart';
 import 'tabs/time_table_tab.dart';
 import 'widgets/class_detail_info_card.dart';
 
@@ -31,10 +32,30 @@ class ClassDetailsView extends StatelessWidget {
   }
 }
 
-class _ClassDetailsContent extends StatelessWidget {
+class _ClassDetailsContent extends StatefulWidget {
   const _ClassDetailsContent({required this.classId});
 
   final String classId;
+
+  @override
+  State<_ClassDetailsContent> createState() => _ClassDetailsContentState();
+}
+
+class _ClassDetailsContentState extends State<_ClassDetailsContent>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +88,7 @@ class _ClassDetailsContent extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () => context
                         .read<ClassDetailsCubit>()
-                        .fetchClassroomDetails(classId),
+                        .fetchClassroomDetails(widget.classId),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -125,16 +146,49 @@ class _ClassDetailsContent extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                // Timetable section header
-                Row(
-                  children: [Text('Timetable', style: AppTextStyles.heading4)],
+                // Tab Bar with gradient selected indicator
+                Container(
+                  height: 48,
+                  padding: const EdgeInsets.all(4),
+
+                  child: TabBar(
+                    controller: _tabController,
+                    indicator: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    labelColor: AppColors.white,
+                    unselectedLabelColor: AppColors.textSecondary,
+                    labelStyle: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    unselectedLabelStyle: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                    tabs: const [
+                      Tab(text: 'Students'),
+                      Tab(text: 'Timetable'),
+                    ],
+                  ),
                 ),
-                // Timetable tab
+                const SizedBox(height: 8),
+                // Tab Views
                 Expanded(
-                  child: ClassTimetableTabView(
-                    classroomId: classId,
-                    academicYearId: classroom.academicYear,
-                    schoolId: classroom.school,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      // Students tab
+                      ClassStudentsTabView(
+                        classroomId: widget.classId,
+                      ), // Timetable tab
+                      ClassTimetableTabView(
+                        classroomId: widget.classId,
+                        academicYearId: classroom.academicYear,
+                        schoolId: classroom.school,
+                      ),
+                    ],
                   ),
                 ),
               ],

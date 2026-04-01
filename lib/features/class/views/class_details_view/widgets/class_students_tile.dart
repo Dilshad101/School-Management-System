@@ -1,181 +1,169 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../shared/styles/app_styles.dart';
-import '../../../../../shared/widgets/buttons/micro_delete_button.dart';
-import '../../../../../shared/widgets/buttons/micro_edit_button.dart';
+import '../../../../students/models/student_model.dart';
 
 class ClassStudentTile extends StatelessWidget {
-  const ClassStudentTile({super.key});
+  const ClassStudentTile({super.key, required this.student, this.onTap});
+
+  final StudentModel student;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: AppColors.white,
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            spacing: 10,
-            children: [
-              Container(
-                height: 64,
-                width: 64,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.border.withAlpha(50),
-                ),
-                child: Icon(
-                  Icons.person,
-                  size: 32,
-                  color: AppColors.textPrimary.withAlpha(160),
-                ),
+    final guardian = student.guardians.isNotEmpty
+        ? student.guardians.first
+        : null;
+    final rollNo = student.enrollment?.rollNo ?? student.commonId ?? '---';
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: AppColors.white,
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Profile picture
+            Container(
+              height: 56,
+              width: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.border.withAlpha(50),
+                image: student.profilePicUrl != null
+                    ? DecorationImage(
+                        image: NetworkImage(student.profilePicUrl!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      spacing: 8,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Priya',
-                            style: AppTextStyles.bodyLarge.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+              child: student.profilePicUrl == null
+                  ? Center(
+                      child: Text(
+                        student.fullName.isNotEmpty
+                            ? student.fullName[0].toUpperCase()
+                            : 'S',
+                        style: AppTextStyles.heading4.copyWith(
+                          color: AppColors.textPrimary.withAlpha(160),
                         ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            // Student info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Name and active status
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          student.fullName,
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (student.isActive)
                         Container(
                           decoration: BoxDecoration(
                             color: AppColors.green.withAlpha(20),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
                             vertical: 2,
                           ),
                           child: Text(
-                            '98%',
-                            style: AppTextStyles.bodySmall.copyWith(
+                            'Active',
+                            style: AppTextStyles.labelSmall.copyWith(
                               fontWeight: FontWeight.w500,
                               color: AppColors.green,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          '8A',
-                          style: AppTextStyles.labelMedium.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  // Class and Roll number
+                  Row(
+                    children: [
+                      Text(
+                        student.classroomName ?? '---',
+                        style: AppTextStyles.labelMedium.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primary,
                         ),
-                        SizedBox(
-                          height: 18,
-                          child: VerticalDivider(color: AppColors.border),
+                      ),
+                      SizedBox(
+                        height: 16,
+                        child: VerticalDivider(color: AppColors.border),
+                      ),
+                      Text(
+                        'Roll: $rollNo',
+                        style: AppTextStyles.labelMedium.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimary.withAlpha(160),
                         ),
-                        Text(
-                          'ID 64452',
-                          style: AppTextStyles.labelMedium.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textPrimary.withAlpha(160),
-                          ),
+                      ),
+                    ],
+                  ),
+                  // Guardian info (if available)
+                  if (guardian != null) ...[
+                    const SizedBox(height: 4),
+                    Text.rich(
+                      TextSpan(
+                        text: 'GDN: ',
+                        style: AppTextStyles.labelMedium.copyWith(
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textPrimary.withAlpha(160),
                         ),
-                      ],
-                    ),
-                    Wrap(
-                      children: [
-                        Text.rich(
+                        children: [
                           TextSpan(
-                            text: 'GDN: ',
+                            text: guardian.fullName,
                             style: AppTextStyles.labelMedium.copyWith(
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textPrimary.withAlpha(160),
+                              color: AppColors.textPrimary,
                             ),
-                            children: [
-                              TextSpan(
-                                text: 'Thomas',
-                                style: AppTextStyles.labelMedium.copyWith(
-                                  color: AppColors.textPrimary,
-                                ),
+                          ),
+                          if (guardian.phone != null) ...[
+                            TextSpan(
+                              text: ' • ',
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: AppColors.textPrimary.withAlpha(160),
                               ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 18,
-                          child: VerticalDivider(color: AppColors.border),
-                        ),
-                        Text(
-                          'Ph: 9988776655',
-                          style: AppTextStyles.labelMedium.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textPrimary.withAlpha(160),
-                          ),
-                        ),
-                      ],
+                            ),
+                            TextSpan(
+                              text: guardian.phone!,
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: AppColors.textPrimary.withAlpha(160),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                ),
+                ],
               ),
-            ],
-          ),
-          Divider(color: AppColors.border, height: 24),
-          // Fee Information Row
-          Row(
-            children: [
-              Expanded(child: _buildFeeColumn('TOTAL FEES', '₹1,200')),
-              Expanded(child: _buildFeeColumn('PAID', '₹1,000')),
-              Expanded(
-                child: _buildFeeColumn('DUE', '₹200', isHighlighted: true),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            spacing: 8,
-            children: [MicroDeleteButton(), MicroEditButton()],
-          ),
-        ],
+            ),
+            // Arrow icon
+            Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          ],
+        ),
       ),
-    );
-  }
-
-  Widget _buildFeeColumn(
-    String label,
-    String value, {
-    bool isHighlighted = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.labelSmall.copyWith(
-            color: AppColors.textPrimary.withAlpha(160),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: AppTextStyles.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-            color: isHighlighted
-                ? const Color(0xFFEF4444)
-                : AppColors.textPrimary,
-          ),
-        ),
-      ],
     );
   }
 }

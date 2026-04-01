@@ -20,18 +20,24 @@ class StudentsRepository {
   /// [page] - The page number (1-indexed).
   /// [pageSize] - The number of items per page (default: 10).
   /// [search] - Optional search query for filtering students.
+  /// [classroomId] - Optional classroom ID for filtering students.
   ///
   /// Throws [ApiException] if the request fails.
   Future<StudentListResponse> getStudents({
     int page = 1,
     int pageSize = 10,
     String? search,
+    String? classroomId,
   }) async {
     try {
       final queryParams = <String, dynamic>{'page': page, 'pagesize': pageSize};
 
       if (search != null && search.isNotEmpty) {
         queryParams['search'] = search;
+      }
+
+      if (classroomId != null && classroomId.isNotEmpty) {
+        queryParams['classroom'] = classroomId;
       }
 
       final response = await _apiClient.get(
