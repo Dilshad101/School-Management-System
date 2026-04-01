@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 
 import '../../../../core/utils/di.dart';
 import '../../../../shared/styles/app_styles.dart';
@@ -51,11 +53,16 @@ class _NotificationViewContent extends StatelessWidget {
           return _buildBody(context, state);
         },
       ),
-      floatingActionButton: MyFloatingActionButton(
-        onPressed: () {
-          AddNotificationBottomSheet.show(context);
-        },
-      ),
+      floatingActionButton:
+          context.read<UserBloc>().state.hasPermission(
+            Permissions.sendNotification,
+          )
+          ? MyFloatingActionButton(
+              onPressed: () {
+                AddNotificationBottomSheet.show(context);
+              },
+            )
+          : null,
     );
   }
 
