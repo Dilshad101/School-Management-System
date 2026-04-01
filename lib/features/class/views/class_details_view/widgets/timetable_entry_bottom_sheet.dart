@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
 
 import '../../../../../core/utils/di.dart';
 import '../../../../../shared/styles/app_styles.dart';
@@ -33,6 +34,7 @@ class TimetableEntryBottomSheet extends StatefulWidget {
   final String? initialTeacherId;
   final String? initialTeacherName;
   final bool isEditing;
+  final ScrollController? scrollController;
 
   const TimetableEntryBottomSheet({
     super.key,
@@ -43,6 +45,7 @@ class TimetableEntryBottomSheet extends StatefulWidget {
     this.initialTeacherId,
     this.initialTeacherName,
     this.isEditing = false,
+    this.scrollController,
   });
 
   /// Shows the bottom sheet and returns the result.
@@ -59,18 +62,28 @@ class TimetableEntryBottomSheet extends StatefulWidget {
     return showModalBottomSheet<TimetableEntryResult>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => TimetableEntryBottomSheet(
-        periodName: periodName,
-        dayName: dayName,
-        initialSubjectId: initialSubjectId,
-        initialSubjectName: initialSubjectName,
-        initialTeacherId: initialTeacherId,
-        initialTeacherName: initialTeacherName,
-        isEditing: isEditing,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.55,
+        minChildSize: 0.4,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: TimetableEntryBottomSheet(
+            periodName: periodName,
+            dayName: dayName,
+            initialSubjectId: initialSubjectId,
+            initialSubjectName: initialSubjectName,
+            initialTeacherId: initialTeacherId,
+            initialTeacherName: initialTeacherName,
+            isEditing: isEditing,
+            scrollController: scrollController,
+          ),
+        ),
       ),
     );
   }
@@ -123,168 +136,189 @@ class _TimetableEntryBottomSheetState extends State<TimetableEntryBottomSheet> {
       padding: EdgeInsets.only(
         left: 24,
         right: 24,
-        top: 16,
+        top: 8,
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: CustomScrollView(
+        controller: widget.scrollController,
+        slivers: [
+          SliverToBoxAdapter(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Spacer(),
-                Text(
-                  widget.isEditing ? 'Edit Schedule' : 'Add Schedule',
-                  style: AppTextStyles.heading4,
+                // Drag Handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
                 ),
-                const Spacer(),
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  borderRadius: BorderRadius.circular(20),
-                  child: const Icon(Icons.close, size: 24),
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Spacer(),
+                    Text(
+                      widget.isEditing ? 'Edit Schedule' : 'Add Schedule',
+                      style: AppTextStyles.heading4,
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      borderRadius: BorderRadius.circular(20),
+                      child: const Icon(Icons.close, size: 24),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Period and Day info
+                Center(
+                  child: Text(
+                    '${widget.periodName} • ${widget.dayName}',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Subject Field
+                SuggestionFormField<SubjectModel>(
+                  controller: _subjectController,
+                  label: 'Subject',
+                  hint: 'Search and select subject',
+                  permission: Permissions.viewSubject,
+                  isRequired: true,
+                  suggestionsCallback: _searchSubjects,
+                  itemBuilder: (context, subject) {
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        radius: 18,
+                        child: Icon(
+                          subject.isLab
+                              ? Icons.science_outlined
+                              : Icons.book_outlined,
+                          size: 18,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      title: Text(subject.name),
+                      subtitle: subject.code != null
+                          ? Text(subject.code!)
+                          : null,
+                      trailing: subject.isLab
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'Lab',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            )
+                          : null,
+                      dense: true,
+                    );
+                  },
+                  onSelected: (subject) {
+                    _selectedSubjectId = subject.id;
+                    _selectedSubjectName = subject.name;
+                    _subjectController.text = subject.name;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Teacher Field
+                SuggestionFormField<EmployeeModel>(
+                  controller: _teacherController,
+                  label: 'Teacher',
+                  hint: 'Search and select teacher',
+                  permission: Permissions.viewUser,
+                  isRequired: true,
+                  suggestionsCallback: _searchTeachers,
+                  itemBuilder: (context, teacher) {
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        backgroundImage: teacher.profilePicUrl != null
+                            ? NetworkImage(teacher.profilePicUrl!)
+                            : null,
+                        child: teacher.profilePicUrl == null
+                            ? Text(
+                                teacher.fullName.isNotEmpty
+                                    ? teacher.fullName[0].toUpperCase()
+                                    : 'T',
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              )
+                            : null,
+                      ),
+                      title: Text(teacher.fullName),
+                      subtitle: Text(teacher.email),
+                      dense: true,
+                    );
+                  },
+                  onSelected: (teacher) {
+                    _selectedTeacherId = teacher.id;
+                    _selectedTeacherName = teacher.fullName;
+                    _teacherController.text = teacher.fullName;
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          side: BorderSide(color: AppColors.border),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: GradientButton(
+                        label: widget.isEditing ? 'Update' : 'Add',
+                        onPressed: _onSubmit,
+                        height: 48,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-
-            // Period and Day info
-            Center(
-              child: Text(
-                '${widget.periodName} • ${widget.dayName}',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Subject Field
-            SuggestionFormField<SubjectModel>(
-              controller: _subjectController,
-              label: 'Subject',
-              hint: 'Search and select subject',
-              isRequired: true,
-              suggestionsCallback: _searchSubjects,
-              itemBuilder: (context, subject) {
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
-                    radius: 18,
-                    child: Icon(
-                      subject.isLab
-                          ? Icons.science_outlined
-                          : Icons.book_outlined,
-                      size: 18,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  title: Text(subject.name),
-                  subtitle: subject.code != null ? Text(subject.code!) : null,
-                  trailing: subject.isLab
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            'Lab',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        )
-                      : null,
-                  dense: true,
-                );
-              },
-              onSelected: (subject) {
-                _selectedSubjectId = subject.id;
-                _selectedSubjectName = subject.name;
-                _subjectController.text = subject.name;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Teacher Field
-            SuggestionFormField<EmployeeModel>(
-              controller: _teacherController,
-              label: 'Teacher',
-              hint: 'Search and select teacher',
-              isRequired: true,
-              suggestionsCallback: _searchTeachers,
-              itemBuilder: (context, teacher) {
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
-                    backgroundImage: teacher.profilePicUrl != null
-                        ? NetworkImage(teacher.profilePicUrl!)
-                        : null,
-                    child: teacher.profilePicUrl == null
-                        ? Text(
-                            teacher.fullName.isNotEmpty
-                                ? teacher.fullName[0].toUpperCase()
-                                : 'T',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          )
-                        : null,
-                  ),
-                  title: Text(teacher.fullName),
-                  subtitle: Text(teacher.email),
-                  dense: true,
-                );
-              },
-              onSelected: (teacher) {
-                _selectedTeacherId = teacher.id;
-                _selectedTeacherName = teacher.fullName;
-                _teacherController.text = teacher.fullName;
-              },
-            ),
-            const SizedBox(height: 24),
-
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: BorderSide(color: AppColors.border),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Cancel',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: GradientButton(
-                    label: widget.isEditing ? 'Update' : 'Add',
-                    onPressed: _onSubmit,
-                    height: 48,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
