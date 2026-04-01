@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../features/auth/blocs/user/user_bloc.dart';
+import '../../../features/auth/blocs/user/user_bloc.dart';
 
 /// A widget that conditionally renders its child based on user permissions.
 ///

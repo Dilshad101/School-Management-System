@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:school_management_system/core/auth/permissions.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/dropdowns/bottom_sheet_dropdown.dart';
-import 'package:school_management_system/shared/widgets/permission_builder.dart';
+import 'package:school_management_system/shared/widgets/permission_builder/permission_builder.dart';
 
 import '../../../../../features/students/views/create_student_view/widgets/date_picker_field.dart';
 import '../../../../../features/students/views/create_student_view/widgets/icon_form_field.dart';
+import '../../../../../shared/widgets/permission_builder/no_permission_field.dart';
 import '../../../blocs/create_employee/create_employee_state.dart';
 
 /// Step 1 of Create Employee flow - Personal Information.
@@ -393,7 +394,7 @@ class _MultiSelectField<T> extends FormField<List<T>> {
                const SizedBox(height: 8),
                PermissionBuilder(
                  permission: permission,
-                 fallback: _NoPermissionField(icon: icon, label: label),
+                 fallback: NoPermissionField(icon: icon, label: label),
                  child: GestureDetector(
                    onTap: onAddItem,
                    child: Container(
@@ -717,46 +718,6 @@ class _ItemSelectorBottomSheetState<T>
                   ),
           ),
           const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-}
-
-/// A disabled field widget shown when user lacks permission.
-class _NoPermissionField extends StatelessWidget {
-  const _NoPermissionField({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border, width: 1),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: AppColors.textSecondary.withAlpha(150), size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'No permission to view $label',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-          Icon(
-            Icons.lock_outline,
-            color: AppColors.textSecondary.withAlpha(150),
-            size: 18,
-          ),
         ],
       ),
     );

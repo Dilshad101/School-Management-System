@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../../core/auth/permissions.dart';
 import '../../../../../../core/utils/di.dart';
 import '../../../../../../shared/styles/app_styles.dart';
-import '../../../../../../shared/widgets/permission_builder.dart';
+import '../../../../../../shared/widgets/permission_builder/permission_builder.dart';
 import '../../../../blocs/academic_year/academic_year_cubit.dart';
 import '../../../../blocs/academic_year/academic_year_state.dart';
 import '../../../../models/academic_year_model.dart';

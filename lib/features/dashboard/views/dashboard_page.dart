@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/auth/permissions.dart';
 import '../../../core/utils/di.dart';
 import '../../../shared/styles/app_styles.dart';
-import '../../../shared/widgets/permission_builder.dart';
+import '../../../shared/widgets/permission_builder/permission_builder.dart';
 import '../../auth/blocs/user/user_bloc.dart';
 import '../blocs/dashboard/dashboard_bloc.dart';
 import '../repositories/dashboard_repository.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../styles/app_styles.dart';
+import '../../styles/app_styles.dart';
 
 /// A user-friendly widget displayed when the user lacks permission to access a feature.
 class NoPermissionView extends StatelessWidget {

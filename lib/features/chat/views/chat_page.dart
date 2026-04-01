@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:school_management_system/core/auth/permissions.dart';
-import 'package:school_management_system/shared/widgets/no_permission_view.dart';
-import 'package:school_management_system/shared/widgets/permission_builder.dart';
+import 'package:school_management_system/shared/widgets/permission_builder/no_permission_view.dart';
+import 'package:school_management_system/shared/widgets/permission_builder/permission_builder.dart';
 
 import '../../../core/router/route_paths.dart';
 import '../../../core/utils/di.dart';
