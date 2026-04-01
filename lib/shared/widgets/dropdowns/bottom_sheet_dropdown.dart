@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
+import 'package:school_management_system/shared/widgets/permission_builder/no_permission_field.dart';
 
 /// A form field that opens a bottom sheet for selection.
 /// This provides a more user-friendly experience on mobile devices.
@@ -16,6 +19,7 @@ class BottomSheetDropdown<T> extends StatefulWidget {
     this.validator,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
     this.isRequired = false,
+    this.permission,
   });
 
   final String label;
@@ -28,6 +32,7 @@ class BottomSheetDropdown<T> extends StatefulWidget {
   final String? Function(T?)? validator;
   final AutovalidateMode autovalidateMode;
   final bool isRequired;
+  final String? permission;
 
   @override
   State<BottomSheetDropdown<T>> createState() => _BottomSheetDropdownState<T>();
@@ -81,73 +86,80 @@ class _BottomSheetDropdownState<T> extends State<BottomSheetDropdown<T>> {
           style: AppTextStyles.labelMedium,
         ),
         const SizedBox(height: 8),
-        FormField<T>(
-          key: _formFieldKey,
-          initialValue: widget.value,
-          validator: widget.validator,
-          autovalidateMode: widget.autovalidateMode,
-          builder: (FormFieldState<T> state) {
-            // Sync the form field value with the widget value
-            if (state.value != widget.value) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                state.didChange(widget.value);
-              });
-            }
+        if (widget.permission != null &&
+            !context.read<UserBloc>().state.hasPermission(widget.permission!))
+          NoPermissionField(
+            icon: Icons.text_fields_rounded,
+            label: widget.label,
+          )
+        else
+          FormField<T>(
+            key: _formFieldKey,
+            initialValue: widget.value,
+            validator: widget.validator,
+            autovalidateMode: widget.autovalidateMode,
+            builder: (FormFieldState<T> state) {
+              // Sync the form field value with the widget value
+              if (state.value != widget.value) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  state.didChange(widget.value);
+                });
+              }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () => _showBottomSheet(context),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardBackground,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: state.hasError
-                            ? AppColors.borderError
-                            : AppColors.border,
-                        width: 1,
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () => _showBottomSheet(context),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardBackground,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: state.hasError
+                              ? AppColors.borderError
+                              : AppColors.border,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.value != null
+                                  ? _getItemLabel(widget.value as T)
+                                  : widget.hint,
+                              style: widget.value != null
+                                  ? AppTextStyles.bodyMedium
+                                  : AppTextStyles.hint,
+                            ),
+                          ),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            color: AppColors.textSecondary,
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            widget.value != null
-                                ? _getItemLabel(widget.value as T)
-                                : widget.hint,
-                            style: widget.value != null
-                                ? AppTextStyles.bodyMedium
-                                : AppTextStyles.hint,
-                          ),
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          color: AppColors.textSecondary,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-                if (state.hasError) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    state.errorText!,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.borderError,
+                  if (state.hasError) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      state.errorText!,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.borderError,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
-            );
-          },
-        ),
+              );
+            },
+          ),
       ],
     );
   }
