@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 
 import '../../../../../shared/styles/app_styles.dart';
 import '../../../../../shared/widgets/buttons/micro_delete_button.dart';
@@ -21,6 +24,7 @@ class EmployeeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPermission = context.read<UserBloc>().state.hasPermission;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -118,8 +122,10 @@ class EmployeeTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               spacing: 8,
               children: [
-                MicroDeleteButton(onTap: onDelete),
-                MicroEditButton(onTap: onEdit),
+                if (hasPermission(Permissions.deleteUser))
+                  MicroDeleteButton(onTap: onDelete),
+                if (hasPermission(Permissions.changeUser))
+                  MicroEditButton(onTap: onEdit),
               ],
             ),
           ],

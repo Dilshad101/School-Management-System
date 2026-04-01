@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
 import 'package:school_management_system/core/utils/di.dart';
 import 'package:school_management_system/core/utils/helpers.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
 
-import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../../shared/widgets/input_fields/search_field.dart';
 import '../../blocs/employees/employees_bloc.dart';
-import '../../blocs/employees/employees_event.dart';
-import '../../blocs/employees/employees_state.dart';
 import '../../repositories/employees_repository.dart';
 import 'widgets/employe_tile.dart';
 
@@ -37,24 +36,24 @@ class _EmployeesViewContent extends StatefulWidget {
 }
 
 class _EmployeesViewContentState extends State<_EmployeesViewContent> {
-  final _roles = const ['Admin', 'Employee', 'Manager'];
-  final _subjects = const ['Math', 'Science', 'History', 'Art'];
-  String? _selectedRole;
-  String? _selectedSubject;
+  // final _roles = const ['Admin', 'Employee', 'Manager'];
+  // final _subjects = const ['Math', 'Science', 'History', 'Art'];
+  // String? _selectedRole;
+  // String? _selectedSubject;
 
-  late ValueNotifier<bool> _allSelectedNotifier;
+  // late ValueNotifier<bool> _allSelectedNotifier;
 
   @override
   void initState() {
     super.initState();
-    _selectedRole = _roles.isNotEmpty ? _roles.first : null;
-    _selectedSubject = _subjects.isNotEmpty ? _subjects.first : null;
-    _allSelectedNotifier = ValueNotifier<bool>(true);
+    // _selectedRole = _roles.isNotEmpty ? _roles.first : null;
+    // _selectedSubject = _subjects.isNotEmpty ? _subjects.first : null;
+    // _allSelectedNotifier = ValueNotifier<bool>(true);
   }
 
   @override
   void dispose() {
-    _allSelectedNotifier.dispose();
+    // _allSelectedNotifier.dispose();
     super.dispose();
   }
 
@@ -79,48 +78,48 @@ class _EmployeesViewContentState extends State<_EmployeesViewContent> {
                 context.read<EmployeesBloc>().add(SearchEmployees(value));
               },
             ),
-            const SizedBox(height: 10),
+            // const SizedBox(height: 10),
 
-            // filter and sort options
-            ValueListenableBuilder(
-              valueListenable: _allSelectedNotifier,
-              builder: (context, value, child) {
-                return Row(
-                  spacing: 8,
-                  children: [
-                    _buildAllChip(value),
-                    FilterDropdown<String>(
-                      items: _roles,
-                      value: _selectedRole,
-                      onChanged: (value) {
-                        print('role - $value');
-                        if (value == null) return;
-                        _selectedRole = value;
-                        _allSelectedNotifier.value = false;
-                      },
-                      hintText: 'Employees',
-                    ),
-                    FilterDropdown<String>(
-                      items: _subjects,
-                      value: _selectedSubject,
-                      onChanged: (value) {
-                        print('subject - $value');
-                        if (value == null) return;
-                        _selectedSubject = value;
-                        _allSelectedNotifier.value = false;
-                      },
-                      hintText: 'Class',
-                    ),
-                    FilterDropdown<String>(
-                      items: const ['Division A', 'Division B', 'Division C'],
-                      value: null,
-                      onChanged: (value) {},
-                      hintText: 'Division',
-                    ),
-                  ],
-                );
-              },
-            ),
+            // // filter and sort options
+            // ValueListenableBuilder(
+            //   valueListenable: _allSelectedNotifier,
+            //   builder: (context, value, child) {
+            //     return Row(
+            //       spacing: 8,
+            //       children: [
+            //         _buildAllChip(value),
+            //         FilterDropdown<String>(
+            //           items: _roles,
+            //           value: _selectedRole,
+            //           onChanged: (value) {
+            //             print('role - $value');
+            //             if (value == null) return;
+            //             _selectedRole = value;
+            //             _allSelectedNotifier.value = false;
+            //           },
+            //           hintText: 'Employees',
+            //         ),
+            //         FilterDropdown<String>(
+            //           items: _subjects,
+            //           value: _selectedSubject,
+            //           onChanged: (value) {
+            //             print('subject - $value');
+            //             if (value == null) return;
+            //             _selectedSubject = value;
+            //             _allSelectedNotifier.value = false;
+            //           },
+            //           hintText: 'Class',
+            //         ),
+            //         FilterDropdown<String>(
+            //           items: const ['Division A', 'Division B', 'Division C'],
+            //           value: null,
+            //           onChanged: (value) {},
+            //           hintText: 'Division',
+            //         ),
+            //       ],
+            //     );
+            //   },
+            // ),
             const SizedBox(height: 16),
             // Employee list
             Expanded(
@@ -225,35 +224,36 @@ class _EmployeesViewContentState extends State<_EmployeesViewContent> {
           ],
         ),
       ),
-      floatingActionButton: MyFloatingActionButton(
-        onPressed: _navigateToCreateEmployee,
-      ),
+      floatingActionButton:
+          context.read<UserBloc>().state.hasPermission(Permissions.addUser)
+          ? MyFloatingActionButton(onPressed: _navigateToCreateEmployee)
+          : const SizedBox.shrink(),
     );
   }
 
-  Widget _buildAllChip(bool isSelected) {
-    return InkWell(
-      onTap: () {
-        _allSelectedNotifier.value = true;
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? null
-              : Border.all(color: AppColors.border.withAlpha(180)),
-        ),
-        child: Text(
-          'All',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: isSelected ? Colors.white : AppColors.textPrimary,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildAllChip(bool isSelected) {
+  //   return InkWell(
+  //     onTap: () {
+  //       // _allSelectedNotifier.value = true;
+  //     },
+  //     child: Container(
+  //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  //       decoration: BoxDecoration(
+  //         color: isSelected ? AppColors.primary : AppColors.white,
+  //         borderRadius: BorderRadius.circular(8),
+  //         border: isSelected
+  //             ? null
+  //             : Border.all(color: AppColors.border.withAlpha(180)),
+  //       ),
+  //       child: Text(
+  //         'All',
+  //         style: AppTextStyles.bodySmall.copyWith(
+  //           color: isSelected ? Colors.white : AppColors.textPrimary,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   void _showDeleteConfirmation(BuildContext context, String employeeId) {
     Helpers.showWarningBottomSheet(
