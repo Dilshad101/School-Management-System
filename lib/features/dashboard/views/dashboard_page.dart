@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/auth/permissions.dart';
 import '../../../core/utils/di.dart';
 import '../../../shared/styles/app_styles.dart';
+import '../../../shared/widgets/permission_builder.dart';
+import '../../auth/blocs/user/user_bloc.dart';
 import '../blocs/dashboard/dashboard_bloc.dart';
 import '../repositories/dashboard_repository.dart';
 import 'widgets/admission_tile.dart';
@@ -18,17 +21,23 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get user permissions to pass to DashboardBloc
+    final userPermissions =
+        context.read<UserBloc>().state.user?.permissions ?? [];
+
     return BlocProvider(
       create: (context) =>
           DashboardBloc(dashboardRepository: locator<DashboardRepository>())
-            ..add(const DashboardFetchRequested()),
-      child: const _DashboardContent(),
+            ..add(DashboardFetchRequested(permissions: userPermissions)),
+      child: _DashboardContent(permissions: userPermissions),
     );
   }
 }
 
 class _DashboardContent extends StatelessWidget {
-  const _DashboardContent();
+  const _DashboardContent({required this.permissions});
+
+  final List<String> permissions;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +59,7 @@ class _DashboardContent extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: () async {
               context.read<DashboardBloc>().add(
-                const DashboardRefreshRequested(),
+                DashboardRefreshRequested(permissions: permissions),
               );
             },
             child: Column(
@@ -84,29 +93,54 @@ class _DashboardContent extends StatelessWidget {
                                   const SizedBox(height: 16),
                                   Row(
                                     children: [
-                                      Expanded(
-                                        child: DashboardSummaryCard(
-                                          label: 'Total Students',
-                                          value: state.isLoading
-                                              ? '...'
-                                              : '${state.studentCount}',
-                                          iconPath: 'assets/icons/person.svg',
-                                          percentageChange: '+1.2% this Year',
-                                          isPositive: true,
-                                        ),
+                                      // Total Students - requires view_student permission
+                                      PermissionBuilder(
+                                        permission: Permissions.viewStudent,
+                                        builder: (context, hasPermission) {
+                                          if (!hasPermission) {
+                                            return const SizedBox.shrink();
+                                          }
+                                          return Expanded(
+                                            child: DashboardSummaryCard(
+                                              label: 'Total Students',
+                                              value: state.isLoading
+                                                  ? '...'
+                                                  : '${state.studentCount}',
+                                              iconPath:
+                                                  'assets/icons/person.svg',
+                                              percentageChange:
+                                                  '+1.2% this Year',
+                                              isPositive: true,
+                                            ),
+                                          );
+                                        },
                                       ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: DashboardSummaryCard(
-                                          label: 'Total Employee',
-                                          value: state.isLoading
-                                              ? '...'
-                                              : '${state.employeeCount}',
-                                          iconPath:
-                                              'assets/icons/dashboard_employee.svg',
-                                          percentageChange: '+1.2% this Year',
-                                          isPositive: true,
-                                        ),
+                                      PermissionBuilder(
+                                        permission: Permissions.viewStudent,
+                                        child: const SizedBox(width: 10),
+                                      ),
+
+                                      // Total Employee - requires view_user permission
+                                      PermissionBuilder(
+                                        permission: Permissions.viewUser,
+                                        builder: (context, hasPermission) {
+                                          if (!hasPermission) {
+                                            return const SizedBox.shrink();
+                                          }
+                                          return Expanded(
+                                            child: DashboardSummaryCard(
+                                              label: 'Total Employee',
+                                              value: state.isLoading
+                                                  ? '...'
+                                                  : '${state.employeeCount}',
+                                              iconPath:
+                                                  'assets/icons/dashboard_employee.svg',
+                                              percentageChange:
+                                                  '+1.2% this Year',
+                                              isPositive: true,
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
@@ -114,28 +148,51 @@ class _DashboardContent extends StatelessWidget {
                                   // Summary cards - Row 2
                                   Row(
                                     children: [
-                                      Expanded(
-                                        child: DashboardSummaryCard(
-                                          label: 'Total Attendance',
-                                          value: '---',
-                                          iconPath:
-                                              'assets/icons/dashboard_calendar.svg',
-                                          percentageChange: '+1.2% this Year',
-                                          isPositive: true,
-                                        ),
+                                      // Total Attendance - requires view_attendance permission
+                                      PermissionBuilder(
+                                        permission: Permissions.viewAttendance,
+                                        builder: (context, hasPermission) {
+                                          if (!hasPermission) {
+                                            return const SizedBox.shrink();
+                                          }
+                                          return Expanded(
+                                            child: DashboardSummaryCard(
+                                              label: 'Total Attendance',
+                                              value: '---',
+                                              iconPath:
+                                                  'assets/icons/dashboard_calendar.svg',
+                                              percentageChange:
+                                                  '+1.2% this Year',
+                                              isPositive: true,
+                                            ),
+                                          );
+                                        },
                                       ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: DashboardSummaryCard(
-                                          label: 'Pending Fees',
-                                          value: state.isLoading
-                                              ? '...'
-                                              : state.formattedPendingFees,
-                                          iconPath: 'assets/icons/fees.svg',
-                                          percentageChange: '+1.2% this Year',
-                                          isPositive:
-                                              state.totalPendingFees <= 0,
-                                        ),
+                                      PermissionBuilder(
+                                        permission: Permissions.viewAttendance,
+                                        child: const SizedBox(width: 10),
+                                      ),
+                                      // Pending Fees - requires view_fee permission
+                                      PermissionBuilder(
+                                        permission: Permissions.viewReports,
+                                        builder: (context, hasPermission) {
+                                          if (!hasPermission) {
+                                            return const SizedBox.shrink();
+                                          }
+                                          return Expanded(
+                                            child: DashboardSummaryCard(
+                                              label: 'Pending Fees',
+                                              value: state.isLoading
+                                                  ? '...'
+                                                  : state.formattedPendingFees,
+                                              iconPath: 'assets/icons/fees.svg',
+                                              percentageChange:
+                                                  '+1.2% this Year',
+                                              isPositive:
+                                                  state.totalPendingFees <= 0,
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
@@ -158,30 +215,64 @@ class _DashboardContent extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              // Fee Collection Chart
-                              _buildFeeCollectionChart(state),
-                              const SizedBox(height: 16),
-                              // Attendance Chart
-                              const AttendanceChart(),
-                              const SizedBox(height: 24),
-                              // Timetable Section
-                              TimetableSection(
-                                periods: state.periods,
-                                isLoading: state.isLoading,
-                                onViewAll: () {
-                                  // TODO: Navigate to timetable page
-                                },
+                              // Fee Collection Chart - requires view_fee permission
+                              PermissionBuilder(
+                                permission: Permissions.viewReports,
+                                child: Column(
+                                  children: [
+                                    _buildFeeCollectionChart(state),
+                                    const SizedBox(height: 16),
+                                  ],
+                                ),
                               ),
-                              const SizedBox(height: 24),
-                              // Recently Paid Section
-                              RecentlyPaidSection(
-                                payments: state.recentPayments,
-                                isLoading: state.isLoading,
-                                onViewAll: () {
-                                  // TODO: Navigate to fees page
-                                },
+                              // Attendance Chart - requires view_attendance permission
+                              PermissionBuilder(
+                                permission: Permissions.viewAttendance,
+                                child: Column(
+                                  children: [
+                                    const AttendanceChart(),
+                                    const SizedBox(height: 24),
+                                  ],
+                                ),
                               ),
-                              const SizedBox(height: 24),
+                              // Timetable Section - requires view_timetable permission
+                              PermissionBuilder(
+                                permissions: [
+                                  Permissions.viewTimetable,
+                                  Permissions.viewTeacherTimetable,
+                                ],
+                                child: Column(
+                                  children: [
+                                    TimetableSection(
+                                      periods: state.periods,
+                                      isLoading: state.isLoading,
+                                      onViewAll: () {
+                                        // TODO: Navigate to timetable page
+                                      },
+                                    ),
+                                    const SizedBox(height: 24),
+                                  ],
+                                ),
+                              ),
+                              // Recently Paid Section - requires view_fee or view_student_fee_history
+                              PermissionBuilder(
+                                permissions: [
+                                  Permissions.viewFee,
+                                  Permissions.viewStudentFeeHistory,
+                                ],
+                                child: Column(
+                                  children: [
+                                    RecentlyPaidSection(
+                                      payments: state.recentPayments,
+                                      isLoading: state.isLoading,
+                                      onViewAll: () {
+                                        // TODO: Navigate to fees page
+                                      },
+                                    ),
+                                    const SizedBox(height: 24),
+                                  ],
+                                ),
+                              ),
                               // New Admissions Status
                               Row(
                                 mainAxisAlignment:
@@ -262,7 +353,7 @@ class _DashboardContent extends StatelessWidget {
   }
 }
 
-var s = {
+var userDetailsResponse = {
   "success": true,
   "data": {
     "id": "09ce4a95-56ac-4ea0-95d8-418189aee3bd",

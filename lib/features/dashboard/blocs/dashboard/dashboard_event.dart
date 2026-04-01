@@ -10,12 +10,25 @@ sealed class DashboardEvent extends Equatable {
 
 /// Event to fetch all dashboard data.
 class DashboardFetchRequested extends DashboardEvent {
-  const DashboardFetchRequested();
+  const DashboardFetchRequested({this.permissions = const []});
+
+  /// List of permissions the current user has.
+  /// Used to conditionally fetch data based on permissions.
+  final List<String> permissions;
+
+  @override
+  List<Object?> get props => [permissions];
 }
 
 /// Event to refresh dashboard data.
 class DashboardRefreshRequested extends DashboardEvent {
-  const DashboardRefreshRequested();
+  const DashboardRefreshRequested({this.permissions = const []});
+
+  /// List of permissions the current user has.
+  final List<String> permissions;
+
+  @override
+  List<Object?> get props => [permissions];
 }
 
 /// Event to clear error.

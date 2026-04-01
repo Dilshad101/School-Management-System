@@ -93,6 +93,25 @@ class UserModel extends Equatable {
     return null;
   }
 
+  /// Check if user has a specific permission.
+  bool hasPermission(String permission) {
+    // Superusers and platform admins have all permissions
+    if (isSuperuser || isPlatformAdmin) return true;
+    return permissions.contains(permission);
+  }
+
+  /// Check if user has all of the specified permissions.
+  bool hasAllPermissions(List<String> requiredPermissions) {
+    if (isSuperuser || isPlatformAdmin) return true;
+    return requiredPermissions.every((p) => permissions.contains(p));
+  }
+
+  /// Check if user has any of the specified permissions.
+  bool hasAnyPermission(List<String> requiredPermissions) {
+    if (isSuperuser || isPlatformAdmin) return true;
+    return requiredPermissions.any((p) => permissions.contains(p));
+  }
+
   factory UserModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>? ?? json;
     return UserModel(

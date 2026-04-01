@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/auth/permissions.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../models/dashboard_models.dart';
 import '../../repositories/dashboard_repository.dart';
@@ -23,37 +24,85 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
   final DashboardRepository _dashboardRepository;
 
-  /// Handles fetching all dashboard data.
+  /// Helper to check if user has permission.
+  bool _hasPermission(List<String> userPermissions, String permission) {
+    return userPermissions.contains(permission);
+  }
+
+  /// Handles fetching all dashboard data based on permissions.
   Future<void> _onFetchRequested(
     DashboardFetchRequested event,
     Emitter<DashboardState> emit,
   ) async {
     emit(state.copyWith(status: DashboardStatus.loading, clearError: true));
 
-    try {
-      // Fetch all data in parallel
-      final results = await Future.wait([
-        _dashboardRepository.getStudentEmployeeCount(),
-        _dashboardRepository.getPendingFees(),
-        _dashboardRepository.getLastSixMonthsPayments(),
-        // TODO: Uncomment when API is ready
-        // _dashboardRepository.getTimetable(),
-        // _dashboardRepository.getRecentlyPaid(),
-      ]);
+    final permissions = event.permissions;
 
-      // Get mock data for timetable and recently paid
-      final mockTimetable = _getMockTimetable();
-      final mockRecentlyPaid = _getMockRecentlyPaid();
+    try {
+      // Prepare futures based on permissions
+      final futures = <Future<dynamic>>[];
+      final futureKeys = <String>[];
+
+      // Student/Employee count - requires view_student OR view_user
+      if (_hasPermission(permissions, Permissions.viewStudent) ||
+          _hasPermission(permissions, Permissions.viewUser)) {
+        futures.add(_dashboardRepository.getStudentEmployeeCount());
+        futureKeys.add('studentEmployeeCount');
+      }
+
+      // Pending fees - requires view_fee
+      if (_hasPermission(permissions, Permissions.viewReports)) {
+        futures.add(_dashboardRepository.getPendingFees());
+        futures.add(_dashboardRepository.getLastSixMonthsPayments());
+        futureKeys.add('lastSixMonthsPayments');
+        futureKeys.add('pendingFees');
+      }
+
+      // TODO: Uncomment when API is ready
+      // Timetable - requires view_timetable
+      // if (_hasPermission(permissions, Permissions.viewTimetable)) {
+      //   futures.add(_dashboardRepository.getTimetable());
+      //   futureKeys.add('timetable');
+      // }
+
+      // Recently paid - requires view_fee OR view_student_fee_history
+      // if (_hasPermission(permissions, Permissions.viewFee) ||
+      //     _hasPermission(permissions, Permissions.viewStudentFeeHistory)) {
+      //   futures.add(_dashboardRepository.getRecentlyPaid());
+      //   futureKeys.add('recentlyPaid');
+      // }
+
+      // Fetch all permitted data in parallel
+      final results = await Future.wait(futures);
+
+      // Map results to their keys
+      final resultMap = <String, dynamic>{};
+      for (var i = 0; i < futureKeys.length; i++) {
+        resultMap[futureKeys[i]] = results[i];
+      }
+
+      // Get mock data for timetable and recently paid (TODO: Remove when API ready)
+      DashboardTimetable? mockTimetable;
+      DashboardRecentlyPaid? mockRecentlyPaid;
+
+      if (_hasPermission(permissions, Permissions.viewTimetable) ||
+          _hasPermission(permissions, Permissions.viewTeacherTimetable)) {
+        mockTimetable = _getMockTimetable();
+      }
+
+      if (_hasPermission(permissions, Permissions.viewFee) ||
+          _hasPermission(permissions, Permissions.viewStudentFeeHistory)) {
+        mockRecentlyPaid = _getMockRecentlyPaid();
+      }
 
       emit(
         state.copyWith(
           status: DashboardStatus.success,
-          studentEmployeeCount: results[0] as dynamic,
-          pendingFees: results[1] as dynamic,
-          lastSixMonthsPayments: results[2] as dynamic,
-          // TODO: Replace with API data when ready
-          // timetable: results[3] as DashboardTimetable,
-          // recentlyPaid: results[4] as DashboardRecentlyPaid,
+          studentEmployeeCount:
+              resultMap['studentEmployeeCount'] as StudentEmployeeCount?,
+          pendingFees: resultMap['pendingFees'] as PendingFees?,
+          lastSixMonthsPayments:
+              resultMap['lastSixMonthsPayments'] as LastSixMonthsPayments?,
           timetable: mockTimetable,
           recentlyPaid: mockRecentlyPaid,
         ),
@@ -72,37 +121,65 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     }
   }
 
-  /// Handles refreshing dashboard data.
+  /// Handles refreshing dashboard data based on permissions.
   Future<void> _onRefreshRequested(
     DashboardRefreshRequested event,
     Emitter<DashboardState> emit,
   ) async {
-    // Don't show loading indicator for refresh, just refetch
-    try {
-      final results = await Future.wait([
-        _dashboardRepository.getStudentEmployeeCount(),
-        _dashboardRepository.getPendingFees(),
-        _dashboardRepository.getLastSixMonthsPayments(),
-        // TODO: Uncomment when API is ready
-        // _dashboardRepository.getTimetable(),
-        // _dashboardRepository.getRecentlyPaid(),
-      ]);
+    final permissions = event.permissions;
 
-      // Get mock data for timetable and recently paid
-      final mockTimetable = _getMockTimetable();
-      final mockRecentlyPaid = _getMockRecentlyPaid();
+    try {
+      // Prepare futures based on permissions
+      final futures = <Future<dynamic>>[];
+      final futureKeys = <String>[];
+
+      if (_hasPermission(permissions, Permissions.viewStudent) ||
+          _hasPermission(permissions, Permissions.viewUser)) {
+        futures.add(_dashboardRepository.getStudentEmployeeCount());
+        futureKeys.add('studentEmployeeCount');
+      }
+
+      if (_hasPermission(permissions, Permissions.viewReports)) {
+        futures.add(_dashboardRepository.getPendingFees());
+        futures.add(_dashboardRepository.getLastSixMonthsPayments());
+        futureKeys.add('lastSixMonthsPayments');
+        futureKeys.add('pendingFees');
+      }
+
+      final results = await Future.wait(futures);
+
+      final resultMap = <String, dynamic>{};
+      for (var i = 0; i < futureKeys.length; i++) {
+        resultMap[futureKeys[i]] = results[i];
+      }
+
+      // Get mock data (TODO: Remove when API ready)
+      DashboardTimetable? mockTimetable;
+      DashboardRecentlyPaid? mockRecentlyPaid;
+
+      if (_hasPermission(permissions, Permissions.viewTimetable) ||
+          _hasPermission(permissions, Permissions.viewTeacherTimetable)) {
+        mockTimetable = _getMockTimetable();
+      }
+
+      if (_hasPermission(permissions, Permissions.viewFee) ||
+          _hasPermission(permissions, Permissions.viewStudentFeeHistory)) {
+        mockRecentlyPaid = _getMockRecentlyPaid();
+      }
 
       emit(
         state.copyWith(
           status: DashboardStatus.success,
-          studentEmployeeCount: results[0] as dynamic,
-          pendingFees: results[1] as dynamic,
-          lastSixMonthsPayments: results[2] as dynamic,
-          // TODO: Replace with API data when ready
-          // timetable: results[3] as DashboardTimetable,
-          // recentlyPaid: results[4] as DashboardRecentlyPaid,
-          timetable: mockTimetable,
-          recentlyPaid: mockRecentlyPaid,
+          studentEmployeeCount:
+              resultMap['studentEmployeeCount'] as StudentEmployeeCount? ??
+              state.studentEmployeeCount,
+          pendingFees:
+              resultMap['pendingFees'] as PendingFees? ?? state.pendingFees,
+          lastSixMonthsPayments:
+              resultMap['lastSixMonthsPayments'] as LastSixMonthsPayments? ??
+              state.lastSixMonthsPayments,
+          timetable: mockTimetable ?? state.timetable,
+          recentlyPaid: mockRecentlyPaid ?? state.recentlyPaid,
           clearError: true,
         ),
       );

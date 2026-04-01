@@ -22,6 +22,14 @@ class UserState extends Equatable {
   bool get isFailure => status == UserStatus.failure;
   bool get hasUser => user != null;
 
+  /// Permission helpers - delegate to user model
+  bool hasPermission(String permission) =>
+      user?.hasPermission(permission) ?? false;
+  bool hasAllPermissions(List<String> permissions) =>
+      user?.hasAllPermissions(permissions) ?? false;
+  bool hasAnyPermission(List<String> permissions) =>
+      user?.hasAnyPermission(permissions) ?? false;
+
   UserState copyWith({
     UserStatus? status,
     UserModel? user,
