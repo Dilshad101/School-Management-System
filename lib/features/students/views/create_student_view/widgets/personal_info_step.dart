@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
 import 'package:school_management_system/core/utils/validations.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/dropdowns/bottom_sheet_dropdown.dart';
@@ -183,6 +184,7 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
               label: 'Class',
               hint: 'Select class',
               items: widget.classRooms,
+              permission: Permissions.viewClassroom,
               value: widget.selectedClassRoom,
               onChanged: widget.onClassRoomChanged,
               itemLabelBuilder: (item) => item.name,
@@ -212,6 +214,7 @@ class _PersonalInfoStepState extends State<PersonalInfoStep> {
             BottomSheetDropdown<AcademicYearModel>(
               label: 'Academic Year',
               hint: 'Select academic year',
+              permission: Permissions.viewAcademicYear,
               items: widget.academicYears,
               value: widget.selectedAcademicYear,
               onChanged: widget.onAcademicYearChanged,

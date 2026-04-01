@@ -157,35 +157,35 @@ class _DefaultAvatar extends StatelessWidget {
   }
 }
 
-class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
+// class _ActionButton extends StatelessWidget {
+//   const _ActionButton({
+//     required this.icon,
+//     required this.label,
+//     required this.color,
+//     required this.onTap,
+//   });
 
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
+//   final IconData icon;
+//   final String label;
+//   final Color color;
+//   final VoidCallback onTap;
 
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16, color: color),
-            const SizedBox(width: 4),
-            Text(label, style: AppTextStyles.bodySmall.copyWith(color: color)),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return InkWell(
+//       onTap: onTap,
+//       borderRadius: BorderRadius.circular(8),
+//       child: Padding(
+//         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+//         child: Row(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Icon(icon, size: 16, color: color),
+//             const SizedBox(width: 4),
+//             Text(label, style: AppTextStyles.bodySmall.copyWith(color: color)),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

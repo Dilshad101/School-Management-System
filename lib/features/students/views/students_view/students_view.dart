@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
 import 'package:school_management_system/core/utils/helpers.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 import 'package:school_management_system/features/students/views/students_view/widgets/student_tile.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
@@ -279,16 +281,19 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
           ],
         ),
       ),
-      floatingActionButton: MyFloatingActionButton(
-        onPressed: () async {
-          final result = await context.push<bool>(Routes.createStudent);
-          if (result == true && context.mounted) {
-            context.read<StudentsBloc>().add(
-              const StudentsFetchRequested(refresh: true),
-            );
-          }
-        },
-      ),
+      floatingActionButton:
+          context.read<UserBloc>().state.hasPermission(Permissions.addStudent)
+          ? MyFloatingActionButton(
+              onPressed: () async {
+                final result = await context.push<bool>(Routes.createStudent);
+                if (result == true && context.mounted) {
+                  context.read<StudentsBloc>().add(
+                    const StudentsFetchRequested(refresh: true),
+                  );
+                }
+              },
+            )
+          : null,
     );
   }
 
