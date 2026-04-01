@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
+import 'package:school_management_system/shared/widgets/permission_builder/no_permission_field.dart';
 
 /// A reusable suggestion form field with autocomplete functionality
 /// using flutter_typeahead package. Matches the design of CustomFormField
@@ -37,6 +40,7 @@ class SuggestionFormField<T> extends StatelessWidget {
     this.scrollController,
     this.noItemsFoundBuilder,
     this.hideKeyboardOnDrag = false,
+    this.permission,
   });
 
   // Core fields
@@ -78,8 +82,14 @@ class SuggestionFormField<T> extends StatelessWidget {
   final ScrollController? scrollController;
   final bool hideKeyboardOnDrag;
 
+  /// permission
+  final String? permission;
+
   @override
   Widget build(BuildContext context) {
+    final hasPermission = permission != null
+        ? context.read<UserBloc>().state.hasPermission(permission!)
+        : false;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -100,142 +110,145 @@ class SuggestionFormField<T> extends StatelessWidget {
         const SizedBox(height: 8),
 
         // TypeAheadField
-        TypeAheadField<T>(
-          controller: controller,
-          hideOnEmpty: hideOnEmpty,
-          hideOnLoading: hideOnLoading,
-          hideOnError: hideOnError,
-          debounceDuration: debounceDuration,
-          animationDuration: animationDuration,
-          scrollController: scrollController,
-          hideKeyboardOnDrag: hideKeyboardOnDrag,
+        if (hasPermission == true)
+          TypeAheadField<T>(
+            controller: controller,
+            hideOnEmpty: hideOnEmpty,
+            hideOnLoading: hideOnLoading,
+            hideOnError: hideOnError,
+            debounceDuration: debounceDuration,
+            animationDuration: animationDuration,
+            scrollController: scrollController,
+            hideKeyboardOnDrag: hideKeyboardOnDrag,
 
-          // Suggestions configuration
-          suggestionsCallback: (pattern) async {
-            if (pattern.length < minCharsForSuggestions) {
-              return [];
-            }
-            return await suggestionsCallback(pattern);
-          },
+            // Suggestions configuration
+            suggestionsCallback: (pattern) async {
+              if (pattern.length < minCharsForSuggestions) {
+                return [];
+              }
+              return await suggestionsCallback(pattern);
+            },
 
-          // Item builder
-          itemBuilder: itemBuilder,
+            // Item builder
+            itemBuilder: itemBuilder,
 
-          // Separator builder (optional)
-          itemSeparatorBuilder: itemSeparatorBuilder,
+            // Separator builder (optional)
+            itemSeparatorBuilder: itemSeparatorBuilder,
 
-          // On selection
-          onSelected: onSelected,
+            // On selection
+            onSelected: onSelected,
 
-          // Builder customizations
-          emptyBuilder: emptyBuilder ?? _defaultEmptyBuilder,
-          errorBuilder: errorBuilder ?? _defaultErrorBuilder,
-          loadingBuilder: loadingBuilder ?? _defaultLoadingBuilder,
+            // Builder customizations
+            emptyBuilder: emptyBuilder ?? _defaultEmptyBuilder,
+            errorBuilder: errorBuilder ?? _defaultErrorBuilder,
+            loadingBuilder: loadingBuilder ?? _defaultLoadingBuilder,
 
-          // Suggestions box decoration
-          decorationBuilder: (context, child) {
-            return Material(
-              elevation: 4,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                decoration:
-                    suggestionsBoxDecoration ??
-                    BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border, width: 1),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+            // Suggestions box decoration
+            decorationBuilder: (context, child) {
+              return Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  decoration:
+                      suggestionsBoxDecoration ??
+                      BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.border, width: 1),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                  child: child,
+                ),
+              );
+            },
+
+            // Text field builder
+            builder: (context, controller, focusNode) {
+              return TextFormField(
+                controller: controller,
+                focusNode: focusNode,
+                keyboardType: keyboardType,
+                enabled: enabled,
+                maxLines: maxLines,
+                style: AppTextStyles.bodyMedium,
+                autovalidateMode: autovalidateMode,
+                onChanged: onChanged,
+                decoration: InputDecoration(
+                  hintText: hint,
+                  hintStyle: AppTextStyles.hint,
+                  prefixIcon: prefixIcon != null
+                      ? IconTheme(
+                          data: const IconThemeData(
+                            color: AppColors.iconDefault,
+                            size: 20,
+                          ),
+                          child: prefixIcon!,
+                        )
+                      : null,
+                  suffixIcon: suffixIcon != null
+                      ? IconTheme(
+                          data: const IconThemeData(
+                            color: AppColors.iconDefault,
+                            size: 20,
+                          ),
+                          child: suffixIcon!,
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: AppColors.cardBackground,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: prefixIcon == null ? 16 : 12,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.border,
+                      width: 1,
                     ),
-                child: child,
-              ),
-            );
-          },
-
-          // Text field builder
-          builder: (context, controller, focusNode) {
-            return TextFormField(
-              controller: controller,
-              focusNode: focusNode,
-              keyboardType: keyboardType,
-              enabled: enabled,
-              maxLines: maxLines,
-              style: AppTextStyles.bodyMedium,
-              autovalidateMode: autovalidateMode,
-              onChanged: onChanged,
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: AppTextStyles.hint,
-                prefixIcon: prefixIcon != null
-                    ? IconTheme(
-                        data: const IconThemeData(
-                          color: AppColors.iconDefault,
-                          size: 20,
-                        ),
-                        child: prefixIcon!,
-                      )
-                    : null,
-                suffixIcon: suffixIcon != null
-                    ? IconTheme(
-                        data: const IconThemeData(
-                          color: AppColors.iconDefault,
-                          size: 20,
-                        ),
-                        child: suffixIcon!,
-                      )
-                    : null,
-                filled: true,
-                fillColor: AppColors.cardBackground,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: prefixIcon == null ? 16 : 12,
-                  vertical: 14,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.border,
-                    width: 1,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.border,
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: AppColors.border.withAlpha(100),
+                      width: 1,
+                    ),
                   ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.border,
-                    width: 1,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.primary,
-                    width: 1.5,
-                  ),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red, width: 1),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red, width: 1.5),
-                ),
-                disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: AppColors.border.withAlpha(100),
-                    width: 1,
-                  ),
-                ),
-              ),
-              validator: validator,
-            );
-          },
-        ),
+                validator: validator,
+              );
+            },
+          )
+        else
+          NoPermissionField(icon: Icons.text_fields, label: label),
       ],
     );
   }
