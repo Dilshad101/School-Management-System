@@ -8,7 +8,6 @@ import '../../../shared/widgets/permission_builder/permission_builder.dart';
 import '../../auth/blocs/user/user_bloc.dart';
 import '../blocs/dashboard/dashboard_bloc.dart';
 import '../repositories/dashboard_repository.dart';
-import 'widgets/admission_tile.dart';
 import 'widgets/attendance_chart.dart';
 import 'widgets/dashboard_header.dart';
 import 'widgets/dashboard_summary_card.dart';
@@ -286,46 +285,46 @@ class _DashboardContent extends StatelessWidget {
                                 ),
                               ),
                               // New Admissions Status
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'New Admissions Status',
-                                    style: AppTextStyles.bodyLarge.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {},
-                                    child: Text(
-                                      'View All',
-                                      style: AppTextStyles.bodySmall.copyWith(
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              // Admission tiles
-                              const AdmissionTile(
-                                studentName: 'Priya',
-                                className: '8 A',
-                                studentId: 'ID 64452',
-                                status: AdmissionStatus.pending,
-                              ),
-                              const AdmissionTile(
-                                studentName: 'Priya',
-                                className: '8 A',
-                                studentId: 'ID 64452',
-                                status: AdmissionStatus.pending,
-                              ),
-                              const AdmissionTile(
-                                studentName: 'Priya',
-                                className: '8 A',
-                                studentId: 'ID 64452',
-                                status: AdmissionStatus.approved,
-                              ),
+                              // Row(
+                              //   mainAxisAlignment:
+                              //       MainAxisAlignment.spaceBetween,
+                              //   children: [
+                              //     Text(
+                              //       'New Admissions Status',
+                              //       style: AppTextStyles.bodyLarge.copyWith(
+                              //         fontWeight: FontWeight.w600,
+                              //       ),
+                              //     ),
+                              //     TextButton(
+                              //       onPressed: () {},
+                              //       child: Text(
+                              //         'View All',
+                              //         style: AppTextStyles.bodySmall.copyWith(
+                              //           color: AppColors.textSecondary,
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
+                              // // Admission tiles
+                              // const AdmissionTile(
+                              //   studentName: 'Priya',
+                              //   className: '8 A',
+                              //   studentId: 'ID 64452',
+                              //   status: AdmissionStatus.pending,
+                              // ),
+                              // const AdmissionTile(
+                              //   studentName: 'Priya',
+                              //   className: '8 A',
+                              //   studentId: 'ID 64452',
+                              //   status: AdmissionStatus.pending,
+                              // ),
+                              // const AdmissionTile(
+                              //   studentName: 'Priya',
+                              //   className: '8 A',
+                              //   studentId: 'ID 64452',
+                              //   status: AdmissionStatus.approved,
+                              // ),
                               const SizedBox(height: 16),
                             ],
                           ),
@@ -345,6 +344,10 @@ class _DashboardContent extends StatelessWidget {
   Widget _buildFeeCollectionChart(DashboardState state) {
     if (state.isLoading) {
       return const FeeCollectionChart(isLoading: true);
+    }
+
+    if (state.hasError) {
+      return const FeeCollectionChart(hasError: true);
     }
 
     final payments = state.lastSixMonthsPayments;

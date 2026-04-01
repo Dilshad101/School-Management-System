@@ -19,22 +19,20 @@ class FeeCollectionData {
 }
 
 class FeeCollectionChart extends StatelessWidget {
-  const FeeCollectionChart({super.key, this.data, this.isLoading = false});
+  const FeeCollectionChart({
+    super.key,
+    this.data,
+    this.isLoading = false,
+    this.hasError = false,
+  });
 
   final List<FeeCollectionData>? data;
   final bool isLoading;
+  final bool hasError;
 
-  // Default sample data
-  static const List<FeeCollectionData> _defaultData = [
-    FeeCollectionData(month: 'Jan', bankAmount: 60000, cashAmount: 40000),
-    FeeCollectionData(month: 'Feb', bankAmount: 72000, cashAmount: 48000),
-    FeeCollectionData(month: 'Mar', bankAmount: 102000, cashAmount: 84000),
-    FeeCollectionData(month: 'Apr', bankAmount: 90000, cashAmount: 66000),
-    FeeCollectionData(month: 'May', bankAmount: 72000, cashAmount: 54000),
-    FeeCollectionData(month: 'Jun', bankAmount: 84000, cashAmount: 60000),
-  ];
+  List<FeeCollectionData> get _chartData => data ?? [];
 
-  List<FeeCollectionData> get _chartData => data ?? _defaultData;
+  bool get _hasData => data != null && data!.isNotEmpty;
 
   double get _totalBank =>
       _chartData.fold(0, (sum, item) => sum + item.bankAmount);
@@ -100,7 +98,13 @@ class FeeCollectionChart extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: isLoading ? _buildLoadingState() : _buildChartContent(),
+      child: isLoading
+          ? _buildLoadingState()
+          : hasError
+          ? _buildErrorState()
+          : !_hasData
+          ? _buildEmptyState()
+          : _buildChartContent(),
     );
   }
 
@@ -108,6 +112,56 @@ class FeeCollectionChart extends StatelessWidget {
     return const SizedBox(
       height: 220,
       child: Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return SizedBox(
+      height: 220,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppColors.borderError.withAlpha(150),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Failed to load fee collection data',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return SizedBox(
+      height: 220,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.bar_chart_outlined,
+              size: 48,
+              color: AppColors.textSecondary.withAlpha(100),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'No fee collection data available',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
