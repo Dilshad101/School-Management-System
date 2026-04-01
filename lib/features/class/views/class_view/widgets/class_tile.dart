@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
 import 'package:school_management_system/core/router/route_paths.dart';
 import 'package:school_management_system/core/utils/helpers.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 import 'package:school_management_system/features/class/models/classroom_model.dart';
 import 'package:school_management_system/shared/widgets/buttons/micro_delete_button.dart';
 import 'package:school_management_system/shared/widgets/buttons/micro_edit_button.dart';
@@ -29,6 +31,7 @@ class ClassTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final teacherName = classroom.classTeacherDetails?.name ?? 'Not assigned';
+    final hasPermission = context.read<UserBloc>().state.hasPermission;
 
     return InkWell(
       onTap: () {
@@ -113,27 +116,29 @@ class ClassTile extends StatelessWidget {
                 if (daysLeft != null && !hasTimetable) _buildDaysLeftBadge(),
                 // else
                 // _buildManageTimetableButton(),
-                MicroEditButton(
-                  onTap: () {
-                    log(classroom.id);
-                    context.push(Routes.editClass, extra: classroom.id);
-                  },
-                ),
-                MicroDeleteButton(
-                  onTap: () {
-                    Helpers.showWarningBottomSheet(
-                      context,
-                      title: 'Delete Class',
-                      message: 'Are you sure you want to delete this class?',
-                      confirmText: 'Delete',
-                      onConfirm: () {
-                        context.read<ClassroomBloc>().add(
-                          DeleteClassroom(classroom.id),
-                        );
-                      },
-                    );
-                  },
-                ),
+                if (hasPermission(Permissions.changeClassroom))
+                  MicroEditButton(
+                    onTap: () {
+                      log(classroom.id);
+                      context.push(Routes.editClass, extra: classroom.id);
+                    },
+                  ),
+                if (hasPermission(Permissions.deleteClassroom))
+                  MicroDeleteButton(
+                    onTap: () {
+                      Helpers.showWarningBottomSheet(
+                        context,
+                        title: 'Delete Class',
+                        message: 'Are you sure you want to delete this class?',
+                        confirmText: 'Delete',
+                        onConfirm: () {
+                          context.read<ClassroomBloc>().add(
+                            DeleteClassroom(classroom.id),
+                          );
+                        },
+                      );
+                    },
+                  ),
               ],
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/input_fields/simple_form_field.dart';
 import 'package:school_management_system/shared/widgets/input_fields/suggestion_form_field.dart';
@@ -136,6 +137,7 @@ class _ClassDetailsStepState extends State<ClassDetailsStep> {
               controller: _academicYearController,
               label: 'Academic Year',
               hint: 'Search academic year',
+              permission: Permissions.viewAcademicYear,
               isRequired: true,
               suggestionsCallback: widget.searchAcademicYears,
               itemBuilder: (context, academicYear) {
@@ -193,6 +195,7 @@ class _ClassDetailsStepState extends State<ClassDetailsStep> {
             SuggestionFormField<SchoolUserModel>(
               controller: _classTeacherController,
               label: 'Class Teacher',
+              permission: Permissions.viewUser,
               hint: 'Search teacher by name or email',
               isRequired: true,
               suggestionsCallback: widget.searchSchoolUsers,
