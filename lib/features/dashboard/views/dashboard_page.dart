@@ -269,12 +269,9 @@ class _DashboardContent extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              // Recently Paid Section - requires view_fee or view_student_fee_history
+                              // Recently Paid Section - requires view_reports
                               PermissionBuilder(
-                                permissions: [
-                                  Permissions.viewFee,
-                                  Permissions.viewStudentFeeHistory,
-                                ],
+                                permission: Permissions.viewReports,
                                 child: Column(
                                   children: [
                                     RecentlyPaidSection(

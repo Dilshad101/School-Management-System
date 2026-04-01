@@ -40,21 +40,21 @@ class TimetableSection extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              TextButton(
-                onPressed: onViewAll,
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: const Size(0, 0),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'View All',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+              // TextButton(
+              //   onPressed: onViewAll,
+              //   style: TextButton.styleFrom(
+              //     padding: EdgeInsets.zero,
+              //     minimumSize: const Size(0, 0),
+              //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              //   ),
+              //   child: Text(
+              //     'View All',
+              //     style: AppTextStyles.bodySmall.copyWith(
+              //       color: AppColors.primary,
+              //       fontWeight: FontWeight.w500,
+              //     ),
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 16),

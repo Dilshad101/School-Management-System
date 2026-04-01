@@ -474,35 +474,29 @@ class RecentlyPaidFee extends Equatable {
     required this.id,
     required this.studentName,
     required this.className,
-    required this.studentId,
     required this.totalFees,
     required this.paidAmount,
     required this.dueAmount,
     required this.paymentMethod,
-    required this.paidAt,
   });
 
   final String id;
   final String studentName;
   final String className;
-  final String studentId;
   final double totalFees;
   final double paidAmount;
   final double dueAmount;
   final PaymentMethod paymentMethod;
-  final DateTime paidAt;
 
   factory RecentlyPaidFee.fromJson(Map<String, dynamic> json) {
     return RecentlyPaidFee(
       id: json['id']?.toString() ?? '',
       studentName: json['student_name'] ?? '',
-      className: json['class_name'] ?? '',
-      studentId: json['student_id'] ?? '',
-      totalFees: (json['total_fees'] as num?)?.toDouble() ?? 0.0,
-      paidAmount: (json['paid_amount'] as num?)?.toDouble() ?? 0.0,
-      dueAmount: (json['due_amount'] as num?)?.toDouble() ?? 0.0,
-      paymentMethod: _parsePaymentMethod(json['payment_method']),
-      paidAt: DateTime.tryParse(json['paid_at'] ?? '') ?? DateTime.now(),
+      className: json['class'] ?? '',
+      totalFees: (json['total_fee'] as num?)?.toDouble() ?? 0.0,
+      paidAmount: (json['paid'] as num?)?.toDouble() ?? 0.0,
+      dueAmount: (json['dues'] as num?)?.toDouble() ?? 0.0,
+      paymentMethod: _parsePaymentMethod(json['method']),
     );
   }
 
@@ -536,19 +530,17 @@ class RecentlyPaidFee extends Equatable {
 
   String get formattedTotalFees => '₹${totalFees.toStringAsFixed(0)}';
   String get formattedPaidAmount => '₹${paidAmount.toStringAsFixed(0)}';
-  String get formattedDueAmount => '₹${dueAmount.toStringAsFixed(0)}';
+  String get formattedDueAmount => '₹${dueAmount.abs().toStringAsFixed(0)}';
 
   @override
   List<Object?> get props => [
     id,
     studentName,
     className,
-    studentId,
     totalFees,
     paidAmount,
     dueAmount,
     paymentMethod,
-    paidAt,
   ];
 }
 
@@ -558,10 +550,9 @@ class DashboardRecentlyPaid extends Equatable {
 
   final List<RecentlyPaidFee> payments;
 
-  factory DashboardRecentlyPaid.fromJson(Map<String, dynamic> json) {
-    final paymentsJson = json['payments'] as List<dynamic>? ?? [];
+  factory DashboardRecentlyPaid.fromJson(List<dynamic> json) {
     return DashboardRecentlyPaid(
-      payments: paymentsJson
+      payments: json
           .map((e) => RecentlyPaidFee.fromJson(e as Map<String, dynamic>))
           .toList(),
     );

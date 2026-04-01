@@ -31,20 +31,20 @@ class RecentlyPaidSection extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            TextButton(
-              onPressed: onViewAll,
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: const Size(0, 0),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                'View All',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
+            // TextButton(
+            //   onPressed: onViewAll,
+            //   style: TextButton.styleFrom(
+            //     padding: EdgeInsets.zero,
+            //     minimumSize: const Size(0, 0),
+            //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            //   ),
+            //   child: Text(
+            //     'View All',
+            //     style: AppTextStyles.bodySmall.copyWith(
+            //       color: AppColors.textSecondary,
+            //     ),
+            //   ),
+            // ),
           ],
         ),
         const SizedBox(height: 12),
@@ -149,29 +149,12 @@ class RecentlyPaidTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Text(
-                          payment.className,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 1,
-                          height: 12,
-                          color: AppColors.border,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          payment.studentId,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      payment.className,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
