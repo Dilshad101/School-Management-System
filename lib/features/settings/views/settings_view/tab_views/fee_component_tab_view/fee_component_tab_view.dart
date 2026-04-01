@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
+import 'package:school_management_system/shared/widgets/permission_builder.dart';
 
 import '../../../../../../core/utils/di.dart';
 import '../../../../../../shared/styles/app_styles.dart';
@@ -186,11 +188,14 @@ class _FeeComponentTabViewContentState
   }
 
   Widget _buildBottomBar(FeeComponentState state) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-        child: _AddFeeComponentButton(
-          onTap: state.isActionLoading ? null : _onAddFeeComponent,
+    return PermissionBuilder(
+      permission: Permissions.changeFee,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+          child: _AddFeeComponentButton(
+            onTap: state.isActionLoading ? null : _onAddFeeComponent,
+          ),
         ),
       ),
     );

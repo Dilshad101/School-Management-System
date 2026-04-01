@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 
 import '../../../../../../../shared/styles/app_styles.dart';
 import '../../../../../models/fee_structure_model.dart';
@@ -65,38 +68,41 @@ class FeeStructureCard extends StatelessWidget {
           ),
 
           // Action Icons
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Edit Icon
-              InkWell(
-                onTap: onEdit,
-                borderRadius: BorderRadius.circular(8),
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Icon(
-                    Icons.edit_outlined,
-                    size: 20,
-                    color: AppColors.textSecondary,
+          if (context.read<UserBloc>().state.hasPermission(
+            Permissions.changeFee,
+          ))
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Edit Icon
+                InkWell(
+                  onTap: onEdit,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      Icons.edit_outlined,
+                      size: 20,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // Delete Icon
-              InkWell(
-                onTap: onDelete,
-                borderRadius: BorderRadius.circular(8),
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Icon(
-                    Icons.delete_outline,
-                    size: 20,
-                    color: AppColors.borderError,
+                const SizedBox(width: 8),
+                // Delete Icon
+                InkWell(
+                  onTap: onDelete,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      Icons.delete_outline,
+                      size: 20,
+                      color: AppColors.borderError,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
     );
