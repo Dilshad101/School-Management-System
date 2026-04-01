@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
 import 'package:school_management_system/core/utils/helpers.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 import 'package:school_management_system/features/guardians/blocs/blocs.dart';
 import 'package:school_management_system/features/guardians/view/widgets/guardian_tile.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
@@ -9,7 +11,6 @@ import 'package:school_management_system/shared/widgets/buttons/floating_action_
 
 import '../../../core/router/route_paths.dart';
 import '../../../core/utils/di.dart';
-import '../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../shared/widgets/input_fields/search_field.dart';
 import '../models/guardian_model.dart';
 import '../repositories/guardians_repository.dart';
@@ -36,21 +37,21 @@ class _GuardianViewContent extends StatefulWidget {
 }
 
 class _GuardianViewContentState extends State<_GuardianViewContent> {
-  final _classes = const ['Class 1', 'Class 2', 'Class 3'];
-  final _divisions = const ['Division A', 'Division B', 'Division C'];
+  // final _classes = const ['Class 1', 'Class 2', 'Class 3'];
+  // final _divisions = const ['Division A', 'Division B', 'Division C'];
 
-  String? _selectedClass;
-  String? _selectedDivision;
+  // String? _selectedClass;
+  // String? _selectedDivision;
 
-  late ValueNotifier<bool> _allSelectedNotifier;
+  // late ValueNotifier<bool> _allSelectedNotifier;
   late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    _selectedClass = _classes.isNotEmpty ? _classes.first : null;
-    _selectedDivision = _divisions.isNotEmpty ? _divisions.first : null;
-    _allSelectedNotifier = ValueNotifier<bool>(true);
+    // _selectedClass = _classes.isNotEmpty ? _classes.first : null;
+    // _selectedDivision = _divisions.isNotEmpty ? _divisions.first : null;
+    // _allSelectedNotifier = ValueNotifier<bool>(true);
     _scrollController = ScrollController();
 
     // Add scroll listener for pagination
@@ -72,7 +73,7 @@ class _GuardianViewContentState extends State<_GuardianViewContent> {
 
   @override
   void dispose() {
-    _allSelectedNotifier.dispose();
+    // _allSelectedNotifier.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -138,46 +139,46 @@ class _GuardianViewContentState extends State<_GuardianViewContent> {
                   },
                 ),
 
-                const SizedBox(height: 10),
+                // const SizedBox(height: 10),
 
-                // filter and sort options
-                ValueListenableBuilder(
-                  valueListenable: _allSelectedNotifier,
-                  builder: (context, value, child) {
-                    return Row(
-                      spacing: 8,
-                      children: [
-                        _buildAllChip(value),
-                        FilterDropdown<String>(
-                          items: _classes,
-                          value: _selectedClass,
-                          onChanged: (value) {
-                            if (value == null) return;
-                            _selectedClass = value;
-                            _allSelectedNotifier.value = false;
-                            context.read<GuardiansBloc>().add(
-                              GuardiansClassFilterChanged(classId: value),
-                            );
-                          },
-                          hintText: 'Class',
-                        ),
-                        FilterDropdown<String>(
-                          items: _divisions,
-                          value: _selectedDivision,
-                          onChanged: (value) {
-                            if (value == null) return;
-                            _selectedDivision = value;
-                            _allSelectedNotifier.value = false;
-                            context.read<GuardiansBloc>().add(
-                              GuardiansDivisionFilterChanged(divisionId: value),
-                            );
-                          },
-                          hintText: 'Division',
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                // // filter and sort options
+                // ValueListenableBuilder(
+                //   valueListenable: _allSelectedNotifier,
+                //   builder: (context, value, child) {
+                //     return Row(
+                //       spacing: 8,
+                //       children: [
+                //         _buildAllChip(value),
+                //         FilterDropdown<String>(
+                //           items: _classes,
+                //           value: _selectedClass,
+                //           onChanged: (value) {
+                //             if (value == null) return;
+                //             _selectedClass = value;
+                //             _allSelectedNotifier.value = false;
+                //             context.read<GuardiansBloc>().add(
+                //               GuardiansClassFilterChanged(classId: value),
+                //             );
+                //           },
+                //           hintText: 'Class',
+                //         ),
+                //         FilterDropdown<String>(
+                //           items: _divisions,
+                //           value: _selectedDivision,
+                //           onChanged: (value) {
+                //             if (value == null) return;
+                //             _selectedDivision = value;
+                //             _allSelectedNotifier.value = false;
+                //             context.read<GuardiansBloc>().add(
+                //               GuardiansDivisionFilterChanged(divisionId: value),
+                //             );
+                //           },
+                //           hintText: 'Division',
+                //         ),
+                //       ],
+                //     );
+                //   },
+                // ),
                 const SizedBox(height: 16),
 
                 // Content based on state
@@ -187,9 +188,10 @@ class _GuardianViewContentState extends State<_GuardianViewContent> {
           );
         },
       ),
-      floatingActionButton: MyFloatingActionButton(
-        onPressed: _navigateToAddGuardian,
-      ),
+      floatingActionButton:
+          context.read<UserBloc>().state.hasPermission(Permissions.addGuardian)
+          ? MyFloatingActionButton(onPressed: _navigateToAddGuardian)
+          : null,
     );
   }
 
@@ -344,28 +346,28 @@ class _GuardianViewContentState extends State<_GuardianViewContent> {
     );
   }
 
-  Widget _buildAllChip(bool isSelected) {
-    return InkWell(
-      onTap: () {
-        _allSelectedNotifier.value = true;
-        context.read<GuardiansBloc>().add(const GuardiansFiltersCleared());
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? null
-              : Border.all(color: AppColors.border.withAlpha(180)),
-        ),
-        child: Text(
-          'All',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: isSelected ? Colors.white : AppColors.textPrimary,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildAllChip(bool isSelected) {
+  //   return InkWell(
+  //     onTap: () {
+  //       _allSelectedNotifier.value = true;
+  //       context.read<GuardiansBloc>().add(const GuardiansFiltersCleared());
+  //     },
+  //     child: Container(
+  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  //       decoration: BoxDecoration(
+  //         color: isSelected ? AppColors.primary : AppColors.white,
+  //         borderRadius: BorderRadius.circular(8),
+  //         border: isSelected
+  //             ? null
+  //             : Border.all(color: AppColors.border.withAlpha(180)),
+  //       ),
+  //       child: Text(
+  //         'All',
+  //         style: AppTextStyles.bodySmall.copyWith(
+  //           color: isSelected ? Colors.white : AppColors.textPrimary,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

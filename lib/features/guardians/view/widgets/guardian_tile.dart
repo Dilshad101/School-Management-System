@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 
 import '../../../../shared/styles/app_styles.dart';
 import '../../../../shared/widgets/buttons/micro_delete_button.dart';
@@ -26,6 +29,8 @@ class GuardianTile extends StatelessWidget {
     final email = guardian?.email ?? 'N/A';
     final relation = guardian?.primaryRelation ?? 'Guardian';
     final linkedCount = guardian?.linkedStudentsCount ?? 0;
+
+    final hasPermission = context.read<UserBloc>().state.hasPermission;
 
     return InkWell(
       onTap: onTap,
@@ -160,9 +165,11 @@ class GuardianTile extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MicroDeleteButton(onTap: onDelete),
+                if (hasPermission(Permissions.deleteGuardian))
+                  MicroDeleteButton(onTap: onDelete),
                 const SizedBox(width: 8),
-                MicroEditButton(onTap: onEdit),
+                if (hasPermission(Permissions.changeGuardian))
+                  MicroEditButton(onTap: onEdit),
               ],
             ),
           ],
