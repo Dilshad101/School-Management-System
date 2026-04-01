@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
 import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/dropdowns/bottom_sheet_dropdown.dart';
+import 'package:school_management_system/shared/widgets/permission_builder.dart';
 
 import '../../../../../features/students/views/create_student_view/widgets/date_picker_field.dart';
 import '../../../../../features/students/views/create_student_view/widgets/icon_form_field.dart';
@@ -202,6 +204,7 @@ class _EmployeePersonalInfoStepState extends State<EmployeePersonalInfoStep> {
             _MultiSelectField<RoleModel>(
               label: 'Role(s)',
               hint: 'Select roles',
+              permission: Permissions.viewRole,
               icon: Icons.work_outline,
               selectedItems: widget.selectedRoles,
               itemLabelBuilder: (item) => item.name,
@@ -273,6 +276,7 @@ class _EmployeePersonalInfoStepState extends State<EmployeePersonalInfoStep> {
             _MultiSelectField<SubjectModel>(
               label: "Subject's",
               hint: 'Select subjects',
+              permission: Permissions.viewSubject,
               icon: Icons.menu_book_outlined,
               selectedItems: widget.selectedSubjects,
               itemLabelBuilder: (item) => item.name,
@@ -367,6 +371,7 @@ class _MultiSelectField<T> extends FormField<List<T>> {
     required VoidCallback onAddItem,
     required ValueChanged<T> onRemoveItem,
     String? Function(List<T>)? validator,
+    required String permission,
   }) : super(
          initialValue: selectedItems,
          validator: validator != null
@@ -386,45 +391,49 @@ class _MultiSelectField<T> extends FormField<List<T>> {
              children: [
                Text(label, style: AppTextStyles.labelMedium),
                const SizedBox(height: 8),
-               GestureDetector(
-                 onTap: onAddItem,
-                 child: Container(
-                   width: double.infinity,
-                   padding: const EdgeInsets.symmetric(
-                     horizontal: 16,
-                     vertical: 12,
-                   ),
-                   decoration: BoxDecoration(
-                     color: AppColors.cardBackground,
-                     borderRadius: BorderRadius.circular(12),
-                     border: Border.all(
-                       color: state.hasError
-                           ? AppColors.borderError
-                           : AppColors.border,
-                       width: 1,
+               PermissionBuilder(
+                 permission: permission,
+                 fallback: _NoPermissionField(icon: icon, label: label),
+                 child: GestureDetector(
+                   onTap: onAddItem,
+                   child: Container(
+                     width: double.infinity,
+                     padding: const EdgeInsets.symmetric(
+                       horizontal: 16,
+                       vertical: 12,
                      ),
-                   ),
-                   child: Row(
-                     children: [
-                       Icon(icon, color: AppColors.iconDefault, size: 20),
-                       const SizedBox(width: 12),
-                       Expanded(
-                         child: selectedItems.isEmpty
-                             ? Text(hint, style: AppTextStyles.hint)
-                             : Wrap(
-                                 spacing: 8,
-                                 runSpacing: 8,
-                                 children: selectedItems
-                                     .map(
-                                       (item) => _ItemChip(
-                                         label: itemLabelBuilder(item),
-                                         onRemove: () => onRemoveItem(item),
-                                       ),
-                                     )
-                                     .toList(),
-                               ),
+                     decoration: BoxDecoration(
+                       color: AppColors.cardBackground,
+                       borderRadius: BorderRadius.circular(12),
+                       border: Border.all(
+                         color: state.hasError
+                             ? AppColors.borderError
+                             : AppColors.border,
+                         width: 1,
                        ),
-                     ],
+                     ),
+                     child: Row(
+                       children: [
+                         Icon(icon, color: AppColors.iconDefault, size: 20),
+                         const SizedBox(width: 12),
+                         Expanded(
+                           child: selectedItems.isEmpty
+                               ? Text(hint, style: AppTextStyles.hint)
+                               : Wrap(
+                                   spacing: 8,
+                                   runSpacing: 8,
+                                   children: selectedItems
+                                       .map(
+                                         (item) => _ItemChip(
+                                           label: itemLabelBuilder(item),
+                                           onRemove: () => onRemoveItem(item),
+                                         ),
+                                       )
+                                       .toList(),
+                                 ),
+                         ),
+                       ],
+                     ),
                    ),
                  ),
                ),
@@ -708,6 +717,46 @@ class _ItemSelectorBottomSheetState<T>
                   ),
           ),
           const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
+/// A disabled field widget shown when user lacks permission.
+class _NoPermissionField extends StatelessWidget {
+  const _NoPermissionField({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border, width: 1),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.textSecondary.withAlpha(150), size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'No permission to view $label',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          Icon(
+            Icons.lock_outline,
+            color: AppColors.textSecondary.withAlpha(150),
+            size: 18,
+          ),
         ],
       ),
     );
