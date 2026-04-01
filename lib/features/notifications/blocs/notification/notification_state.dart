@@ -86,16 +86,6 @@ class NotificationState extends Equatable {
   /// Check if load failed.
   bool get isFailure => loadStatus == NotificationLoadStatus.failure;
 
-  /// Get filtered notifications based on selected filter.
-  List<NotificationModel> get filteredNotifications {
-    if (selectedFilter == NotificationAudience.all) {
-      return notifications;
-    }
-    return notifications
-        .where((n) => n.notificationType == selectedFilter)
-        .toList();
-  }
-
   /// Check if form is valid for submission.
   /// Required fields: Sent To, Title, Message
   bool get isFormValid => title.trim().isNotEmpty && message.trim().isNotEmpty;

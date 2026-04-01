@@ -96,10 +96,10 @@ class _NotificationViewContent extends StatelessWidget {
 
             // Notifications list
             Expanded(
-              child: state.filteredNotifications.isEmpty
+              child: state.notifications.isEmpty
                   ? _buildEmptyState()
                   : _NotificationsList(
-                      notifications: state.filteredNotifications,
+                      notifications: state.notifications,
                       hasMore: state.hasMore,
                       isLoadingMore: state.isLoadingMore,
                       onLoadMore: () {

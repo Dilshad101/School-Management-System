@@ -38,6 +38,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       final response = await _repository.getNotifications(
         page: 1,
         pageSize: _pageSize,
+        filter: state.selectedFilter.apiValue,
       );
 
       emit(
@@ -81,6 +82,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       final response = await _repository.getNotifications(
         page: 1,
         pageSize: _pageSize,
+        filter: state.selectedFilter.apiValue,
       );
 
       emit(
@@ -122,6 +124,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       final response = await _repository.getNotifications(
         page: nextPage,
         pageSize: _pageSize,
+        filter: state.selectedFilter.apiValue,
       );
 
       // Append new notifications to existing list.
@@ -154,9 +157,50 @@ class NotificationCubit extends Cubit<NotificationState> {
 
   // ==================== Filter ====================
 
-  /// Update the selected filter.
-  void updateFilter(NotificationAudience filter) {
-    emit(state.copyWith(selectedFilter: filter));
+  /// Update the selected filter and fetch filtered notifications.
+  Future<void> updateFilter(NotificationAudience filter) async {
+    if (filter == state.selectedFilter) return;
+
+    emit(
+      state.copyWith(
+        selectedFilter: filter,
+        loadStatus: NotificationLoadStatus.loading,
+        clearErrorMessage: true,
+      ),
+    );
+
+    try {
+      final response = await _repository.getNotifications(
+        page: 1,
+        pageSize: _pageSize,
+        filter: filter.apiValue,
+      );
+
+      emit(
+        state.copyWith(
+          loadStatus: NotificationLoadStatus.success,
+          notifications: response.results,
+          currentPage: response.page,
+          totalPages: response.totalPages,
+          totalCount: response.count,
+          hasMore: response.hasMore,
+        ),
+      );
+    } on ApiException catch (e) {
+      emit(
+        state.copyWith(
+          loadStatus: NotificationLoadStatus.failure,
+          errorMessage: e.message,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          loadStatus: NotificationLoadStatus.failure,
+          errorMessage: 'Failed to filter notifications. Please try again.',
+        ),
+      );
+    }
   }
 
   // ==================== Form Field Updates ====================

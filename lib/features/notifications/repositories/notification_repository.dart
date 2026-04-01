@@ -21,14 +21,20 @@ class NotificationRepository {
   ///
   /// [page] - The page number (1-indexed).
   /// [pageSize] - The number of items per page (default: 10).
+  /// [filter] - Optional filter for notification type (ALL, STUDENT, EMPLOYEE, GUARDIAN).
   ///
   /// Throws [ApiException] if the request fails.
   Future<NotificationListResponse> getNotifications({
     int page = 1,
     int pageSize = 10,
+    String? filter,
   }) async {
     try {
       final queryParams = <String, dynamic>{'page': page, 'pagesize': pageSize};
+
+      if (filter != null && filter.isNotEmpty) {
+        queryParams['filter'] = filter;
+      }
 
       final response = await _apiClient.get(
         Endpoints.notifications,
