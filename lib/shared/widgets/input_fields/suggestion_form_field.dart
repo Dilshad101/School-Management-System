@@ -89,7 +89,8 @@ class SuggestionFormField<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasPermission = permission != null
         ? context.read<UserBloc>().state.hasPermission(permission!)
-        : false;
+        /// If no specific permission is required, field is visible by default
+        : true;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
