@@ -10,7 +10,6 @@ import 'package:school_management_system/shared/styles/app_styles.dart';
 import 'package:school_management_system/shared/widgets/buttons/floating_action_button.dart';
 
 import '../../../../core/utils/di.dart';
-import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../../shared/widgets/input_fields/search_field.dart';
 import '../../blocs/students/students_bloc.dart';
 import '../../blocs/students/students_event.dart';
@@ -39,21 +38,21 @@ class _StudentsViewContent extends StatefulWidget {
 }
 
 class _StudentsViewContentState extends State<_StudentsViewContent> {
-  final _classes = const ['Class 1', 'Class 2', 'Class 3'];
-  final _divisions = const ['Division A', 'Division B', 'Division C'];
+  // final _classes = const ['Class 1', 'Class 2', 'Class 3'];
+  // final _divisions = const ['Division A', 'Division B', 'Division C'];
 
-  String? _selectedClass;
-  String? _selectedDivision;
+  // String? _selectedClass;
+  // String? _selectedDivision;
 
-  late ValueNotifier<bool> _allSelectedNotifier;
+  // late ValueNotifier<bool> _allSelectedNotifier;
   late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    _selectedClass = _classes.isEmpty ? null : _classes.first;
-    _selectedDivision = _divisions.isEmpty ? null : _divisions.first;
-    _allSelectedNotifier = ValueNotifier<bool>(true);
+    // _selectedClass = _classes.isEmpty ? null : _classes.first;
+    // _selectedDivision = _divisions.isEmpty ? null : _divisions.first;
+    // _allSelectedNotifier = ValueNotifier<bool>(true);
     _scrollController = ScrollController();
 
     _scrollController.addListener(_onScroll);
@@ -61,7 +60,7 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
 
   @override
   void dispose() {
-    _allSelectedNotifier.dispose();
+    // _allSelectedNotifier.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -93,40 +92,40 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
           children: [
             // Search bar with filter button
             AppSearchBar(onChanged: _onSearchChanged),
-            const SizedBox(height: 10),
+            // const SizedBox(height: 10),
 
-            // filter and sort options
-            ValueListenableBuilder(
-              valueListenable: _allSelectedNotifier,
-              builder: (context, value, child) {
-                return Row(
-                  spacing: 8,
-                  children: [
-                    _buildAllChip(value),
-                    FilterDropdown<String>(
-                      items: _classes,
-                      value: _selectedClass,
-                      onChanged: (value) {
-                        if (value == null) return;
-                        _selectedClass = value;
-                        _allSelectedNotifier.value = false;
-                      },
-                      hintText: 'Class',
-                    ),
-                    FilterDropdown<String>(
-                      items: _divisions,
-                      value: _selectedDivision,
-                      onChanged: (value) {
-                        if (value == null) return;
-                        _selectedDivision = value;
-                        _allSelectedNotifier.value = false;
-                      },
-                      hintText: 'Division',
-                    ),
-                  ],
-                );
-              },
-            ),
+            // // filter and sort options
+            // ValueListenableBuilder(
+            //   valueListenable: _allSelectedNotifier,
+            //   builder: (context, value, child) {
+            //     return Row(
+            //       spacing: 8,
+            //       children: [
+            //         _buildAllChip(value),
+            //         FilterDropdown<String>(
+            //           items: _classes,
+            //           value: _selectedClass,
+            //           onChanged: (value) {
+            //             if (value == null) return;
+            //             _selectedClass = value;
+            //             _allSelectedNotifier.value = false;
+            //           },
+            //           hintText: 'Class',
+            //         ),
+            //         FilterDropdown<String>(
+            //           items: _divisions,
+            //           value: _selectedDivision,
+            //           onChanged: (value) {
+            //             if (value == null) return;
+            //             _selectedDivision = value;
+            //             _allSelectedNotifier.value = false;
+            //           },
+            //           hintText: 'Division',
+            //         ),
+            //       ],
+            //     );
+            //   },
+            // ),
             const SizedBox(height: 16),
             // Students list
             Expanded(
@@ -297,28 +296,28 @@ class _StudentsViewContentState extends State<_StudentsViewContent> {
     );
   }
 
-  Widget _buildAllChip(bool isSelected) {
-    return InkWell(
-      onTap: () {
-        _allSelectedNotifier.value = true;
-        context.read<StudentsBloc>().add(const StudentsSearchCleared());
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? null
-              : Border.all(color: AppColors.border.withAlpha(180)),
-        ),
-        child: Text(
-          'All',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: isSelected ? Colors.white : AppColors.textPrimary,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildAllChip(bool isSelected) {
+  //   return InkWell(
+  //     onTap: () {
+  //       _allSelectedNotifier.value = true;
+  //       context.read<StudentsBloc>().add(const StudentsSearchCleared());
+  //     },
+  //     child: Container(
+  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  //       decoration: BoxDecoration(
+  //         color: isSelected ? AppColors.primary : AppColors.white,
+  //         borderRadius: BorderRadius.circular(8),
+  //         border: isSelected
+  //             ? null
+  //             : Border.all(color: AppColors.border.withAlpha(180)),
+  //       ),
+  //       child: Text(
+  //         'All',
+  //         style: AppTextStyles.bodySmall.copyWith(
+  //           color: isSelected ? Colors.white : AppColors.textPrimary,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }
