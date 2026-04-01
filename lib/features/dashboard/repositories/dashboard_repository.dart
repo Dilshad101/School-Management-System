@@ -110,6 +110,68 @@ class DashboardRepository {
     }
   }
 
+  /// Fetches today's student timetable.
+  Future<TodayTimetableResponse> getStudentTimetable() async {
+    try {
+      final response = await _apiClient.get(Endpoints.studentTimetables);
+
+      if (response.statusCode != null &&
+          (response.statusCode! < 200 || response.statusCode! >= 300)) {
+        throw ApiException(
+          message: 'Failed to fetch student timetable',
+          statusCode: response.statusCode,
+        );
+      }
+
+      if (response.data == null) {
+        throw const ApiException(message: 'Empty response from server');
+      }
+
+      final responseData = response.data as Map<String, dynamic>;
+      final data = responseData['data'] as Map<String, dynamic>? ?? {};
+      return TodayTimetableResponse.fromJson(data);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    } catch (e, s) {
+      log('DashboardRepository.getStudentTimetable error: $e trace: $s');
+      if (e is ApiException) rethrow;
+      throw ApiException(
+        message: 'Failed to fetch student timetable: ${e.toString()}',
+      );
+    }
+  }
+
+  /// Fetches today's teacher timetable.
+  Future<TodayTimetableResponse> getTeacherTimetable() async {
+    try {
+      final response = await _apiClient.get(Endpoints.teacherTimetables);
+
+      if (response.statusCode != null &&
+          (response.statusCode! < 200 || response.statusCode! >= 300)) {
+        throw ApiException(
+          message: 'Failed to fetch teacher timetable',
+          statusCode: response.statusCode,
+        );
+      }
+
+      if (response.data == null) {
+        throw const ApiException(message: 'Empty response from server');
+      }
+
+      final responseData = response.data as Map<String, dynamic>;
+      final data = responseData['data'] as Map<String, dynamic>? ?? {};
+      return TodayTimetableResponse.fromJson(data);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    } catch (e, s) {
+      log('DashboardRepository.getTeacherTimetable error: $e trace: $s');
+      if (e is ApiException) rethrow;
+      throw ApiException(
+        message: 'Failed to fetch teacher timetable: ${e.toString()}',
+      );
+    }
+  }
+
   // TODO: Uncomment when API is ready
   // /// Fetches today's timetable for dashboard.
   // Future<DashboardTimetable> getTimetable() async {

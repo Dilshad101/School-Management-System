@@ -11,6 +11,8 @@ class DashboardState extends Equatable {
     this.pendingFees,
     this.lastSixMonthsPayments,
     this.timetable,
+    this.studentTimetable,
+    this.teacherTimetable,
     this.recentlyPaid,
     this.error,
   });
@@ -20,6 +22,8 @@ class DashboardState extends Equatable {
   final PendingFees? pendingFees;
   final LastSixMonthsPayments? lastSixMonthsPayments;
   final DashboardTimetable? timetable;
+  final TodayTimetableResponse? studentTimetable;
+  final TodayTimetableResponse? teacherTimetable;
   final DashboardRecentlyPaid? recentlyPaid;
   final String? error;
 
@@ -34,9 +38,19 @@ class DashboardState extends Equatable {
   double get totalPendingFees => pendingFees?.totalPending ?? 0;
   String get formattedPendingFees => pendingFees?.formattedAmount ?? '₹0';
 
-  // Timetable helpers
+  // Timetable helpers (legacy)
   List<TimetablePeriod> get periods => timetable?.periods ?? [];
   bool get hasTimetable => periods.isNotEmpty;
+
+  // Student timetable helpers
+  List<TimetablePeriod> get studentPeriods =>
+      studentTimetable?.toTimetablePeriods() ?? [];
+  bool get hasStudentTimetable => studentPeriods.isNotEmpty;
+
+  // Teacher timetable helpers
+  List<TimetablePeriod> get teacherPeriods =>
+      teacherTimetable?.toTimetablePeriods() ?? [];
+  bool get hasTeacherTimetable => teacherPeriods.isNotEmpty;
 
   // Recently paid helpers
   List<RecentlyPaidFee> get recentPayments => recentlyPaid?.payments ?? [];
@@ -48,6 +62,8 @@ class DashboardState extends Equatable {
     PendingFees? pendingFees,
     LastSixMonthsPayments? lastSixMonthsPayments,
     DashboardTimetable? timetable,
+    TodayTimetableResponse? studentTimetable,
+    TodayTimetableResponse? teacherTimetable,
     DashboardRecentlyPaid? recentlyPaid,
     String? error,
     bool clearError = false,
@@ -59,6 +75,8 @@ class DashboardState extends Equatable {
       lastSixMonthsPayments:
           lastSixMonthsPayments ?? this.lastSixMonthsPayments,
       timetable: timetable ?? this.timetable,
+      studentTimetable: studentTimetable ?? this.studentTimetable,
+      teacherTimetable: teacherTimetable ?? this.teacherTimetable,
       recentlyPaid: recentlyPaid ?? this.recentlyPaid,
       error: clearError ? null : (error ?? this.error),
     );
@@ -71,6 +89,8 @@ class DashboardState extends Equatable {
     pendingFees,
     lastSixMonthsPayments,
     timetable,
+    studentTimetable,
+    teacherTimetable,
     recentlyPaid,
     error,
   ];

@@ -235,19 +235,34 @@ class _DashboardContent extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              // Timetable Section - requires view_timetable permission
+                              // Student Timetable Section - requires view_student_timetable permission
                               PermissionBuilder(
-                                permissions: [
-                                  Permissions.viewTimetable,
-                                  Permissions.viewTeacherTimetable,
-                                ],
+                                permission: Permissions.viewStudentTimetable,
                                 child: Column(
                                   children: [
                                     TimetableSection(
-                                      periods: state.periods,
+                                      title: 'Student Timetable',
+                                      periods: state.studentPeriods,
                                       isLoading: state.isLoading,
                                       onViewAll: () {
-                                        // TODO: Navigate to timetable page
+                                        // TODO: Navigate to student timetable page
+                                      },
+                                    ),
+                                    const SizedBox(height: 24),
+                                  ],
+                                ),
+                              ),
+                              // Teacher Timetable Section - requires view_teacher_timetable permission
+                              PermissionBuilder(
+                                permission: Permissions.viewTeacherTimetable,
+                                child: Column(
+                                  children: [
+                                    TimetableSection(
+                                      title: 'Teacher Timetable',
+                                      periods: state.teacherPeriods,
+                                      isLoading: state.isLoading,
+                                      onViewAll: () {
+                                        // TODO: Navigate to teacher timetable page
                                       },
                                     ),
                                     const SizedBox(height: 24),

@@ -158,6 +158,222 @@ class LastSixMonthsPayments extends Equatable {
 /// Status for timetable periods.
 enum TimetablePeriodStatus { completed, liveNow, upcoming }
 
+/// Model for period info in timetable entry.
+class TimetablePeriodInfo extends Equatable {
+  const TimetablePeriodInfo({
+    required this.id,
+    required this.order,
+    required this.startTime,
+    required this.endTime,
+  });
+
+  final String id;
+  final int order;
+  final String startTime;
+  final String endTime;
+
+  factory TimetablePeriodInfo.fromJson(Map<String, dynamic> json) {
+    return TimetablePeriodInfo(
+      id: json['id']?.toString() ?? '',
+      order: json['order'] ?? 0,
+      startTime: json['start_time'] ?? '',
+      endTime: json['end_time'] ?? '',
+    );
+  }
+
+  @override
+  List<Object?> get props => [id, order, startTime, endTime];
+}
+
+/// Model for classroom info in timetable entry.
+class TimetableClassroomInfo extends Equatable {
+  const TimetableClassroomInfo({
+    required this.id,
+    required this.name,
+    required this.code,
+  });
+
+  final String id;
+  final String name;
+  final String code;
+
+  factory TimetableClassroomInfo.fromJson(Map<String, dynamic> json) {
+    return TimetableClassroomInfo(
+      id: json['id']?.toString() ?? '',
+      name: json['name'] ?? '',
+      code: json['code'] ?? '',
+    );
+  }
+
+  @override
+  List<Object?> get props => [id, name, code];
+}
+
+/// Model for subject info in timetable entry.
+class TimetableSubjectInfo extends Equatable {
+  const TimetableSubjectInfo({
+    required this.id,
+    required this.code,
+    required this.name,
+  });
+
+  final String id;
+  final String code;
+  final String name;
+
+  factory TimetableSubjectInfo.fromJson(Map<String, dynamic> json) {
+    return TimetableSubjectInfo(
+      id: json['id']?.toString() ?? '',
+      code: json['code'] ?? '',
+      name: json['name'] ?? '',
+    );
+  }
+
+  @override
+  List<Object?> get props => [id, code, name];
+}
+
+/// Model for teacher info in timetable entry.
+class TimetableTeacherInfo extends Equatable {
+  const TimetableTeacherInfo({
+    required this.id,
+    required this.userId,
+    required this.name,
+    required this.email,
+  });
+
+  final String id;
+  final String userId;
+  final String name;
+  final String email;
+
+  factory TimetableTeacherInfo.fromJson(Map<String, dynamic> json) {
+    return TimetableTeacherInfo(
+      id: json['id']?.toString() ?? '',
+      userId: json['user_id']?.toString() ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+    );
+  }
+
+  @override
+  List<Object?> get props => [id, userId, name, email];
+}
+
+/// Model for a today's class entry from student/teacher timetable API.
+class TodayClassEntry extends Equatable {
+  const TodayClassEntry({
+    required this.id,
+    required this.dayOfWeek,
+    required this.status,
+    required this.period,
+    required this.classroom,
+    required this.subject,
+    required this.teacher,
+  });
+
+  final String id;
+  final int dayOfWeek;
+  final TimetablePeriodStatus status;
+  final TimetablePeriodInfo period;
+  final TimetableClassroomInfo classroom;
+  final TimetableSubjectInfo subject;
+  final TimetableTeacherInfo teacher;
+
+  factory TodayClassEntry.fromJson(Map<String, dynamic> json) {
+    return TodayClassEntry(
+      id: json['id']?.toString() ?? '',
+      dayOfWeek: json['day_of_week'] ?? 0,
+      status: _parseStatus(json['status']),
+      period: TimetablePeriodInfo.fromJson(
+        json['period'] as Map<String, dynamic>? ?? {},
+      ),
+      classroom: TimetableClassroomInfo.fromJson(
+        json['classroom'] as Map<String, dynamic>? ?? {},
+      ),
+      subject: TimetableSubjectInfo.fromJson(
+        json['subject'] as Map<String, dynamic>? ?? {},
+      ),
+      teacher: TimetableTeacherInfo.fromJson(
+        json['teacher'] as Map<String, dynamic>? ?? {},
+      ),
+    );
+  }
+
+  static TimetablePeriodStatus _parseStatus(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'completed':
+        return TimetablePeriodStatus.completed;
+      case 'live_now':
+      case 'live':
+        return TimetablePeriodStatus.liveNow;
+      case 'upcoming':
+      default:
+        return TimetablePeriodStatus.upcoming;
+    }
+  }
+
+  /// Convert to TimetablePeriod for UI compatibility.
+  TimetablePeriod toTimetablePeriod() {
+    return TimetablePeriod(
+      id: id,
+      periodNumber: period.order,
+      startTime: period.startTime,
+      endTime: period.endTime,
+      subjectName: subject.name,
+      className: classroom.name,
+      roomName: teacher.name,
+      status: status,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    id,
+    dayOfWeek,
+    status,
+    period,
+    classroom,
+    subject,
+    teacher,
+  ];
+}
+
+/// Model for student/teacher timetable API response.
+class TodayTimetableResponse extends Equatable {
+  const TodayTimetableResponse({
+    required this.date,
+    required this.dayOfWeek,
+    this.classroomId,
+    required this.todayClasses,
+  });
+
+  final String date;
+  final int dayOfWeek;
+  final String? classroomId;
+  final List<TodayClassEntry> todayClasses;
+
+  factory TodayTimetableResponse.fromJson(Map<String, dynamic> json) {
+    final classesJson = json['today_classes'] as List<dynamic>? ?? [];
+    return TodayTimetableResponse(
+      date: json['date']?.toString() ?? '',
+      dayOfWeek: json['day_of_week'] ?? 0,
+      classroomId: json['classroom_id']?.toString(),
+      todayClasses: classesJson
+          .map((e) => TodayClassEntry.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  /// Convert to list of TimetablePeriod for UI compatibility.
+  List<TimetablePeriod> toTimetablePeriods() {
+    return todayClasses.map((e) => e.toTimetablePeriod()).toList();
+  }
+
+  @override
+  List<Object?> get props => [date, dayOfWeek, classroomId, todayClasses];
+}
+
 /// Model for a timetable period.
 class TimetablePeriod extends Equatable {
   const TimetablePeriod({

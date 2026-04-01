@@ -65,6 +65,8 @@ class Endpoints {
   // Periods/Timetable endpoints
   static const String periods = '/v1/academics/periods/';
   static const String timetables = '/v1/academics/timetables/';
+  static const String studentTimetables = '/v1/academics/student-timetables/';
+  static const String teacherTimetables = '/v1/academics/teacher-timetables/';
 
   // Chat/Communication endpoints
   static const String chat = '/v1/communication/chat/';

@@ -58,6 +58,18 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         futureKeys.add('lastSixMonthsPayments');
       }
 
+      // Student timetable - requires view_student_timetable
+      if (_hasPermission(permissions, Permissions.viewStudentTimetable)) {
+        futures.add(_dashboardRepository.getStudentTimetable());
+        futureKeys.add('studentTimetable');
+      }
+
+      // Teacher timetable - requires view_teacher_timetable
+      if (_hasPermission(permissions, Permissions.viewTeacherTimetable)) {
+        futures.add(_dashboardRepository.getTeacherTimetable());
+        futureKeys.add('teacherTimetable');
+      }
+
       // TODO: Uncomment when API is ready
       // Timetable - requires view_timetable
       // if (_hasPermission(permissions, Permissions.viewTimetable)) {
@@ -85,8 +97,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       DashboardTimetable? mockTimetable;
       DashboardRecentlyPaid? mockRecentlyPaid;
 
-      if (_hasPermission(permissions, Permissions.viewTimetable) ||
-          _hasPermission(permissions, Permissions.viewTeacherTimetable)) {
+      if (_hasPermission(permissions, Permissions.viewTimetable)) {
         mockTimetable = _getMockTimetable();
       }
 
@@ -103,6 +114,10 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
           pendingFees: resultMap['pendingFees'] as PendingFees?,
           lastSixMonthsPayments:
               resultMap['lastSixMonthsPayments'] as LastSixMonthsPayments?,
+          studentTimetable:
+              resultMap['studentTimetable'] as TodayTimetableResponse?,
+          teacherTimetable:
+              resultMap['teacherTimetable'] as TodayTimetableResponse?,
           timetable: mockTimetable,
           recentlyPaid: mockRecentlyPaid,
         ),
@@ -146,6 +161,18 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         futureKeys.add('lastSixMonthsPayments');
       }
 
+      // Student timetable - requires view_student_timetable
+      if (_hasPermission(permissions, Permissions.viewStudentTimetable)) {
+        futures.add(_dashboardRepository.getStudentTimetable());
+        futureKeys.add('studentTimetable');
+      }
+
+      // Teacher timetable - requires view_teacher_timetable
+      if (_hasPermission(permissions, Permissions.viewTeacherTimetable)) {
+        futures.add(_dashboardRepository.getTeacherTimetable());
+        futureKeys.add('teacherTimetable');
+      }
+
       final results = await Future.wait(futures);
 
       final resultMap = <String, dynamic>{};
@@ -157,8 +184,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       DashboardTimetable? mockTimetable;
       DashboardRecentlyPaid? mockRecentlyPaid;
 
-      if (_hasPermission(permissions, Permissions.viewTimetable) ||
-          _hasPermission(permissions, Permissions.viewTeacherTimetable)) {
+      if (_hasPermission(permissions, Permissions.viewTimetable)) {
         mockTimetable = _getMockTimetable();
       }
 
@@ -178,6 +204,12 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
           lastSixMonthsPayments:
               resultMap['lastSixMonthsPayments'] as LastSixMonthsPayments? ??
               state.lastSixMonthsPayments,
+          studentTimetable:
+              resultMap['studentTimetable'] as TodayTimetableResponse? ??
+              state.studentTimetable,
+          teacherTimetable:
+              resultMap['teacherTimetable'] as TodayTimetableResponse? ??
+              state.teacherTimetable,
           timetable: mockTimetable ?? state.timetable,
           recentlyPaid: mockRecentlyPaid ?? state.recentlyPaid,
           clearError: true,

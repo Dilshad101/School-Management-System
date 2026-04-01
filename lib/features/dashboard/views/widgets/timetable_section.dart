@@ -8,11 +8,13 @@ class TimetableSection extends StatelessWidget {
   const TimetableSection({
     super.key,
     required this.periods,
+    this.title = 'Timetable',
     this.isLoading = false,
     this.onViewAll,
   });
 
   final List<TimetablePeriod> periods;
+  final String title;
   final bool isLoading;
   final VoidCallback? onViewAll;
 
@@ -33,7 +35,7 @@ class TimetableSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Timetable',
+                title,
                 style: AppTextStyles.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
