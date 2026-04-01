@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
+import 'package:school_management_system/shared/widgets/no_permission_view.dart';
+import 'package:school_management_system/shared/widgets/permission_builder.dart';
 
 import '../../../core/router/route_paths.dart';
 import '../../../core/utils/di.dart';
 import '../../../shared/styles/app_styles.dart';
 import '../../../shared/widgets/input_fields/search_field.dart';
+import '../../auth/blocs/user/user_bloc.dart';
 import '../blocs/chat_list/chat_list_bloc.dart';
 import '../repositories/chat_repository.dart';
 import 'widgets/chat_filter_chip.dart';
@@ -17,11 +21,20 @@ class ChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          ChatListBloc(chatRepository: locator<ChatRepository>())
-            ..add(const FetchChatUsers()),
-      child: const _ChatPageContent(),
+    return PermissionBuilder(
+      permission: Permissions.viewChat,
+      fallback: const NoPermissionView(
+        title: 'Chat Access Restricted',
+        showGoBackButton: false,
+        message:
+            'You don\'t have permission to access the chat feature. Please contact your administrator.',
+      ),
+      child: BlocProvider(
+        create: (context) =>
+            ChatListBloc(chatRepository: locator<ChatRepository>())
+              ..add(const FetchChatUsers()),
+        child: const _ChatPageContent(),
+      ),
     );
   }
 }
@@ -35,7 +48,26 @@ class _ChatPageContent extends StatefulWidget {
 
 class _ChatPageContentState extends State<_ChatPageContent> {
   int _selectedFilterIndex = 0;
-  final _filters = const ['All', 'Employees', 'Guardians', 'Students'];
+  final _filters = [];
+
+  @override
+  void initState() {
+    _filters.add('All');
+
+    /// check view_user, view_guardian, and view_student feature flags and add unavailable filters
+    if (context.read<UserBloc>().state.hasPermission(Permissions.viewUser)) {
+      _filters.add('Users');
+    }
+    if (context.read<UserBloc>().state.hasPermission(
+      Permissions.viewGuardian,
+    )) {
+      _filters.add('Guardians');
+    }
+    if (context.read<UserBloc>().state.hasPermission(Permissions.viewStudent)) {
+      _filters.add('Students');
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
