@@ -53,9 +53,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       // Pending fees - requires view_fee
       if (_hasPermission(permissions, Permissions.viewReports)) {
         futures.add(_dashboardRepository.getPendingFees());
+        futureKeys.add('pendingFees');
         futures.add(_dashboardRepository.getLastSixMonthsPayments());
         futureKeys.add('lastSixMonthsPayments');
-        futureKeys.add('pendingFees');
       }
 
       // TODO: Uncomment when API is ready
@@ -141,9 +141,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
       if (_hasPermission(permissions, Permissions.viewReports)) {
         futures.add(_dashboardRepository.getPendingFees());
+        futureKeys.add('pendingFees');
         futures.add(_dashboardRepository.getLastSixMonthsPayments());
         futureKeys.add('lastSixMonthsPayments');
-        futureKeys.add('pendingFees');
       }
 
       final results = await Future.wait(futures);
