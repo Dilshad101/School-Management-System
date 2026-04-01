@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
+import 'package:school_management_system/shared/widgets/permission_builder.dart';
 
 import '../../../../../../core/utils/di.dart';
 import '../../../../../../shared/styles/app_styles.dart';
@@ -179,11 +181,14 @@ class _SubjectTabViewContentState extends State<_SubjectTabViewContent> {
   }
 
   Widget _buildBottomBar(SubjectState state) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-        child: _AddSubjectButton(
-          onTap: state.isActionLoading ? null : _onAddSubject,
+    return PermissionBuilder(
+      permission: Permissions.addSubject,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+          child: _AddSubjectButton(
+            onTap: state.isActionLoading ? null : _onAddSubject,
+          ),
         ),
       ),
     );
