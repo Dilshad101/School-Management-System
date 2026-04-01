@@ -5,7 +5,6 @@ import '../../../../core/tenant/tenant_context.dart';
 import '../../../../core/utils/di.dart';
 import '../../../../shared/styles/app_styles.dart';
 import '../../../../shared/widgets/buttons/floating_action_button.dart';
-import '../../../../shared/widgets/dropdowns/filter_dropdown.dart';
 import '../../../../shared/widgets/input_fields/search_field.dart';
 import '../../blocs/fees/fees_bloc.dart';
 import '../../blocs/fees/fees_event.dart';
@@ -14,7 +13,6 @@ import '../../models/student_fee_model.dart';
 import '../../repositories/fees_repository.dart';
 import 'widgets/add_payment_bottom_sheet.dart';
 import 'widgets/create_fee_bottom_sheet.dart';
-import 'widgets/fee_summary_card.dart';
 import 'widgets/fee_tile.dart';
 
 class FeesView extends StatelessWidget {
@@ -39,23 +37,23 @@ class _FeesViewContent extends StatefulWidget {
 }
 
 class _FeesViewContentState extends State<_FeesViewContent> {
-  final _classes = const ['Class 1', 'Class 2', 'Class 3'];
-  final _divisions = const ['Division A', 'Division B', 'Division C'];
-  final _paymentStatuses = const ['Paid', 'Unpaid', 'Partial'];
-  String? _selectedClass;
-  String? _selectedDivision;
-  String? _selectedPaymentStatus;
+  // final _classes = const ['Class 1', 'Class 2', 'Class 3'];
+  // final _divisions = const ['Division A', 'Division B', 'Division C'];
+  // final _paymentStatuses = const ['Paid', 'Unpaid', 'Partial'];
+  // String? _selectedClass;
+  // String? _selectedDivision;
+  // String? _selectedPaymentStatus;
 
-  late ValueNotifier<bool> _allSelectedNotifier;
+  // late ValueNotifier<bool> _allSelectedNotifier;
   late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    _selectedClass = _classes.isNotEmpty ? _classes.first : null;
-    _selectedDivision = _divisions.isNotEmpty ? _divisions.first : null;
-    _selectedPaymentStatus = 'Paid';
-    _allSelectedNotifier = ValueNotifier<bool>(true);
+    // _selectedClass = _classes.isNotEmpty ? _classes.first : null;
+    // _selectedDivision = _divisions.isNotEmpty ? _divisions.first : null;
+    // _selectedPaymentStatus = 'Paid';
+    // _allSelectedNotifier = ValueNotifier<bool>(true);
     _scrollController = ScrollController();
 
     _scrollController.addListener(_onScroll);
@@ -63,7 +61,7 @@ class _FeesViewContentState extends State<_FeesViewContent> {
 
   @override
   void dispose() {
-    _allSelectedNotifier.dispose();
+    // _allSelectedNotifier.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -93,61 +91,61 @@ class _FeesViewContentState extends State<_FeesViewContent> {
         controller: _scrollController,
         slivers: [
           // Summary cards - Scrollable (hides on scroll)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  // Summary cards - Row 1
-                  Row(
-                    children: [
-                      Expanded(
-                        child: FeeSummaryCard(
-                          label: 'Total Fee Structures',
-                          value: '15',
-                          percentageChange: '+1.2% this Year',
-                          isPositive: true,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: FeeSummaryCard(
-                          label: 'Total Payments Collected',
-                          value: '₹50,000',
-                          percentageChange: '+1.2% this Year',
-                          isPositive: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  // Summary cards - Row 2
-                  Row(
-                    children: [
-                      Expanded(
-                        child: FeeSummaryCard(
-                          label: 'Pending Dues',
-                          value: '₹10,000',
-                          percentageChange: '- 1.2% this Year',
-                          isPositive: false,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: FeeSummaryCard(
-                          label: 'Overdue Fees',
-                          value: '₹20,000',
-                          percentageChange: '+1.2% this Year',
-                          isPositive: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //     child: Column(
+          //       children: [
+          //         // Summary cards - Row 1
+          //         Row(
+          //           children: [
+          //             Expanded(
+          //               child: FeeSummaryCard(
+          //                 label: 'Total Fee Structures',
+          //                 value: '15',
+          //                 percentageChange: '+1.2% this Year',
+          //                 isPositive: true,
+          //               ),
+          //             ),
+          //             const SizedBox(width: 10),
+          //             Expanded(
+          //               child: FeeSummaryCard(
+          //                 label: 'Total Payments Collected',
+          //                 value: '₹50,000',
+          //                 percentageChange: '+1.2% this Year',
+          //                 isPositive: true,
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //         const SizedBox(height: 10),
+          //         // Summary cards - Row 2
+          //         Row(
+          //           children: [
+          //             Expanded(
+          //               child: FeeSummaryCard(
+          //                 label: 'Pending Dues',
+          //                 value: '₹10,000',
+          //                 percentageChange: '- 1.2% this Year',
+          //                 isPositive: false,
+          //               ),
+          //             ),
+          //             const SizedBox(width: 10),
+          //             Expanded(
+          //               child: FeeSummaryCard(
+          //                 label: 'Overdue Fees',
+          //                 value: '₹20,000',
+          //                 percentageChange: '+1.2% this Year',
+          //                 isPositive: true,
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //         const SizedBox(height: 16),
+          //       ],
+          //     ),
+          //   ),
+          // ),
 
           // Search bar and filter chips - Sticky header
           SliverPersistentHeader(
@@ -158,56 +156,56 @@ class _FeesViewContentState extends State<_FeesViewContent> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    const Spacer(),
                     // Search bar
                     AppSearchBar(onChanged: _onSearchChanged),
-                    const SizedBox(height: 4),
+                    // const SizedBox(height: 4),
                     // Filter chips
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: ValueListenableBuilder(
-                        valueListenable: _allSelectedNotifier,
-                        builder: (context, value, child) {
-                          return Row(
-                            spacing: 8,
-                            children: [
-                              _buildAllChip(value),
-                              FilterDropdown<String>(
-                                items: _paymentStatuses,
-                                value: _selectedPaymentStatus,
-                                onChanged: (value) {
-                                  if (value == null) return;
-                                  _selectedPaymentStatus = value;
-                                  _allSelectedNotifier.value = false;
-                                },
-                                hintText: '',
-                              ),
-                              FilterDropdown<String>(
-                                items: _classes,
-                                value: _selectedClass,
-                                onChanged: (value) {
-                                  if (value == null) return;
-                                  _selectedClass = value;
-                                  _allSelectedNotifier.value = false;
-                                },
-                                hintText: 'Class',
-                              ),
-                              FilterDropdown<String>(
-                                items: _divisions,
-                                value: _selectedDivision,
-                                onChanged: (value) {
-                                  if (value == null) return;
-                                  _selectedDivision = value;
-                                  _allSelectedNotifier.value = false;
-                                },
-                                hintText: 'Division',
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
+                    // SingleChildScrollView(
+                    //   scrollDirection: Axis.horizontal,
+                    //   child: ValueListenableBuilder(
+                    //     valueListenable: _allSelectedNotifier,
+                    //     builder: (context, value, child) {
+                    //       return Row(
+                    //         spacing: 8,
+                    //         children: [
+                    //           _buildAllChip(value),
+                    //           FilterDropdown<String>(
+                    //             items: _paymentStatuses,
+                    //             value: _selectedPaymentStatus,
+                    //             onChanged: (value) {
+                    //               if (value == null) return;
+                    //               _selectedPaymentStatus = value;
+                    //               _allSelectedNotifier.value = false;
+                    //             },
+                    //             hintText: '',
+                    //           ),
+                    //           FilterDropdown<String>(
+                    //             items: _classes,
+                    //             value: _selectedClass,
+                    //             onChanged: (value) {
+                    //               if (value == null) return;
+                    //               _selectedClass = value;
+                    //               _allSelectedNotifier.value = false;
+                    //             },
+                    //             hintText: 'Class',
+                    //           ),
+                    //           FilterDropdown<String>(
+                    //             items: _divisions,
+                    //             value: _selectedDivision,
+                    //             onChanged: (value) {
+                    //               if (value == null) return;
+                    //               _selectedDivision = value;
+                    //               _allSelectedNotifier.value = false;
+                    //             },
+                    //             hintText: 'Division',
+                    //           ),
+                    //         ],
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
                     const SizedBox(height: 12),
                   ],
                 ),
@@ -361,30 +359,30 @@ class _FeesViewContentState extends State<_FeesViewContent> {
     return locator<TenantContext>().selectedSchoolId ?? '';
   }
 
-  Widget _buildAllChip(bool isSelected) {
-    return InkWell(
-      onTap: () {
-        _allSelectedNotifier.value = true;
-        context.read<FeesBloc>().add(const FeesSearchCleared());
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? null
-              : Border.all(color: AppColors.border.withAlpha(180)),
-        ),
-        child: Text(
-          'All',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: isSelected ? Colors.white : AppColors.textPrimary,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildAllChip(bool isSelected) {
+  //   return InkWell(
+  //     onTap: () {
+  //       _allSelectedNotifier.value = true;
+  //       context.read<FeesBloc>().add(const FeesSearchCleared());
+  //     },
+  //     child: Container(
+  //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  //       decoration: BoxDecoration(
+  //         color: isSelected ? AppColors.primary : AppColors.white,
+  //         borderRadius: BorderRadius.circular(8),
+  //         border: isSelected
+  //             ? null
+  //             : Border.all(color: AppColors.border.withAlpha(180)),
+  //       ),
+  //       child: Text(
+  //         'All',
+  //         style: AppTextStyles.bodySmall.copyWith(
+  //           color: isSelected ? Colors.white : AppColors.textPrimary,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }
 
 /// Custom delegate for sticky header with fixed height
@@ -394,10 +392,10 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   _StickyHeaderDelegate({required this.child});
 
   @override
-  double get minExtent => 110;
+  double get minExtent => 68;
 
   @override
-  double get maxExtent => 110;
+  double get maxExtent => 68;
 
   @override
   Widget build(

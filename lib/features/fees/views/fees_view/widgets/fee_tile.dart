@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:school_management_system/core/auth/permissions.dart';
+import 'package:school_management_system/features/auth/blocs/user/user_bloc.dart';
 
 import '../../../../../shared/styles/app_styles.dart';
 import '../../../models/student_fee_model.dart';
@@ -12,6 +15,7 @@ class FeeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPermission = context.read<UserBloc>().state.hasPermission;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -54,7 +58,8 @@ class FeeTile extends StatelessWidget {
                     _buildStatusBadge(),
                     const SizedBox(width: 8),
                     // Payment button
-                    _PaymentButton(onTap: onAddPayment),
+                    if (hasPermission(Permissions.collectPayment))
+                      _PaymentButton(onTap: onAddPayment),
                   ],
                 ),
               ],
